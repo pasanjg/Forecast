@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: Center(
         child: Text(
-          "Home Page",
+          DotEnv().env['APP_NAME'],
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),

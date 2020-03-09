@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 import 'package:forecast/pages/home.dart';
 
-void main() => runApp(Forecast());
+Future main() async {
+  await DotEnv().load('.env');
+  runApp(Forecast());
+}
 
 class Forecast extends StatelessWidget {
   @override
