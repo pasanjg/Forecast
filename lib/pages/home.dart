@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:forecast/pages/weather_animations_list.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -14,11 +15,27 @@ class _HomePageState extends State<HomePage> {
         title: Text("Home"),
       ),
       body: Center(
-        child: Text(
-          DotEnv().env['APP_NAME'],
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+        child: Column(
+          children: <Widget>[
+            Text(
+              DotEnv().env['APP_NAME'],
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            FlatButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FlareAnimationsPage(),
+                  ),
+                );
+              },
+              color: Colors.blueAccent,
+              child: Text("View Animations"),
+            ),
+          ],
         ),
       ),
     );
