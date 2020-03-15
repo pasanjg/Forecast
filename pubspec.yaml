@@ -25,6 +25,7 @@ dependencies:
   cloud_firestore: ^0.13.4+1
   flutter_dotenv: ^2.1.0
   flare_flutter: ^2.0.1
+  http: ^0.12.0+4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -54,6 +55,7 @@ flutter:
   assets:
     - assets/images/
     - assets/flare_animations/
+    - assets/json/
     - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see

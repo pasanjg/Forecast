@@ -3,8 +3,9 @@ import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forecast/models/open_weather_map_api.dart';
+import 'dart:convert' as convert;
 
-import 'package:forecast/pages/current_weather.dart';
+import 'package:forecast/components/current_weather.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,22 +21,129 @@ class _HomePageState extends State<HomePage> {
     forecast: true,
   );
 
+  final TextEditingController _searchTextField = TextEditingController();
+  String _searchText = " ";
+  List cities = new List();
+  List filteredCities = new List();
+  Icon _searchIcon = new Icon(Icons.search);
+  bool isSearching = false;
+
+  @override
+  void initState() {
+    super.initState();
+    this._getCities();
+  }
+
+  _HomePageState() {
+    _searchTextField.addListener(() {
+      setState(() {
+        if (_searchTextField.text.isEmpty) {
+          _searchText = "";
+          filteredCities = cities;
+        } else {
+          _searchText = _searchTextField.text;
+          print(_searchText);
+        }
+      });
+    });
+  }
+
+  void _getCities() async {
+    final response = await DefaultAssetBundle.of(context)
+        .loadString("assets/json/current_city_list_min.json");
+    final jsonResponse = convert.jsonDecode(response);
+    List tempList = new List();
+    for (int i = 0; i < jsonResponse.length; i++) {
+      tempList.add(jsonResponse[i]);
+      print(jsonResponse.length);
+    }
+    setState(() {
+      cities = tempList;
+      filteredCities = cities;
+    });
+  }
+
+  Widget _appBarTitle() {
+    return isSearching
+        ? TextField(
+      controller: _searchTextField,
+      decoration: InputDecoration.collapsed(
+        hintText: "Search city name",
+        hintStyle: TextStyle(
+          color: Colors.white70,
+        ),
+      ),
+    )
+        : Text(" ");
+  }
+
+  void _onSearchPressed() {
+    setState(() {
+      isSearching = isSearching ? false : true;
+      if (isSearching) {
+        _searchIcon = Icon(Icons.close);
+      } else {
+        _searchIcon = Icon(Icons.search);
+        filteredCities = cities;
+        _searchTextField.clear();
+      }
+    });
+  }
+
+  Widget _searchList() {
+    print(filteredCities.length);
+    if (_searchText.isNotEmpty) {
+      List tempList = List();
+      for (int i = 0; i < filteredCities.length; i++) {
+        if (filteredCities[i]['name']
+            .toLowerCase()
+            .contains(_searchText.toLowerCase())) {
+          tempList.add(filteredCities[i]);
+        }
+      }
+      filteredCities = tempList;
+    }
+
+    return Container(
+      color: Colors.black.withOpacity(0.9),
+      child: ListView.builder(
+        itemCount: filteredCities.length,
+        itemBuilder: (BuildContext context, int index) {
+          return ListTile(
+            onTap: () {},
+            title: Text(
+              "${filteredCities[index]['name']}",
+            ),
+            trailing: Container(
+              height: 30.0,
+              child: Image.network(
+                "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
-        backgroundColor: Theme.of(context).accentColor,
+        title: _appBarTitle(),
+        centerTitle: true,
+        backgroundColor: Theme
+            .of(context)
+            .accentColor,
         actions: <Widget>[
           IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.search,
-              color: Colors.white,
-            ),
+            onPressed: _onSearchPressed,
+            icon: _searchIcon,
           ),
         ],
       ),
+      resizeToAvoidBottomInset: false,
       drawer: Theme(
         data: Theme.of(context).copyWith(
           canvasColor: Colors.transparent,
@@ -55,11 +163,13 @@ class _HomePageState extends State<HomePage> {
                       currentAccountPicture: CircleAvatar(
                         child: Text(
                           "B",
-                          style: TextStyle(fontSize: 40.0),
+                          style: TextStyle(fontSize: 30.0),
                         ),
                         backgroundColor: Colors.white,
                       ),
-                      decoration: BoxDecoration(color: Colors.transparent),
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                      ),
                     ),
                     ListTile(
                       leading: Icon(
@@ -146,7 +256,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: CurrentWeatherPage(),
+      body: Stack(
+        children: <Widget>[
+          CurrentWeatherDetails(),
+          isSearching ? _searchList() : SizedBox.shrink()
+        ],
+      ),
     );
   }
 }
