@@ -12,7 +12,7 @@ class _FlareAnimationsPageState extends State<FlareAnimationsPage> {
     return Scaffold(
       backgroundColor: Colors.lightBlueAccent,
       appBar: AppBar(
-        title: Text("Home"),
+        title: Text("Temp Page"),
       ),
       body: Center(
         child: GridView.count(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -25,13 +26,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: Theme.of(context).accentColor,
-/*        leading: IconButton(
-          onPressed: () {},
-          icon: Icon(
-            Icons.add,
-            color: Colors.white,
-          ),
-        ),*/
         actions: <Widget>[
           IconButton(
             onPressed: () {},
@@ -40,48 +34,117 @@ class _HomePageState extends State<HomePage> {
               color: Colors.white,
             ),
           ),
-          PopupMenuButton(
-            icon: Icon(
-              Icons.more_vert,
-              color: Colors.white,
-            ),
-            elevation: 1.0,
-            color: Theme.of(context).accentColor,
-            onSelected: (value) {},
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem(
-                enabled: false,
-                value: "Toggle Mode",
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        ],
+      ),
+      drawer: Theme(
+        data: Theme.of(context).copyWith(
+          canvasColor: Colors.transparent,
+        ),
+        child: Drawer(
+          elevation: 0.0,
+          child: Container(
+            color: Colors.black.withOpacity(0.8),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
                   children: <Widget>[
-                    Text(
-                      "Switch mode",
-                      style: TextStyle(color: Colors.white),
+                    UserAccountsDrawerHeader(
+                      accountName: Text("Bruce Wayne"),
+                      accountEmail: Text("bruce@wayne.inc"),
+                      currentAccountPicture: CircleAvatar(
+                        child: Text(
+                          "B",
+                          style: TextStyle(fontSize: 40.0),
+                        ),
+                        backgroundColor: Colors.white,
+                      ),
+                      decoration: BoxDecoration(color: Colors.transparent),
                     ),
-                    Switch(
-                      value: true,
-                      onChanged: (value) {
-                        setState(() {
+                    ListTile(
+                      leading: Icon(
+                        FontAwesome5.moon,
+                        color: Colors.white70,
+                      ),
+                      title: Text(
+                        "Switch mode",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      trailing: Switch(
+                        value: false,
+                        onChanged: (value) {
+                          setState(() {
 //                          mode = value;
-                        });
+                          });
+                        },
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      leading: Icon(
+                        FontAwesomeIcons.heart,
+                        color: Colors.white70,
+                      ),
+                      title: Text("Favourites"),
+                      trailing: Icon(
+                        FontAwesomeIcons.angleRight,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FlareAnimationsPage(),
+                          ),
+                        );
                       },
-                      activeColor: Theme.of(context).primaryColor,
+                      leading: Icon(
+                        FontAwesomeIcons.cloudSunRain,
+                        color: Colors.white70,
+                      ),
+                      title: Text("Weather Animations"),
+                      trailing: Icon(
+                        FontAwesomeIcons.angleRight,
+                        color: Colors.white70,
+                      ),
                     ),
                   ],
                 ),
-              ),
-              PopupMenuItem(
-                value: "Favourites",
-                child: Text("Favourites"),
-              ),
-              PopupMenuItem(
-                value: "Settings",
-                child: Text("Settings"),
-              ),
-            ],
+                Column(
+                  children: <Widget>[
+                    ListTile(
+                      onTap: () {},
+                      leading: Icon(
+                        FontAwesomeIcons.cog,
+                        color: Colors.white70,
+                      ),
+                      title: Text("Settings"),
+                      trailing: Icon(
+                        FontAwesomeIcons.angleRight,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    ListTile(
+                      onTap: () {},
+                      leading: Icon(
+                        FontAwesomeIcons.powerOff,
+                        color: Colors.white70,
+                      ),
+                      title: Text("Log out"),
+                      trailing: Icon(
+                        FontAwesomeIcons.angleRight,
+                        color: Colors.white70,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
       body: Container(
         height: double.infinity,
@@ -100,7 +163,7 @@ class _HomePageState extends State<HomePage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
               Column(
                 children: <Widget>[
@@ -114,7 +177,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   SizedBox(
-                    height: 20.0,
+                    height: 10.0,
                   ),
                   Text(
                     "Malabe, Sri Lanka",
@@ -129,21 +192,28 @@ class _HomePageState extends State<HomePage> {
               Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
-                  Container(
-                    height: MediaQuery.of(context).size.height * 0.15,
-                    child: FlareActor(
-                      "assets/flare_animations/weather_02d.flr",
-                      fit: BoxFit.contain,
-                      animation: "02d",
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    child: Container(
+                      height: MediaQuery.of(context).size.height * 0.15,
+                      child: FlareActor(
+                        "assets/flare_animations/weather_02d.flr",
+                        fit: BoxFit.contain,
+                        animation: "02d",
+                      ),
                     ),
                   ),
                   Column(
                     children: <Widget>[
                       Text(
+                        "Few Clouds",
+                        style: TextStyle(fontSize: 14.0),
+                      ),
+                      Text(
                         "32 ‎°C",
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 40.0,
+                          fontSize: 38.0,
                         ),
                       ),
                       Text(
@@ -159,12 +229,11 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           child: Card(
                             elevation: 0.3,
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withOpacity(0.15),
                             child: Container(
-                              height: 120.0,
+                              height: 80.0,
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                padding: const EdgeInsets.all(4.0),
                                 child: Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
@@ -173,16 +242,16 @@ class _HomePageState extends State<HomePage> {
                                     Icon(
                                       FontAwesomeIcons.thermometerFull,
                                       color: Colors.white,
-                                      size: 32.0,
+                                      size: 24.0,
                                     ),
                                     Text(
                                       "32 °C",
                                       style: TextStyle(
                                           fontWeight: FontWeight.w400,
-                                          fontSize: 18.0),
+                                          fontSize: 16.0),
                                     ),
                                     Text(
-                                      "Max Temp",
+                                      "Max. Temp",
                                       textAlign: TextAlign.center,
                                     ),
                                   ],
@@ -194,12 +263,11 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           child: Card(
                             elevation: 0.3,
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withOpacity(0.15),
                             child: Container(
-                              height: 120.0,
+                              height: 80.0,
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                padding: const EdgeInsets.all(4.0),
                                 child: Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
@@ -208,16 +276,16 @@ class _HomePageState extends State<HomePage> {
                                     Icon(
                                       FontAwesomeIcons.thermometerQuarter,
                                       color: Colors.white,
-                                      size: 32.0,
+                                      size: 24.0,
                                     ),
                                     Text(
                                       "32 °C",
                                       style: TextStyle(
                                           fontWeight: FontWeight.w400,
-                                          fontSize: 18.0),
+                                          fontSize: 16.0),
                                     ),
                                     Text(
-                                      "Min Temp",
+                                      "Min. Temp",
                                       textAlign: TextAlign.center,
                                     ),
                                   ],
@@ -229,12 +297,11 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           child: Card(
                             elevation: 0.3,
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withOpacity(0.15),
                             child: Container(
-                              height: 120.0,
+                              height: 80.0,
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                padding: const EdgeInsets.all(4.0),
                                 child: Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
@@ -243,13 +310,13 @@ class _HomePageState extends State<HomePage> {
                                     Icon(
                                       FontAwesome.tachometer,
                                       color: Colors.white,
-                                      size: 32.0,
+                                      size: 24.0,
                                     ),
                                     Text(
                                       "1009 hPa",
                                       style: TextStyle(
                                           fontWeight: FontWeight.w400,
-                                          fontSize: 18.0),
+                                          fontSize: 16.0),
                                     ),
                                     Text(
                                       "Preassure",
@@ -264,12 +331,11 @@ class _HomePageState extends State<HomePage> {
                         Expanded(
                           child: Card(
                             elevation: 0.3,
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withOpacity(0.15),
                             child: Container(
-                              height: 120.0,
+                              height: 80.0,
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4.0),
+                                padding: const EdgeInsets.all(4.0),
                                 child: Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceAround,
@@ -278,13 +344,13 @@ class _HomePageState extends State<HomePage> {
                                     Icon(
                                       Entypo.drop,
                                       color: Colors.white,
-                                      size: 32.0,
+                                      size: 24.0,
                                     ),
                                     Text(
                                       "66%",
                                       style: TextStyle(
                                           fontWeight: FontWeight.w400,
-                                          fontSize: 18.0),
+                                          fontSize: 16.0),
                                     ),
                                     Text(
                                       "Humidity",
@@ -301,7 +367,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Card(
                     elevation: 0.3,
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withOpacity(0.15),
                     child: Padding(
                       padding: const EdgeInsets.all(15.0),
                       child: Row(
@@ -335,115 +401,112 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  Divider(
-                    color: Colors.white.withOpacity(0.4),
-                  ),
-                ],
-              ),
-              Card(
-                elevation: 0.3,
-                color: Colors.white.withOpacity(0.2),
-                child: Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: IntrinsicHeight(
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Column(
-                            children: <Widget>[
-                              Text("Sun"),
-                              Container(
-                                height: 40.0,
-                                child: FlareActor(
-                                  "assets/flare_animations/weather_02d.flr",
-                                  fit: BoxFit.contain,
-                                  animation: "02d",
-                                ),
+                  Card(
+                    elevation: 0.3,
+                    color: Colors.white.withOpacity(0.15),
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: IntrinsicHeight(
+                        child: Row(
+                          children: <Widget>[
+                            Expanded(
+                              child: Column(
+                                children: <Widget>[
+                                  Text("Sun"),
+                                  Container(
+                                    height: 30.0,
+                                    child: FlareActor(
+                                      "assets/flare_animations/weather_02d.flr",
+                                      fit: BoxFit.contain,
+                                      animation: "02d",
+                                    ),
+                                  ),
+                                  Text("30 °C")
+                                ],
                               ),
-                              Text("30 °C")
-                            ],
-                          ),
-                        ),
-                        VerticalDivider(
-                          color: Colors.white.withOpacity(0.3),
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: <Widget>[
-                              Text("Sun"),
-                              Container(
-                                height: 40.0,
-                                child: FlareActor(
-                                  "assets/flare_animations/weather_11d.flr",
-                                  fit: BoxFit.contain,
-                                  animation: "11d",
-                                ),
+                            ),
+                            VerticalDivider(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: <Widget>[
+                                  Text("Sun"),
+                                  Container(
+                                    height: 30.0,
+                                    child: FlareActor(
+                                      "assets/flare_animations/weather_11d.flr",
+                                      fit: BoxFit.contain,
+                                      animation: "11d",
+                                    ),
+                                  ),
+                                  Text("30 °C")
+                                ],
                               ),
-                              Text("30 °C")
-                            ],
-                          ),
-                        ),
-                        VerticalDivider(
-                          color: Colors.white.withOpacity(0.3),
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: <Widget>[
-                              Text("Sun"),
-                              Container(
-                                height: 40.0,
-                                child: FlareActor(
-                                  "assets/flare_animations/weather_04d.flr",
-                                  fit: BoxFit.contain,
-                                  animation: "04d",
-                                ),
+                            ),
+                            VerticalDivider(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: <Widget>[
+                                  Text("Sun"),
+                                  Container(
+                                    height: 30.0,
+                                    child: FlareActor(
+                                      "assets/flare_animations/weather_04d.flr",
+                                      fit: BoxFit.contain,
+                                      animation: "04d",
+                                    ),
+                                  ),
+                                  Text("30 °C")
+                                ],
                               ),
-                              Text("30 °C")
-                            ],
-                          ),
-                        ),
-                        VerticalDivider(
-                          color: Colors.white.withOpacity(0.3),
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: <Widget>[
-                              Text("Sun"),
-                              Container(
-                                height: 40.0,
-                                child: FlareActor(
-                                  "assets/flare_animations/weather_09d.flr",
-                                  fit: BoxFit.contain,
-                                  animation: "09d",
-                                ),
+                            ),
+                            VerticalDivider(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: <Widget>[
+                                  Text("Sun"),
+                                  Container(
+                                    height: 30.0,
+                                    child: FlareActor(
+                                      "assets/flare_animations/weather_09d.flr",
+                                      fit: BoxFit.contain,
+                                      animation: "09d",
+                                    ),
+                                  ),
+                                  Text("30 °C")
+                                ],
                               ),
-                              Text("30 °C")
-                            ],
-                          ),
-                        ),
-                        VerticalDivider(
-                          color: Colors.white.withOpacity(0.3),
-                        ),
-                        Expanded(
-                          child: Column(
-                            children: <Widget>[
-                              Text("Sun"),
-                              Container(
-                                height: 40.0,
-                                child: FlareActor(
-                                  "assets/flare_animations/weather_50d.flr",
-                                  fit: BoxFit.contain,
-                                  animation: "50d",
-                                ),
+                            ),
+                            VerticalDivider(
+                              color: Colors.white.withOpacity(0.3),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: <Widget>[
+                                  Text("Sun"),
+                                  Container(
+                                    height: 30.0,
+                                    child: FlareActor(
+                                      "assets/flare_animations/weather_50d.flr",
+                                      fit: BoxFit.contain,
+                                      animation: "50d",
+                                    ),
+                                  ),
+                                  Text("30 °C")
+                                ],
                               ),
-                              Text("30 °C")
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
