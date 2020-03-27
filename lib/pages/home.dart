@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:forecast/models/open_weather_map_api.dart';
+import 'package:forecast/models/openweathermap_api.dart';
 import 'dart:convert' as convert;
 
-import 'package:forecast/components/current_weather.dart';
+import 'package:forecast/pages/current_weather.dart';
 
 class HomePage extends StatefulWidget {
   @override

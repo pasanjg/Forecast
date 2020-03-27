@@ -9,7 +9,6 @@ class OpenWeatherMapAPI {
   final String zipCode;
   final String units;
   final bool forecast;
-
   String _requestURL;
 
   String get requestURL => _requestURL;
@@ -47,17 +46,3 @@ class OpenWeatherMapAPI {
     print(requestURL);
   }
 }
-
-/*
-
-class CurrentWeather{
-
-  CurrentWeather.fromResponse();
-}
-
-class WeatherForecast{
-
-  WeatherForecast.fromResponse();
-}
-
-*/

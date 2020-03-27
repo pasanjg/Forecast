@@ -118,7 +118,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                                   "32 °C",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
-                                      fontSize: 16.0),
+                                      fontSize: 16.0,),
                                 ),
                                 Text(
                                   "Max. Temp",
