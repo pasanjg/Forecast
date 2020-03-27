@@ -12,20 +12,10 @@ class CurrentWeatherDetails extends StatefulWidget {
 class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
   @override
   Widget build(BuildContext context) {
+    Color _cardColor = Theme.of(context).primaryColor.withOpacity(0.4);
     return Container(
       height: double.infinity,
       width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: [0.0, 1.0],
-          colors: <Color>[
-            Theme.of(context).accentColor,
-            Theme.of(context).primaryColor,
-          ],
-        ),
-      ),
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: Column(
@@ -38,6 +28,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                     DateTime.now(),
                   ),
                   style: TextStyle(
+                    letterSpacing: 1.5,
                     fontWeight: FontWeight.w400,
                     fontSize: 18.0,
                   ),
@@ -46,9 +37,10 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                   height: 10.0,
                 ),
                 Text(
-                  "Malabe, Sri Lanka",
+                  "Malabe".toUpperCase(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
+                    letterSpacing: 2,
                     fontWeight: FontWeight.w700,
                     fontSize: 24.0,
                   ),
@@ -56,184 +48,192 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
               ],
             ),
             Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: Container(
-                    height: MediaQuery.of(context).size.height * 0.15,
-                    child: FlareActor(
-                      "assets/flare_animations/weather_02d.flr",
-                      fit: BoxFit.contain,
-                      animation: "02d",
-                    ),
-                  ),
-                ),
-                Column(
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      "Few Clouds",
-                      style: TextStyle(fontSize: 14.0),
+                    Column(
+                      children: <Widget>[
+                        Container(
+                          height: MediaQuery.of(context).size.width * 0.4,
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          child: FlareActor(
+                            "assets/flare_animations/weather_11d.flr",
+                            fit: BoxFit.contain,
+                            animation: "11d",
+                          ),
+                        ),
+                      ],
                     ),
-                    Text(
-                      "32 ‎°C",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 38.0,
+                    SizedBox(width: 20.0),
+                    Column(
+                      children: <Widget>[
+                        Text(
+                          "32 ‎°C",
+                          style: TextStyle(
+                            height: 0.8,
+                            fontSize: 50.0,
+                          ),
+                        ),
+                        Text(
+                          "Few Clouds",
+                          style: TextStyle(fontSize: 14.0),
+                        ),
+                        SizedBox(
+                          height: 5.0,
+                        ),
+                        Text(
+                          "Feels like 36.15 °C",
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              ],
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Card(
+                        elevation: 0.3,
+                        color: _cardColor,
+                        child: Container(
+                          height: 90.0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Icon(
+                                  FontAwesomeIcons.thermometerFull,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                Text(
+                                  "32 °C",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 16.0),
+                                ),
+                                Text(
+                                  "Max. Temp",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                    Text(
-                      "Feels like 36.15 °C",
-                      style: TextStyle(fontSize: 16.0),
+                    Expanded(
+                      child: Card(
+                        elevation: 0.3,
+                        color: _cardColor,
+                        child: Container(
+                          height: 90.0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Icon(
+                                  FontAwesomeIcons.thermometerQuarter,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                Text(
+                                  "32 °C",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 16.0),
+                                ),
+                                Text(
+                                  "Min. Temp",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Card(
+                        elevation: 0.3,
+                        color: _cardColor,
+                        child: Container(
+                          height: 90.0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Icon(
+                                  FontAwesome.tachometer,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                Text(
+                                  "1009 hPa",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 16.0),
+                                ),
+                                Text(
+                                  "Preassure",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Card(
+                        elevation: 0.3,
+                        color: _cardColor,
+                        child: Container(
+                          height: 90.0,
+                          child: Padding(
+                            padding: const EdgeInsets.all(4.0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              mainAxisSize: MainAxisSize.max,
+                              children: <Widget>[
+                                Icon(
+                                  Entypo.drop,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                Text(
+                                  "66%",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 16.0),
+                                ),
+                                Text(
+                                  "Humidity",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: Card(
-                          elevation: 0.3,
-                          color: Colors.white.withOpacity(0.15),
-                          child: Container(
-                            height: 80.0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Icon(
-                                    FontAwesomeIcons.thermometerFull,
-                                    color: Colors.white,
-                                    size: 24.0,
-                                  ),
-                                  Text(
-                                    "32 °C",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 16.0),
-                                  ),
-                                  Text(
-                                    "Max. Temp",
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Card(
-                          elevation: 0.3,
-                          color: Colors.white.withOpacity(0.15),
-                          child: Container(
-                            height: 80.0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Icon(
-                                    FontAwesomeIcons.thermometerQuarter,
-                                    color: Colors.white,
-                                    size: 24.0,
-                                  ),
-                                  Text(
-                                    "32 °C",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 16.0),
-                                  ),
-                                  Text(
-                                    "Min. Temp",
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Card(
-                          elevation: 0.3,
-                          color: Colors.white.withOpacity(0.15),
-                          child: Container(
-                            height: 80.0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Icon(
-                                    FontAwesome.tachometer,
-                                    color: Colors.white,
-                                    size: 24.0,
-                                  ),
-                                  Text(
-                                    "1009 hPa",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 16.0),
-                                  ),
-                                  Text(
-                                    "Preassure",
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Card(
-                          elevation: 0.3,
-                          color: Colors.white.withOpacity(0.15),
-                          child: Container(
-                            height: 80.0,
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Column(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceAround,
-                                mainAxisSize: MainAxisSize.max,
-                                children: <Widget>[
-                                  Icon(
-                                    Entypo.drop,
-                                    color: Colors.white,
-                                    size: 24.0,
-                                  ),
-                                  Text(
-                                    "66%",
-                                    style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: 16.0),
-                                  ),
-                                  Text(
-                                    "Humidity",
-                                    textAlign: TextAlign.center,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
                 Card(
                   elevation: 0.3,
-                  color: Colors.white.withOpacity(0.15),
+                  color: _cardColor,
                   child: Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: Row(
@@ -269,7 +269,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                 ),
                 Card(
                   elevation: 0.3,
-                  color: Colors.white.withOpacity(0.15),
+                  color: _cardColor,
                   child: Padding(
                     padding: const EdgeInsets.all(15.0),
                     child: IntrinsicHeight(

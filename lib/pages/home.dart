@@ -66,14 +66,14 @@ class _HomePageState extends State<HomePage> {
   Widget _appBarTitle() {
     return isSearching
         ? TextField(
-      controller: _searchTextField,
-      decoration: InputDecoration.collapsed(
-        hintText: "Search city name",
-        hintStyle: TextStyle(
-          color: Colors.white70,
-        ),
-      ),
-    )
+            controller: _searchTextField,
+            decoration: InputDecoration.collapsed(
+              hintText: "Search city name",
+              hintStyle: TextStyle(
+                color: Colors.white70,
+              ),
+            ),
+          )
         : Text(" ");
   }
 
@@ -126,6 +126,31 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _snappedScroll(int itemIndex) {
+    switch (itemIndex) {
+      case 0:
+        {
+          return CurrentWeatherDetails();
+        }
+        break;
+
+      case 1:
+        {
+          return Text(
+            "TODAY FORECAST DETAILS",
+            style: TextStyle(fontSize: 20.0),
+          );
+        }
+        break;
+
+      default:
+        {
+          return CurrentWeatherDetails();
+        }
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,9 +158,7 @@ class _HomePageState extends State<HomePage> {
         elevation: 0.0,
         title: _appBarTitle(),
         centerTitle: true,
-        backgroundColor: Theme
-            .of(context)
-            .accentColor,
+        backgroundColor: Theme.of(context).accentColor,
         actions: <Widget>[
           IconButton(
             onPressed: _onSearchPressed,
@@ -256,12 +279,29 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: Stack(
-        children: <Widget>[
-          CurrentWeatherDetails(),
-          isSearching ? _searchList() : SizedBox.shrink()
-        ],
-      ),
+      body: isSearching
+          ? _searchList()
+          : Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.0, 1.0],
+                  colors: <Color>[
+                    Theme.of(context).accentColor,
+                    Theme.of(context).primaryColor,
+                  ],
+                ),
+              ),
+              child: PageView.builder(
+                scrollDirection: Axis.vertical,
+                controller: PageController(viewportFraction: 1),
+                itemCount: 2,
+                itemBuilder: (BuildContext context, int itemIndex) {
+                  return _snappedScroll(itemIndex);
+                },
+              ),
+            ),
     );
   }
 }
