@@ -1,17 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:forecast/models/openweathermap_api.dart';
 import 'package:intl/intl.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:forecast/blocs/current_weather/current_weather_bloc.dart';
+import 'package:forecast/models/weather_model.dart';
 
-class CurrentWeatherDetails extends StatefulWidget {
+class CurrentWeatherDetailsPage extends StatefulWidget {
   @override
-  _CurrentWeatherDetailsState createState() => _CurrentWeatherDetailsState();
+  _CurrentWeatherDetailsPageState createState() =>
+      _CurrentWeatherDetailsPageState();
 }
 
-class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
+class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
+  OpenWeatherMapAPI openWeatherMapAPI;
+
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    openWeatherMapAPI = OpenWeatherMapAPI(cityName: "Malabe", units: "metric");
+    currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+  }
+
+  @override
+  void dispose() {
+//    currentWeatherBloc.dispose();
+    super.dispose();
+  }
+
+  Widget _buildCurrentWeatherData(AsyncSnapshot<WeatherModel> snapshot) {
     Color _cardColor = Theme.of(context).primaryColor.withOpacity(0.4);
     return Container(
       height: double.infinity,
@@ -37,7 +60,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                   height: 10.0,
                 ),
                 Text(
-                  "Malabe".toUpperCase(),
+                  snapshot.data.name.toUpperCase(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     letterSpacing: 2,
@@ -58,9 +81,9 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                           height: MediaQuery.of(context).size.width * 0.4,
                           width: MediaQuery.of(context).size.width * 0.4,
                           child: FlareActor(
-                            "assets/flare_animations/weather_11d.flr",
+                            "assets/flare_animations/weather_${snapshot.data.weatherIcon}.flr",
                             fit: BoxFit.contain,
-                            animation: "11d",
+                            animation: snapshot.data.weatherIcon,
                           ),
                         ),
                       ],
@@ -69,21 +92,21 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                     Column(
                       children: <Widget>[
                         Text(
-                          "32 ‎°C",
+                          "${snapshot.data.temp} °C",
                           style: TextStyle(
-                            height: 0.8,
+                            height: 1.2,
                             fontSize: 50.0,
                           ),
                         ),
                         Text(
-                          "Few Clouds",
+                          snapshot.data.weatherDescription.toUpperCase(),
                           style: TextStyle(fontSize: 14.0),
                         ),
                         SizedBox(
                           height: 5.0,
                         ),
                         Text(
-                          "Feels like 36.15 °C",
+                          "${snapshot.data.feelsLike} °C",
                           style: TextStyle(fontSize: 16.0),
                         ),
                       ],
@@ -115,10 +138,11 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "32 °C",
+                                  "${snapshot.data.tempMax} °C",
                                   style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16.0,),
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16.0,
+                                  ),
                                 ),
                                 Text(
                                   "Max. Temp",
@@ -148,7 +172,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "32 °C",
+                                  "${snapshot.data.tempMin} °C",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 16.0),
@@ -181,7 +205,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "1009 hPa",
+                                  "${snapshot.data.pressure} hPa",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 16.0),
@@ -214,7 +238,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "66%",
+                                  "${snapshot.data.humidity}%",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 16.0),
@@ -248,7 +272,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                               size: 15.0,
                             ),
                             SizedBox(width: 15.0),
-                            Text("29%"),
+                            Text("${snapshot.data.clouds}%"),
                           ],
                         ),
                         Row(
@@ -260,7 +284,7 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
                               size: 15.0,
                             ),
                             SizedBox(width: 15.0),
-                            Text("2.1 m/s"),
+                            Text("${snapshot.data.windSpeed} m/s"),
                           ],
                         ),
                       ],
@@ -377,6 +401,26 @@ class _CurrentWeatherDetailsState extends State<CurrentWeatherDetails> {
           ],
         ),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder(
+      stream: currentWeatherBloc.currentWeather,
+      builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
+        if (snapshot.hasData) {
+          return _buildCurrentWeatherData(snapshot);
+        } else if (snapshot.hasError) {
+          return Text(snapshot.error);
+        } else {
+          return Center(
+            child: CircularProgressIndicator(
+              backgroundColor: Colors.white,
+            ),
+          );
+        }
+      },
     );
   }
 }

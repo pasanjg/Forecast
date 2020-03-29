@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:forecast/models/openweathermap_api.dart';
 import 'dart:convert' as convert;
 
 import 'package:forecast/pages/current_weather.dart';
@@ -13,14 +12,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  OpenWeatherMapAPI openWeatherMapAPI = OpenWeatherMapAPI(
-    cityName: "Malabe,LK",
-    // coordinates: {'lat': '6.9', 'lon': '75.9'},
-    // zipCode: "10115",
-    units: "metric",
-    forecast: true,
-  );
-
   final TextEditingController _searchTextField = TextEditingController();
   String _searchText = " ";
   List cities = new List();
@@ -130,7 +121,7 @@ class _HomePageState extends State<HomePage> {
     switch (itemIndex) {
       case 0:
         {
-          return CurrentWeatherDetails();
+          return CurrentWeatherDetailsPage();
         }
         break;
 
@@ -145,7 +136,7 @@ class _HomePageState extends State<HomePage> {
 
       default:
         {
-          return CurrentWeatherDetails();
+          return CurrentWeatherDetailsPage();
         }
         break;
     }
@@ -281,6 +272,7 @@ class _HomePageState extends State<HomePage> {
       ),
       body: isSearching
           ? _searchList()
+//          : CurrentWeatherDetails(),
           : Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(

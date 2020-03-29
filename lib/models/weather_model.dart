@@ -58,6 +58,23 @@ class WeatherModel {
   String get cod => _cod;
 
   WeatherModel.fromJSON(Map<String, dynamic> parsedJSON) {
-    print(parsedJSON);
+//    print(parsedJSON.length);
+//    print(parsedJSON['sys']['sunrise']);
+    _weatherMain = parsedJSON['weather'][0]['main'];
+    _weatherDescription = parsedJSON['weather'][0]['description'];
+    _weatherIcon = parsedJSON['weather'][0]['icon'];
+    _temp = parsedJSON['main']['temp'].toString();
+    _feelsLike = parsedJSON['main']['feels_like'].toString();
+    _tempMin = parsedJSON['main']['temp_min'].toString();
+    _tempMax = parsedJSON['main']['temp_max'].toString();
+    _pressure = parsedJSON['main']['pressure'].toString();
+    _humidity = parsedJSON['main']['humidity'].toString();
+    _windSpeed = parsedJSON['wind']['speed'].toString();
+    _clouds = parsedJSON['clouds']['all'].toString();
+    _country = parsedJSON['sys']['country'];
+    _sunRise = DateTime.parse(parsedJSON['sys']['sunrise'].toString());
+    _sunSet = DateTime.parse(parsedJSON['sys']['sunset'].toString());
+    _name = parsedJSON['name'];
+    _cod = parsedJSON['cod'].toString();
   }
 }

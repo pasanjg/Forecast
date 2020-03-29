@@ -42,7 +42,5 @@ class OpenWeatherMapAPI {
                     "$apiBaseURL/$weatherType?lat=${coordinates['lat']}&lon=${coordinates['lon']}&appid=$apiKey&units=$units"
                 : this._requestURL =
                     "$apiBaseURL/$weatherType?zip=$zipCode&appid=$apiKey&units=$units";
-
-    print(requestURL);
   }
 }
