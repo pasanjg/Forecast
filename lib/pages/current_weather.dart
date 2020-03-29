@@ -36,7 +36,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   }
 
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
-    Color _cardColor = Theme.of(context).primaryColor.withOpacity(0.4);
+    Color _cardColor = Colors.white.withOpacity(0.1);
     return Container(
       height: double.infinity,
       width: double.infinity,
@@ -82,7 +82,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           height: MediaQuery.of(context).size.width * 0.4,
                           width: MediaQuery.of(context).size.width * 0.4,
                           child: FlareActor(
-                            "assets/flare_animations/weather_${currentWeather.weatherIcon}.flr",
+                            "assets/flare_animations/weather_icons/weather_${currentWeather.weatherIcon}.flr",
                             fit: BoxFit.contain,
                             animation: currentWeather.weatherIcon,
                           ),
@@ -93,7 +93,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                     Column(
                       children: <Widget>[
                         Text(
-                          "${currentWeather.temp} °C",
+                          "${currentWeather.temp}°C",
                           style: TextStyle(
                             height: 1.2,
                             fontSize: 50.0,
@@ -107,7 +107,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           height: 5.0,
                         ),
                         Text(
-                          "${currentWeather.feelsLike} °C",
+                          "${currentWeather.feelsLike}°C",
                           style: TextStyle(fontSize: 16.0),
                         ),
                       ],
@@ -139,7 +139,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "${currentWeather.tempMax} °C",
+                                  "${currentWeather.tempMax}°C",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 16.0,
@@ -173,7 +173,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "${currentWeather.tempMin} °C",
+                                  "${currentWeather.tempMin}°C",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 16.0),
@@ -212,7 +212,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                       fontSize: 16.0),
                                 ),
                                 Text(
-                                  "Preassure",
+                                  "Pressure",
                                   textAlign: TextAlign.center,
                                 ),
                               ],
@@ -307,7 +307,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 Container(
                                   height: 30.0,
                                   child: FlareActor(
-                                    "assets/flare_animations/weather_02d.flr",
+                                    "assets/flare_animations/weather_icons/weather_02d.flr",
                                     fit: BoxFit.contain,
                                     animation: "02d",
                                   ),
@@ -326,7 +326,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 Container(
                                   height: 30.0,
                                   child: FlareActor(
-                                    "assets/flare_animations/weather_11d.flr",
+                                    "assets/flare_animations/weather_icons/weather_11d.flr",
                                     fit: BoxFit.contain,
                                     animation: "11d",
                                   ),
@@ -345,7 +345,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 Container(
                                   height: 30.0,
                                   child: FlareActor(
-                                    "assets/flare_animations/weather_04d.flr",
+                                    "assets/flare_animations/weather_icons/weather_04d.flr",
                                     fit: BoxFit.contain,
                                     animation: "04d",
                                   ),
@@ -364,7 +364,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 Container(
                                   height: 30.0,
                                   child: FlareActor(
-                                    "assets/flare_animations/weather_09d.flr",
+                                    "assets/flare_animations/weather_icons/weather_09d.flr",
                                     fit: BoxFit.contain,
                                     animation: "09d",
                                   ),
@@ -383,7 +383,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 Container(
                                   height: 30.0,
                                   child: FlareActor(
-                                    "assets/flare_animations/weather_50d.flr",
+                                    "assets/flare_animations/weather_icons/weather_50d.flr",
                                     fit: BoxFit.contain,
                                     animation: "50d",
                                   ),

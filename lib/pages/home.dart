@@ -96,7 +96,17 @@ class _HomePageState extends State<HomePage> {
     }
 
     return Container(
-      color: Colors.black.withOpacity(0.9),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          stops: [0.0, 1.0],
+          colors: <Color>[
+            Theme.of(context).accentColor,
+            Theme.of(context).primaryColor,
+          ],
+        ),
+      ),
       child: ListView.builder(
         itemCount: filteredCities.length,
         itemBuilder: (BuildContext context, int index) {

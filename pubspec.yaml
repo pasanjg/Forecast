@@ -58,6 +58,7 @@ flutter:
   assets:
     - assets/images/
     - assets/flare_animations/
+    - assets/flare_animations/weather_icons/
     - assets/json/
     - .env
 
