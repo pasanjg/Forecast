@@ -6,6 +6,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forecast/blocs/current_weather/current_weather_bloc.dart';
 import 'package:forecast/models/weather_model.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CurrentWeatherDetailsPage extends StatefulWidget {
   @override
@@ -34,7 +35,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     super.dispose();
   }
 
-  Widget _buildCurrentWeatherData(AsyncSnapshot<WeatherModel> snapshot) {
+  Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
     Color _cardColor = Theme.of(context).primaryColor.withOpacity(0.4);
     return Container(
       height: double.infinity,
@@ -60,7 +61,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                   height: 10.0,
                 ),
                 Text(
-                  snapshot.data.name.toUpperCase(),
+                  currentWeather.name.toUpperCase(),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     letterSpacing: 2,
@@ -81,9 +82,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           height: MediaQuery.of(context).size.width * 0.4,
                           width: MediaQuery.of(context).size.width * 0.4,
                           child: FlareActor(
-                            "assets/flare_animations/weather_${snapshot.data.weatherIcon}.flr",
+                            "assets/flare_animations/weather_${currentWeather.weatherIcon}.flr",
                             fit: BoxFit.contain,
-                            animation: snapshot.data.weatherIcon,
+                            animation: currentWeather.weatherIcon,
                           ),
                         ),
                       ],
@@ -92,21 +93,21 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                     Column(
                       children: <Widget>[
                         Text(
-                          "${snapshot.data.temp} °C",
+                          "${currentWeather.temp} °C",
                           style: TextStyle(
                             height: 1.2,
                             fontSize: 50.0,
                           ),
                         ),
                         Text(
-                          snapshot.data.weatherDescription.toUpperCase(),
+                          currentWeather.weatherDescription.toUpperCase(),
                           style: TextStyle(fontSize: 14.0),
                         ),
                         SizedBox(
                           height: 5.0,
                         ),
                         Text(
-                          "${snapshot.data.feelsLike} °C",
+                          "${currentWeather.feelsLike} °C",
                           style: TextStyle(fontSize: 16.0),
                         ),
                       ],
@@ -138,7 +139,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "${snapshot.data.tempMax} °C",
+                                  "${currentWeather.tempMax} °C",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 16.0,
@@ -172,7 +173,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "${snapshot.data.tempMin} °C",
+                                  "${currentWeather.tempMin} °C",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 16.0),
@@ -205,7 +206,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "${snapshot.data.pressure} hPa",
+                                  "${currentWeather.pressure} hPa",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 16.0),
@@ -238,7 +239,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 Text(
-                                  "${snapshot.data.humidity}%",
+                                  "${currentWeather.humidity}%",
                                   style: TextStyle(
                                       fontWeight: FontWeight.w400,
                                       fontSize: 16.0),
@@ -272,7 +273,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                               size: 15.0,
                             ),
                             SizedBox(width: 15.0),
-                            Text("${snapshot.data.clouds}%"),
+                            Text("${currentWeather.clouds}%"),
                           ],
                         ),
                         Row(
@@ -284,7 +285,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                               size: 15.0,
                             ),
                             SizedBox(width: 15.0),
-                            Text("${snapshot.data.windSpeed} m/s"),
+                            Text("${currentWeather.windSpeed} m/s"),
                           ],
                         ),
                       ],
@@ -410,9 +411,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       stream: currentWeatherBloc.currentWeather,
       builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
         if (snapshot.hasData) {
-          return _buildCurrentWeatherData(snapshot);
+          return _buildCurrentWeatherData(snapshot.data);
         } else if (snapshot.hasError) {
-          return Text(snapshot.error);
+          Fluttertoast.showToast(msg: snapshot.error);
+          return Center(child: Text(snapshot.error));
         } else {
           return Center(
             child: CircularProgressIndicator(
