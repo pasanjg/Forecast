@@ -58,7 +58,8 @@ class _HomePageState extends State<HomePage> {
     return isSearching
         ? TextField(
             controller: _searchTextField,
-            decoration: InputDecoration.collapsed(
+            decoration: InputDecoration(
+              border: InputBorder.none,
               hintText: "Search city name",
               hintStyle: TextStyle(
                 color: Colors.white70,

@@ -36,7 +36,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   }
 
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
-    Color _cardColor = Colors.white.withOpacity(0.1);
+    Color _cardColor = Theme.of(context).primaryColor.withOpacity(0.8);
     return Container(
       height: double.infinity,
       width: double.infinity,
