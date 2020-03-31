@@ -7,6 +7,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forecast/blocs/current_weather/current_weather_bloc.dart';
 import 'package:forecast/models/weather_model.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geolocator/geolocator.dart';
 
 class CurrentWeatherDetailsPage extends StatefulWidget {
   @override
@@ -16,12 +17,31 @@ class CurrentWeatherDetailsPage extends StatefulWidget {
 
 class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   OpenWeatherMapAPI openWeatherMapAPI;
+  Geolocator geolocator = Geolocator();
+  Position userLocation;
+
+  Future<Position> _getLocation() async {
+    var currentLocation;
+    try {
+      currentLocation = await geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.best);
+    } catch (e) {
+      currentLocation = null;
+    }
+    return currentLocation;
+  }
 
   @override
   void initState() {
     super.initState();
-    openWeatherMapAPI = OpenWeatherMapAPI(cityName: "Malabe", units: "metric");
-    currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
+    _getLocation().then((position) {
+      userLocation = position;
+      print(userLocation);
+      openWeatherMapAPI = OpenWeatherMapAPI(lon: userLocation.longitude.toString(), lat: userLocation.latitude.toString(), units: "metric", coordinates: true);
+      currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
+    });
+//    openWeatherMapAPI = OpenWeatherMapAPI(cityName: "Malabe", units: "metric");
+//    currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
   }
 
   @override

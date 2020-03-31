@@ -5,11 +5,14 @@ class OpenWeatherMapAPI {
   final String apiBaseURL = DotEnv().env['OPENWEATHERMAP_API_BASE_URL'];
   final String cityName;
   final String cityId;
-  final Map coordinates;
+  final bool coordinates;
+  final String lon;
+  final String lat;
   final String zipCode;
   final String units;
   final bool forecast;
   String _requestURL;
+
 
   String get requestURL => _requestURL;
 
@@ -20,6 +23,8 @@ class OpenWeatherMapAPI {
       {this.cityName,
       this.cityId,
       this.coordinates,
+      this.lon,
+      this.lat,
       this.zipCode,
       this.units,
       this.forecast = false})
@@ -39,7 +44,7 @@ class OpenWeatherMapAPI {
                 "$apiBaseURL/$weatherType?id=$cityId&appid=$apiKey&units=$units"
             : coordinates != null
                 ? this._requestURL =
-                    "$apiBaseURL/$weatherType?lat=${coordinates['lat']}&lon=${coordinates['lon']}&appid=$apiKey&units=$units"
+                    "$apiBaseURL/$weatherType?lat=$lat&lon=$lon&appid=$apiKey&units=$units"
                 : this._requestURL =
                     "$apiBaseURL/$weatherType?zip=$zipCode&appid=$apiKey&units=$units";
   }
