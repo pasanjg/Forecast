@@ -24,6 +24,7 @@ class Forecast extends StatefulWidget {
 
 class _ForecastState extends State<Forecast> {
   DateTime _dateTime = DateTime.now();
+
   @override
   void initState() {
     super.initState();
@@ -36,8 +37,7 @@ class _ForecastState extends State<Forecast> {
 
     if (_currentHour >= 6 && _currentHour <= 15) {
       return AppThemeKeys.DAY;
-    }
-    else if (_currentHour >= 16 && _currentHour <= 18) {
+    } else if (_currentHour >= 16 && _currentHour <= 18) {
       return AppThemeKeys.EVENING;
     } else {
       return AppThemeKeys.NIGHT;
@@ -53,7 +53,9 @@ class _ForecastState extends State<Forecast> {
 
     return MaterialApp(
       title: "Forecast",
-      theme: AppThemes.getThemeFromKey(updateTheme()),
+      theme: AppTheme.of(context) == null
+          ? AppThemes.getThemeFromKey(updateTheme())
+          : AppTheme.of(context),
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
     );

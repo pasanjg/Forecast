@@ -37,9 +37,9 @@ class AppThemes {
     fontFamily: fontFamily,
   );
 
-  static ThemeData getThemeFromKey(AppThemeKeys forecastThemeKeys) {
+  static ThemeData getThemeFromKey(AppThemeKeys appThemeKeys) {
     ThemeData currentTheme = ThemeData();
-    switch (forecastThemeKeys) {
+    switch (appThemeKeys) {
       case AppThemeKeys.DAY:
         currentTheme = dayTheme;
         break;
