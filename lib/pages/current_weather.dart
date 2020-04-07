@@ -22,7 +22,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   Position userLocation;
 
   double _animatedHeight = 0;
-  double _animatedMaxHeight = 290;
+  double _animatedMaxHeight = 250;
   ScrollController _controller = ScrollController();
 
   List<Color> gradientColors = [
@@ -346,13 +346,12 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 _animatedHeight == _animatedMaxHeight
                                     ? 0
                                     : _animatedMaxHeight;
-
-                            _controller.animateTo(
-                              _controller.position.maxScrollExtent,
-                              duration: Duration(milliseconds: 500),
-                              curve: Curves.easeIn,
-                            );
                           });
+                          _controller.animateTo(
+                            _controller.position.maxScrollExtent,
+                            duration: Duration(milliseconds: 500),
+                            curve: Curves.easeIn,
+                          );
                         },
                         child: Card(
                           elevation: 0.3,
@@ -472,7 +471,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                 // color: Colors.red,
                 curve: Curves.easeInOut,
                 duration: Duration(milliseconds: 500),
-                height: this._animatedHeight,
+                height: _animatedHeight,
                 child: AnimatedOpacity(
                   curve: Curves.easeInOut,
                   duration: Duration(milliseconds: 500),
@@ -481,124 +480,157 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                       : 0.0,
                   child: Wrap(
                     children: <Widget>[
-                      Card(
-                        elevation: 0.3,
-                        color: _cardColor,
-                        child: Column(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: IntrinsicHeight(
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("Sun"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_02d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "02d",
-                                            ),
+                      Stack(
+                        children: <Widget>[
+                          Container(
+                            height: _animatedMaxHeight,
+                            child: Card(
+                              elevation: 0.3,
+                              color: _cardColor,
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: IntrinsicHeight(
+                                  child: Row(
+                                    children: <Widget>[
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 0.0,
                                           ),
-                                          Text("30 °C")
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("Sun"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_11d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "11d",
-                                            ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: <Widget>[
+                                              Container(
+                                                height: 30.0,
+                                                child: FlareActor(
+                                                  "assets/flare_animations/weather_icons/weather_02d.flr",
+                                                  fit: BoxFit.contain,
+                                                  animation: "02d",
+                                                ),
+                                              ),
+                                              Text("30 °C")
+                                            ],
                                           ),
-                                          Text("30 °C")
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("Sun"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_04d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "04d",
-                                            ),
+                                      VerticalDivider(
+                                        color: Colors.white.withOpacity(0.3),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 0.0,
                                           ),
-                                          Text("30 °C")
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("Sun"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_09d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "09d",
-                                            ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: <Widget>[
+                                              Container(
+                                                height: 30.0,
+                                                child: FlareActor(
+                                                  "assets/flare_animations/weather_icons/weather_11d.flr",
+                                                  fit: BoxFit.contain,
+                                                  animation: "11d",
+                                                ),
+                                              ),
+                                              Text("30 °C")
+                                            ],
                                           ),
-                                          Text("30 °C")
-                                        ],
+                                        ),
                                       ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("Sun"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_50d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "50d",
-                                            ),
+                                      VerticalDivider(
+                                        color: Colors.white.withOpacity(0.3),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 0.0,
                                           ),
-                                          Text("30 °C"),
-                                        ],
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: <Widget>[
+                                              Container(
+                                                height: 30.0,
+                                                child: FlareActor(
+                                                  "assets/flare_animations/weather_icons/weather_04d.flr",
+                                                  fit: BoxFit.contain,
+                                                  animation: "04d",
+                                                ),
+                                              ),
+                                              Text("30 °C")
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      VerticalDivider(
+                                        color: Colors.white.withOpacity(0.3),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 0.0,
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: <Widget>[
+                                              Container(
+                                                height: 30.0,
+                                                child: FlareActor(
+                                                  "assets/flare_animations/weather_icons/weather_09d.flr",
+                                                  fit: BoxFit.contain,
+                                                  animation: "09d",
+                                                ),
+                                              ),
+                                              Text("30 °C")
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      VerticalDivider(
+                                        color: Colors.white.withOpacity(0.3),
+                                      ),
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 0.0,
+                                          ),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
+                                            children: <Widget>[
+                                              Container(
+                                                height: 30.0,
+                                                child: FlareActor(
+                                                  "assets/flare_animations/weather_icons/weather_50d.flr",
+                                                  fit: BoxFit.contain,
+                                                  animation: "50d",
+                                                ),
+                                              ),
+                                              Text("30 °C"),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                  top: 25.0, left: 8.0, right: 8.0),
-                              child: AspectRatio(
-                                aspectRatio: 5 / 2, // width / height
-                                child: LineChart(
-                                  mainData(),
-                                ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 25.0, left: 8.0, right: 8.0),
+                            child: AspectRatio(
+                              aspectRatio: 5 / 2, // width / height
+                              child: LineChart(
+                                mainData(),
                               ),
-                            )
-                          ],
-                        ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -632,7 +664,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       titlesData: FlTitlesData(
         show: true,
         bottomTitles: SideTitles(
-          showTitles: true,
+          showTitles: false,
           reservedSize: 0,
           textStyle: TextStyle(
             color: const Color(0xff37434d),
@@ -691,16 +723,16 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       ),
       minX: 0,
       maxX: 10,
-      minY: 0,
-      maxY: 5,
+      minY: 25.75,
+      maxY: 33.55,
       lineBarsData: [
         LineChartBarData(
           spots: const [
-            FlSpot(1, 0.5),
-            FlSpot(3, 2.5),
-            FlSpot(5, 4.5),
-            FlSpot(7, 4.5),
-            FlSpot(9, 4.5),
+            FlSpot(1, 25.75),
+            FlSpot(3, 31.97),
+            FlSpot(5, 33.55),
+            FlSpot(7, 28.52),
+            FlSpot(9, 26.46),
           ],
           isCurved: true,
           colors: gradientColors,
