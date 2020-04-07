@@ -283,30 +283,30 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: isSearching
-          ? _searchList()
-//          : CurrentWeatherDetails(),
-          : Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 1.0],
-                  colors: <Color>[
-                    Theme.of(context).accentColor,
-                    Theme.of(context).primaryColor,
-                  ],
-                ),
-              ),
-              child: PageView.builder(
-                scrollDirection: Axis.vertical,
-                controller: PageController(viewportFraction: 1),
-                itemCount: 2,
-                itemBuilder: (BuildContext context, int itemIndex) {
-                  return _snappedScroll(itemIndex);
-                },
-              ),
-            ),
+      body: isSearching ? _searchList()
+//          : CurrentWeatherDetailsPage(),
+       : Container(
+           decoration: BoxDecoration(
+             gradient: LinearGradient(
+               begin: Alignment.topCenter,
+               end: Alignment.bottomCenter,
+               stops: [0.0, 1.0],
+               colors: <Color>[
+                 Theme.of(context).accentColor,
+                 Theme.of(context).primaryColor,
+               ],
+             ),
+           ),
+           child: CurrentWeatherDetailsPage(),
+//           PageView.builder(
+//             scrollDirection: Axis.vertical,
+//             controller: PageController(viewportFraction: 1),
+//             itemCount: 2,
+//             itemBuilder: (BuildContext context, int itemIndex) {
+//               return _snappedScroll(itemIndex);
+//             },
+//           ),
+         ),
     );
   }
 }
