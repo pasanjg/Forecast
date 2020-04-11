@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
 import 'package:forecast/models/openweathermap_api.dart';
 import 'package:forecast/widgets/current_weather/card_data.dart';
 import 'package:forecast/widgets/current_weather/temp_data_card.dart';
-import 'package:intl/intl.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -72,6 +74,14 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     super.dispose();
   }
 
+  handleAutoScroll() {
+    _controller.animateTo(
+      _controller.position.maxScrollExtent,
+      duration: Duration(milliseconds: 400),
+      curve: Curves.easeInOut,
+    );
+  }
+
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
     Color _cardColor = Theme.of(context).primaryColor.withOpacity(0.8);
     return NotificationListener<OverscrollIndicatorNotification>(
@@ -85,7 +95,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           controller: _controller,
           children: <Widget>[
             Container(
-              height: MediaQuery.of(context).size.height * 0.88,
+              height: MediaQuery.of(context).size.height * 0.86,
               width: MediaQuery.of(context).size.width,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -137,12 +147,27 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           SizedBox(width: 20.0),
                           Column(
                             children: <Widget>[
-                              Text(
-                                "${currentWeather.temp}°C",
-                                style: TextStyle(
-                                  height: 1.2,
-                                  fontSize: 50.0,
-                                ),
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    "${currentWeather.temp}",
+                                    style: TextStyle(
+                                      height: 1.2,
+                                      fontSize: 50.0,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 7.0),
+                                    child: Text(
+                                      "°C",
+                                      style: TextStyle(
+                                        height: 1.2,
+                                        fontSize: 18.0,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               Text(
                                 currentWeather.weatherDescription.toUpperCase(),
@@ -239,8 +264,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                               middleElement: Text(
                                 "${currentWeather.humidity}%",
                                 style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 16.0),
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16.0,
+                                ),
                               ),
                               bottomElement: Text(
                                 "Humidity",
@@ -299,11 +325,12 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     ? 0
                                     : _animatedMaxHeight;
                           });
-                          _controller.animateTo(
-                            _controller.position.maxScrollExtent,
-                            duration: Duration(milliseconds: 500),
-                            curve: Curves.easeIn,
-                          );
+
+                          if (_animatedHeight == _animatedMaxHeight)
+                            Timer(
+                              Duration(milliseconds: 500),
+                              handleAutoScroll,
+                            );
                         },
                         ////////////////////////////////////////////////////////
                         child: Card(

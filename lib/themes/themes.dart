@@ -20,13 +20,15 @@ class AppThemes {
     textTheme: textTheme,
     accentColor: Color(0XFF078DD9),
     primaryColor: Color(0xFF0669BF),
+    canvasColor: Color(0xFF141414),
     fontFamily: fontFamily,
   );
 
   static final ThemeData eveningTheme = ThemeData(
     textTheme: textTheme,
-    accentColor: Color(0XFFFE7F4A),
-    primaryColor: Color(0XFF2F0F2C),
+    accentColor: Color(0XFFCE6955),
+    primaryColor: Color(0XFF27213D),
+    canvasColor: Color(0xFF141414),
     fontFamily: fontFamily,
   );
 
@@ -34,6 +36,7 @@ class AppThemes {
     textTheme: textTheme,
     accentColor: Color(0xFF010A5D),
     primaryColor: Color(0xFF010A26),
+    canvasColor: Color(0xFF141414),
     fontFamily: fontFamily,
   );
 
