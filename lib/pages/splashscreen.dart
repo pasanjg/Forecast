@@ -12,7 +12,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -38,14 +37,16 @@ class _SplashScreenState extends State<SplashScreen> {
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
     return Center(
       child: Container(
-        decoration: BoxDecoration(
-          gradient: RadialGradient(
-            colors: [
-              Theme.of(context).accentColor,
-              Theme.of(context).primaryColor,
-            ],
-          ),
-        ),
+        color: Theme.of(context).primaryColor,
+//        decoration: BoxDecoration(
+//          gradient: RadialGradient(
+//            stops: [0.1, 0.5],
+//            colors: [
+//              Theme.of(context).primaryColor,
+//              Theme.of(context).accentColor,
+//            ],
+//          ),
+//        ),
         child: Center(
           child: Container(
             height: MediaQuery.of(context).size.height * 0.4,

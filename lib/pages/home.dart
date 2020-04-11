@@ -118,41 +118,42 @@ class _HomePageState extends State<HomePage> {
               "${filteredCities[index]['name']}",
             ),
             trailing: Container(
-              height: 30.0,
-              child: Image.network(
-                "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
-              ),
-            ),
+                height: 30.0,
+                child: FadeInImage.assetNetwork(
+                  placeholder: "assets/images/flag-loading.png",
+                  image:
+                      "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
+                )),
           );
         },
       ),
     );
   }
 
-  Widget _snappedScroll(int itemIndex) {
-    switch (itemIndex) {
-      case 0:
-        {
-          return CurrentWeatherDetailsPage();
-        }
-        break;
+  // Widget _snappedScroll(int itemIndex) {
+  //   switch (itemIndex) {
+  //     case 0:
+  //       {
+  //         return CurrentWeatherDetailsPage();
+  //       }
+  //       break;
 
-      case 1:
-        {
-          return Text(
-            "TODAY FORECAST DETAILS",
-            style: TextStyle(fontSize: 20.0),
-          );
-        }
-        break;
+  //     case 1:
+  //       {
+  //         return Text(
+  //           "TODAY FORECAST DETAILS",
+  //           style: TextStyle(fontSize: 20.0),
+  //         );
+  //       }
+  //       break;
 
-      default:
-        {
-          return CurrentWeatherDetailsPage();
-        }
-        break;
-    }
-  }
+  //     default:
+  //       {
+  //         return CurrentWeatherDetailsPage();
+  //       }
+  //       break;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -283,21 +284,22 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      body: isSearching ? _searchList()
+      body: isSearching
+          ? _searchList()
 //          : CurrentWeatherDetailsPage(),
-       : Container(
-           decoration: BoxDecoration(
-             gradient: LinearGradient(
-               begin: Alignment.topCenter,
-               end: Alignment.bottomCenter,
-               stops: [0.0, 1.0],
-               colors: <Color>[
-                 Theme.of(context).accentColor,
-                 Theme.of(context).primaryColor,
-               ],
-             ),
-           ),
-           child: CurrentWeatherDetailsPage(),
+          : Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  stops: [0.0, 1.0],
+                  colors: <Color>[
+                    Theme.of(context).accentColor,
+                    Theme.of(context).primaryColor,
+                  ],
+                ),
+              ),
+              child: CurrentWeatherDetailsPage(),
 //           PageView.builder(
 //             scrollDirection: Axis.vertical,
 //             controller: PageController(viewportFraction: 1),
@@ -306,7 +308,7 @@ class _HomePageState extends State<HomePage> {
 //               return _snappedScroll(itemIndex);
 //             },
 //           ),
-         ),
+            ),
     );
   }
 }

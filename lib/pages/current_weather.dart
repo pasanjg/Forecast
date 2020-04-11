@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forecast/models/openweathermap_api.dart';
+import 'package:forecast/widgets/current_weather/card_data.dart';
+import 'package:forecast/widgets/current_weather/temp_data_card.dart';
 import 'package:intl/intl.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -26,8 +28,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   ScrollController _controller = ScrollController();
 
   List<Color> gradientColors = [
-    // const Color(0xffff0000),
-    // const Color(0xff0000ff),
     Colors.grey,
     Colors.white,
   ];
@@ -36,7 +36,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     var currentLocation;
     try {
       currentLocation = await geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best);
+        desiredAccuracy: LocationAccuracy.best,
+      );
     } catch (e) {
       currentLocation = null;
     }
@@ -50,10 +51,11 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       userLocation = position;
       print(userLocation);
       openWeatherMapAPI = OpenWeatherMapAPI(
-        lon: userLocation.longitude.toString(),
-        lat: userLocation.latitude.toString(),
+        coordinates: {
+          'lat': userLocation.latitude.toString(),
+          'lon': userLocation.longitude.toString(),
+        },
         units: "metric",
-        coordinates: true,
       );
       currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
     });
@@ -162,147 +164,95 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                   Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
+                      /////// MAX.TEMP | MIN.TEMP | PRESSURE | HUMIDITY ////////
                       Row(
                         children: <Widget>[
-                          Expanded(
-                            child: Card(
-                              elevation: 0.3,
-                              color: _cardColor,
-                              child: Container(
-                                height: 90.0,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      Icon(
-                                        FontAwesomeIcons.thermometerFull,
-                                        color: Colors.white,
-                                        size: 24.0,
-                                      ),
-                                      Text(
-                                        "${currentWeather.tempMax}°C",
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w400,
-                                          fontSize: 16.0,
-                                        ),
-                                      ),
-                                      Text(
-                                        "Max. Temp",
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
+                          TempDataCard(
+                            cardColor: _cardColor,
+                            cardData: CardData(
+                              topElement: Icon(
+                                FontAwesomeIcons.thermometerFull,
+                                color: Colors.white,
+                                size: 24.0,
+                              ),
+                              middleElement: Text(
+                                "${currentWeather.tempMax}°C",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: 16.0,
                                 ),
+                              ),
+                              bottomElement: Text(
+                                "Max. Temp",
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: Card(
-                              elevation: 0.3,
-                              color: _cardColor,
-                              child: Container(
-                                height: 90.0,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      Icon(
-                                        FontAwesomeIcons.thermometerQuarter,
-                                        color: Colors.white,
-                                        size: 24.0,
-                                      ),
-                                      Text(
-                                        "${currentWeather.tempMin}°C",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 16.0),
-                                      ),
-                                      Text(
-                                        "Min. Temp",
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                          TempDataCard(
+                            cardColor: _cardColor,
+                            cardData: CardData(
+                              topElement: Icon(
+                                FontAwesomeIcons.thermometerQuarter,
+                                color: Colors.white,
+                                size: 24.0,
+                              ),
+                              middleElement: Text(
+                                "${currentWeather.tempMin}°C",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16.0),
+                              ),
+                              bottomElement: Text(
+                                "Min. Temp",
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: Card(
-                              elevation: 0.3,
-                              color: _cardColor,
-                              child: Container(
-                                height: 90.0,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      Icon(
-                                        FontAwesome.tachometer,
-                                        color: Colors.white,
-                                        size: 24.0,
-                                      ),
-                                      Text(
-                                        "${currentWeather.pressure} hPa",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 16.0),
-                                      ),
-                                      Text(
-                                        "Pressure",
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                          TempDataCard(
+                            cardColor: _cardColor,
+                            cardData: CardData(
+                              topElement: Icon(
+                                FontAwesome.tachometer,
+                                color: Colors.white,
+                                size: 24.0,
+                              ),
+                              middleElement: Text(
+                                "${currentWeather.pressure} hPa",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16.0),
+                              ),
+                              bottomElement: Text(
+                                "Pressure",
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
-                          Expanded(
-                            child: Card(
-                              elevation: 0.3,
-                              color: _cardColor,
-                              child: Container(
-                                height: 90.0,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceAround,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: <Widget>[
-                                      Icon(
-                                        Entypo.drop,
-                                        color: Colors.white,
-                                        size: 24.0,
-                                      ),
-                                      Text(
-                                        "${currentWeather.humidity}%",
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.w400,
-                                            fontSize: 16.0),
-                                      ),
-                                      Text(
-                                        "Humidity",
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                          TempDataCard(
+                            cardColor: _cardColor,
+                            cardData: CardData(
+                              topElement: Icon(
+                                Entypo.drop,
+                                color: Colors.white,
+                                size: 24.0,
+                              ),
+                              middleElement: Text(
+                                "${currentWeather.humidity}%",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16.0),
+                              ),
+                              bottomElement: Text(
+                                "Humidity",
+                                textAlign: TextAlign.center,
                               ),
                             ),
                           ),
                         ],
                       ),
+                      /////////////////// END OF TEMP CARD DATA ////////////////
+
+                      ////////////////////// OTHER DATA ////////////////////////
                       Card(
                         elevation: 0.3,
                         color: _cardColor,
@@ -339,6 +289,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           ),
                         ),
                       ),
+                      ////////////////// END OF OTHER DATA /////////////////////
+
                       InkWell(
                         onTap: () {
                           setState(() {
@@ -353,18 +305,20 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                             curve: Curves.easeIn,
                           );
                         },
+                        ////////////////////////////////////////////////////////
                         child: Card(
                           elevation: 0.3,
                           color: _cardColor,
                           child: Padding(
                             padding: const EdgeInsets.all(15.0),
                             child: IntrinsicHeight(
+                              //////////////////////////////////////////////////
                               child: Row(
                                 children: <Widget>[
                                   Expanded(
                                     child: Column(
                                       children: <Widget>[
-                                        Text("Sun"),
+                                        Text("SUN"),
                                         Container(
                                           height: 30.0,
                                           child: FlareActor(
@@ -383,7 +337,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   Expanded(
                                     child: Column(
                                       children: <Widget>[
-                                        Text("Sun"),
+                                        Text("MON"),
                                         Container(
                                           height: 30.0,
                                           child: FlareActor(
@@ -402,7 +356,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   Expanded(
                                     child: Column(
                                       children: <Widget>[
-                                        Text("Sun"),
+                                        Text("TUE"),
                                         Container(
                                           height: 30.0,
                                           child: FlareActor(
@@ -421,7 +375,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   Expanded(
                                     child: Column(
                                       children: <Widget>[
-                                        Text("Sun"),
+                                        Text("WED"),
                                         Container(
                                           height: 30.0,
                                           child: FlareActor(
@@ -440,7 +394,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   Expanded(
                                     child: Column(
                                       children: <Widget>[
-                                        Text("Sun"),
+                                        Text("THU"),
                                         Container(
                                           height: 30.0,
                                           child: FlareActor(
@@ -455,16 +409,18 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   ),
                                 ],
                               ),
+                              //////////////////////////////////////////////////
                             ),
                           ),
                         ),
+                        ////////////////////////////////////////////////////////
                       ),
                     ],
                   ),
                 ],
               ),
             ),
-            // TODAYS FORECAST DETAILS //
+            // TODAY'S FORECAST DETAILS //
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: AnimatedContainer(
@@ -662,64 +618,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
         },
       ),
       titlesData: FlTitlesData(
-        show: true,
-        bottomTitles: SideTitles(
-          showTitles: false,
-          reservedSize: 0,
-          textStyle: TextStyle(
-            color: const Color(0xff37434d),
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 1:
-                return 'SUN';
-              case 3:
-                return 'MON';
-              case 5:
-                return 'TUE';
-              case 7:
-                return 'WED';
-              case 9:
-                return 'THUR';
-            }
-            return '';
-          },
-          margin: 8,
-        ),
-        leftTitles: SideTitles(
-          showTitles: false,
-          textStyle: TextStyle(
-            color: const Color(0xff67727d),
-            fontWeight: FontWeight.bold,
-            fontSize: 15,
-          ),
-          getTitles: (value) {
-            switch (value.toInt()) {
-              case 0:
-                return '0';
-              case 1:
-                return '1';
-              case 2:
-                return '2';
-              case 3:
-                return '3';
-              case 4:
-                return '4';
-            }
-            return '';
-          },
-          reservedSize: 28,
-          margin: 0,
-        ),
+        show: false,
       ),
       borderData: FlBorderData(
         show: false,
-        border: Border.all(
-          color: const Color(0xff37434d),
-          width: 1,
-        ),
       ),
       minX: 0,
       maxX: 10,
@@ -728,22 +630,24 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       lineBarsData: [
         LineChartBarData(
           spots: const [
+//            FlSpot(0, 28.75),
             FlSpot(1, 25.75),
             FlSpot(3, 31.97),
             FlSpot(5, 33.55),
             FlSpot(7, 28.52),
             FlSpot(9, 26.46),
+//            FlSpot(10, 30.46),
           ],
           isCurved: true,
           colors: gradientColors,
-          barWidth: 4,
+          barWidth: 2,
           isStrokeCapRound: true,
           dotData: const FlDotData(
             show: true,
             dotColor: Colors.white,
           ),
           belowBarData: BarAreaData(
-            show: false,
+            show: true,
             colors:
                 gradientColors.map((color) => color.withOpacity(0.3)).toList(),
           ),

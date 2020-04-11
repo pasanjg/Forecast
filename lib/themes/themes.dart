@@ -18,22 +18,22 @@ class AppThemes {
 
   static final ThemeData dayTheme = ThemeData(
     textTheme: textTheme,
-    primaryColor: Color(0xFF0669BF),
     accentColor: Color(0XFF078DD9),
+    primaryColor: Color(0xFF0669BF),
     fontFamily: fontFamily,
   );
 
   static final ThemeData eveningTheme = ThemeData(
     textTheme: textTheme,
-    primaryColor: Color(0XFF2D102C),
-    accentColor: Color(0XFFE26340),
+    accentColor: Color(0XFFFE7F4A),
+    primaryColor: Color(0XFF2F0F2C),
     fontFamily: fontFamily,
   );
 
   static final ThemeData nightTheme = ThemeData(
     textTheme: textTheme,
-    primaryColor: Color(0xFF010A26),
     accentColor: Color(0xFF010A5D),
+    primaryColor: Color(0xFF010A26),
     fontFamily: fontFamily,
   );
 
@@ -51,5 +51,20 @@ class AppThemes {
         break;
     }
     return currentTheme;
+  }
+
+  static ThemeData setCurrentDynamicTheme() {
+    DateTime _dateTime = DateTime.now();
+    _dateTime = DateTime.now();
+    int _currentHour = _dateTime.hour;
+    print(_currentHour);
+
+    if (_currentHour >= 6 && _currentHour <= 15) {
+      return getThemeFromKey(AppThemeKeys.DAY);
+    } else if (_currentHour >= 16 && _currentHour <= 18) {
+      return getThemeFromKey(AppThemeKeys.EVENING);
+    } else {
+      return getThemeFromKey(AppThemeKeys.NIGHT);
+    }
   }
 }
