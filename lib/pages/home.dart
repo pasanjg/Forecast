@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:forecast/pages/settings.dart';
 import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -218,7 +219,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
                       leading: Icon(
                         FontAwesomeIcons.heart,
                         color: Colors.white70,
@@ -254,7 +257,15 @@ class _HomePageState extends State<HomePage> {
                 Column(
                   children: <Widget>[
                     ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).pop();
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SettingsPage(),
+                          ),
+                        );
+                      },
                       leading: Icon(
                         FontAwesomeIcons.cog,
                         color: Colors.white70,
@@ -266,7 +277,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     ListTile(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.of(context).pop();
+                      },
                       leading: Icon(
                         FontAwesomeIcons.powerOff,
                         color: Colors.white70,
