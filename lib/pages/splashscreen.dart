@@ -38,15 +38,6 @@ class _SplashScreenState extends State<SplashScreen> {
     return Center(
       child: Container(
         color: Theme.of(context).primaryColor,
-//        decoration: BoxDecoration(
-//          gradient: RadialGradient(
-//            stops: [0.1, 0.5],
-//            colors: [
-//              Theme.of(context).primaryColor,
-//              Theme.of(context).accentColor,
-//            ],
-//          ),
-//        ),
         child: Center(
           child: Container(
             height: MediaQuery.of(context).size.height * 0.4,

@@ -58,16 +58,18 @@ class AppThemes {
 
   static ThemeData setCurrentDynamicTheme() {
     DateTime _dateTime = DateTime.now();
-    _dateTime = DateTime.now();
-    int _currentHour = _dateTime.hour;
-    print(_currentHour);
+    return AppThemes.getThemeFromKey(getThemeKeyFromTime(_dateTime));
+  }
+
+  static AppThemeKeys getThemeKeyFromTime(DateTime locationDate) {
+    int _currentHour = locationDate.hour;
 
     if (_currentHour >= 6 && _currentHour <= 15) {
-      return getThemeFromKey(AppThemeKeys.DAY);
+      return AppThemeKeys.DAY;
     } else if (_currentHour >= 16 && _currentHour <= 18) {
-      return getThemeFromKey(AppThemeKeys.EVENING);
+      return AppThemeKeys.EVENING;
     } else {
-      return getThemeFromKey(AppThemeKeys.NIGHT);
+      return AppThemeKeys.NIGHT;
     }
   }
 }

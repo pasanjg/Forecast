@@ -16,6 +16,7 @@ class WeatherModel {
   String _country;
   DateTime _sunRise;
   DateTime _sunSet;
+  int _timeZone;
   String _name;
   String _cod;
 
@@ -53,13 +54,15 @@ class WeatherModel {
 
   DateTime get sunSet => _sunSet;
 
+  int get timeZone => _timeZone;
+
   String get name => _name;
 
   String get cod => _cod;
 
   WeatherModel.fromJSON(Map<String, dynamic> parsedJSON) {
 //    print(parsedJSON.length);
-//    print(parsedJSON['sys']['sunrise']);
+//    print(parsedJSON['timezone']);
     _weatherMain = parsedJSON['weather'][0]['main'];
     _weatherDescription = parsedJSON['weather'][0]['description'];
     _weatherIcon = parsedJSON['weather'][0]['icon'];
@@ -74,6 +77,7 @@ class WeatherModel {
     _country = parsedJSON['sys']['country'];
     _sunRise = DateTime.parse(parsedJSON['sys']['sunrise'].toString());
     _sunSet = DateTime.parse(parsedJSON['sys']['sunset'].toString());
+    _timeZone = parsedJSON['timezone'];
     _name = parsedJSON['name'];
     _cod = parsedJSON['cod'].toString();
   }

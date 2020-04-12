@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:forecast/themes/app_theme.dart';
+import 'package:forecast/themes/themes.dart';
 import 'package:intl/intl.dart';
 
 import 'package:forecast/models/openweathermap_api.dart';
@@ -24,6 +26,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   OpenWeatherMapAPI openWeatherMapAPI;
   Geolocator geolocator = Geolocator();
   Position userLocation;
+  DateTime locationDate;
 
   double _animatedHeight = 0;
   double _animatedMaxHeight = 250;
@@ -82,6 +85,41 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     );
   }
 
+  getTodayDateTime(int timeZone) {
+    DateTime today = new DateTime.now();
+
+    if (timeZone >= 0) {
+      this.locationDate = today
+          .add(
+            Duration(
+              hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
+              minutes: DateFormat("ss").parse(timeZone.toString(), true).minute,
+            ),
+          )
+          .toUtc();
+    } else {
+      timeZone *= -1;
+      this.locationDate = today
+          .subtract(
+            Duration(
+              hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
+              minutes: DateFormat("ss").parse(timeZone.toString(), true).minute,
+            ),
+          )
+          .toUtc();
+    }
+
+    this.locationDate = locationDate;
+    return DateFormat.yMMMMEEEEd().format(locationDate);
+  }
+
+  void _onAfterBuild(BuildContext context) {
+    setState(() {
+      if(locationDate != null)
+        AppTheme.instanceOf(context).changeTheme(AppThemes.getThemeKeyFromTime(locationDate));
+    });
+  }
+
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
     Color _cardColor = Theme.of(context).primaryColor.withOpacity(0.8);
     return NotificationListener<OverscrollIndicatorNotification>(
@@ -103,9 +141,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                   Column(
                     children: <Widget>[
                       Text(
-                        DateFormat.yMMMMEEEEd().format(
-                          DateTime.now(),
-                        ),
+                        getTodayDateTime(currentWeather.timeZone),
                         style: TextStyle(
                           letterSpacing: 1.5,
                           fontWeight: FontWeight.w400,
@@ -124,12 +160,15 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           fontSize: 24.0,
                         ),
                       ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
                     ],
                   ),
                   Column(
                     children: <Widget>[
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: <Widget>[
                           Column(
                             children: <Widget>[
@@ -144,7 +183,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                               ),
                             ],
                           ),
-                          SizedBox(width: 20.0),
                           Column(
                             children: <Widget>[
                               Row(
@@ -685,6 +723,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) => _onAfterBuild(context));
     return StreamBuilder(
       stream: currentWeatherBloc.currentWeather,
       builder: (context, AsyncSnapshot<WeatherModel> snapshot) {

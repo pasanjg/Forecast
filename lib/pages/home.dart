@@ -48,7 +48,6 @@ class _HomePageState extends State<HomePage> {
     List tempList = new List();
     for (int i = 0; i < jsonResponse.length; i++) {
       tempList.add(jsonResponse[i]);
-      print(jsonResponse.length);
     }
     setState(() {
       cities = tempList;
