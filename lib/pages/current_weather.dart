@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:forecast/themes/app_theme.dart';
-import 'package:forecast/themes/themes.dart';
+import 'package:forecast/utils/common/common_utils.dart';
+import 'package:forecast/utils/common/shared_preferences.dart';
+import 'package:forecast/utils/themes/app_theme.dart';
+import 'package:forecast/utils/themes/themes.dart';
 import 'package:intl/intl.dart';
 
 import 'package:forecast/models/openweathermap_api.dart';
@@ -27,6 +29,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   Geolocator geolocator = Geolocator();
   Position userLocation;
   DateTime locationDate;
+  String units;
+  String temperatureUnit;
 
   double _animatedHeight = 0;
   double _animatedMaxHeight = 250;
@@ -36,18 +40,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     Colors.grey,
     Colors.white,
   ];
-
-  Future<Position> _getLocation() async {
-    var currentLocation;
-    try {
-      currentLocation = await geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best,
-      );
-    } catch (e) {
-      currentLocation = null;
-    }
-    return currentLocation;
-  }
 
   @override
   void initState() {
@@ -60,9 +52,16 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           'lat': userLocation.latitude.toString(),
           'lon': userLocation.longitude.toString(),
         },
-        units: "metric",
+        units: units,
       );
       currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
+    });
+
+    AppSharedPreferences.getStringSharedPreferences("units").then((value) {
+      setState(() {
+        temperatureUnit = CommonUtils.getTemperatureUnit(value);
+        units = value;
+      });
     });
   }
 
@@ -75,6 +74,18 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   void dispose() {
 //    currentWeatherBloc.dispose();
     super.dispose();
+  }
+
+  Future<Position> _getLocation() async {
+    var currentLocation;
+    try {
+      currentLocation = await geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.best,
+      );
+    } catch (e) {
+      currentLocation = null;
+    }
+    return currentLocation;
   }
 
   handleAutoScroll() {
@@ -115,8 +126,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   void _onAfterBuild(BuildContext context) {
     setState(() {
-      if(locationDate != null)
-        AppTheme.instanceOf(context).changeTheme(AppThemes.getThemeKeyFromTime(locationDate));
+      if (locationDate != null)
+        AppTheme.instanceOf(context)
+            .changeTheme(AppThemes.getThemeKeyFromTime(locationDate));
     });
   }
 
@@ -196,9 +208,12 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     ),
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 7.0),
+                                    padding: const EdgeInsets.only(
+                                      left: 3.0,
+                                      top: 7.0,
+                                    ),
                                     child: Text(
-                                      "°C",
+                                      temperatureUnit,
                                       style: TextStyle(
                                         height: 1.2,
                                         fontSize: 18.0,
@@ -215,7 +230,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 height: 5.0,
                               ),
                               Text(
-                                "${currentWeather.feelsLike}°C",
+                                "${currentWeather.feelsLike} ${temperatureUnit}",
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ],
@@ -239,7 +254,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 size: 24.0,
                               ),
                               middleElement: Text(
-                                "${currentWeather.tempMax}°C",
+                                "${currentWeather.tempMax} ${temperatureUnit}",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 16.0,
@@ -260,7 +275,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 size: 24.0,
                               ),
                               middleElement: Text(
-                                "${currentWeather.tempMin}°C",
+                                "${currentWeather.tempMin} ${temperatureUnit}",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 16.0),
@@ -392,7 +407,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                             animation: "02d",
                                           ),
                                         ),
-                                        Text("30 °C")
+                                        Text("30 $temperatureUnit")
                                       ],
                                     ),
                                   ),
@@ -411,7 +426,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                             animation: "11d",
                                           ),
                                         ),
-                                        Text("30 °C")
+                                        Text("30 $temperatureUnit")
                                       ],
                                     ),
                                   ),
@@ -430,7 +445,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                             animation: "04d",
                                           ),
                                         ),
-                                        Text("30 °C")
+                                        Text("30 $temperatureUnit")
                                       ],
                                     ),
                                   ),
@@ -449,7 +464,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                             animation: "09d",
                                           ),
                                         ),
-                                        Text("30 °C")
+                                        Text("30 $temperatureUnit")
                                       ],
                                     ),
                                   ),
@@ -468,7 +483,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                             animation: "50d",
                                           ),
                                         ),
-                                        Text("30 °C"),
+                                        Text("30 $temperatureUnit"),
                                       ],
                                     ),
                                   ),

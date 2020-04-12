@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:forecast/pages/splashscreen.dart';
-import 'package:forecast/themes/app_theme.dart';
-import 'package:forecast/themes/themes.dart';
+import 'package:forecast/utils/themes/app_theme.dart';
+import 'package:forecast/utils/themes/themes.dart';
 
 Future main() async {
   await DotEnv().load('.env');

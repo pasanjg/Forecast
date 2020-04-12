@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:forecast/utils/common/common_utils.dart';
+import 'package:forecast/utils/common/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -6,8 +8,18 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  String currencyDropdownValue = "Celsius";
+  String unitDropdownValue;
   bool isOut = false;
+
+  @override
+  void initState() {
+    super.initState();
+    AppSharedPreferences.getStringSharedPreferences("units").then((value) {
+      setState(() {
+        unitDropdownValue = CommonUtils.getTemperatureValue(value);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +69,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                       ),
                       DropdownButton<String>(
-                        value: currencyDropdownValue,
+                        value: unitDropdownValue,
                         icon: Icon(null),
                         iconSize: 15,
                         elevation: 16,
@@ -71,7 +83,10 @@ class _SettingsPageState extends State<SettingsPage> {
                         ),
                         onChanged: (String newValue) {
                           setState(() {
-                            currencyDropdownValue = newValue;
+                            unitDropdownValue = newValue;
+                            AppSharedPreferences.setStringSharedPreferences(
+                                "units",
+                                CommonUtils.getTemperatureAPIUnit(newValue));
                           });
                         },
                         items: <String>["Celsius", "Fahrenheit", "Kelvin"]

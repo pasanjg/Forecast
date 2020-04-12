@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:forecast/themes/themes.dart';
+import 'package:forecast/utils/themes/themes.dart';
 
 class _AppTheme extends InheritedWidget {
   final AppThemeState data;
