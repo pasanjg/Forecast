@@ -19,6 +19,10 @@ import 'package:geolocator/geolocator.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class CurrentWeatherDetailsPage extends StatefulWidget {
+  final String cityName;
+
+  CurrentWeatherDetailsPage({Key key, this.cityName}) : super(key: key);
+
   @override
   _CurrentWeatherDetailsPageState createState() =>
       _CurrentWeatherDetailsPageState();
@@ -47,13 +51,20 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     _getLocation().then((position) {
       userLocation = position;
       print(userLocation);
-      openWeatherMapAPI = OpenWeatherMapAPI(
-        coordinates: {
-          'lat': userLocation.latitude.toString(),
-          'lon': userLocation.longitude.toString(),
-        },
-        units: units,
-      );
+      if (widget.cityName == null) {
+        openWeatherMapAPI = OpenWeatherMapAPI(
+          coordinates: {
+            'lat': userLocation.latitude.toString(),
+            'lon': userLocation.longitude.toString(),
+          },
+          units: units,
+        );
+      } else {
+        openWeatherMapAPI = OpenWeatherMapAPI(
+          cityName: widget.cityName,
+          units: units,
+        );
+      }
       currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
     });
 
@@ -96,9 +107,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     );
   }
 
-  getTodayDateTime(int timeZone) {
+  String getTodayDate(int timeZone) {
     DateTime today = new DateTime.now();
-
     if (timeZone >= 0) {
       this.locationDate = today
           .add(
@@ -120,15 +130,14 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           .toUtc();
     }
 
-    this.locationDate = locationDate;
-    return DateFormat.yMMMMEEEEd().format(locationDate);
+    return DateFormat.yMMMMEEEEd().format(this.locationDate);
   }
 
   void _onAfterBuild(BuildContext context) {
     setState(() {
-      if (locationDate != null)
+      if (this.locationDate != null)
         AppTheme.instanceOf(context)
-            .changeTheme(AppThemes.getThemeKeyFromTime(locationDate));
+            .changeTheme(AppThemes.getThemeKeyFromTime(this.locationDate));
     });
   }
 
@@ -153,7 +162,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                   Column(
                     children: <Widget>[
                       Text(
-                        getTodayDateTime(currentWeather.timeZone),
+                        getTodayDate(currentWeather.timeZone),
                         style: TextStyle(
                           letterSpacing: 1.5,
                           fontWeight: FontWeight.w400,
@@ -230,7 +239,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 height: 5.0,
                               ),
                               Text(
-                                "${currentWeather.feelsLike} ${temperatureUnit}",
+                                "${currentWeather.feelsLike} $temperatureUnit",
                                 style: TextStyle(fontSize: 16.0),
                               ),
                             ],
@@ -254,7 +263,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 size: 24.0,
                               ),
                               middleElement: Text(
-                                "${currentWeather.tempMax} ${temperatureUnit}",
+                                "${currentWeather.tempMax} $temperatureUnit",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 16.0,
@@ -275,7 +284,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 size: 24.0,
                               ),
                               middleElement: Text(
-                                "${currentWeather.tempMin} ${temperatureUnit}",
+                                "${currentWeather.tempMin} $temperatureUnit",
                                 style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontSize: 16.0),
