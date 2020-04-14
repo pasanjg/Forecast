@@ -142,7 +142,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   }
 
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
-    Color _cardColor = Theme.of(context).primaryColor.withOpacity(0.8);
+    Color _cardColor = Colors.black.withAlpha(20);
     return NotificationListener<OverscrollIndicatorNotification>(
       onNotification: (scroll) {
         scroll.disallowGlow();

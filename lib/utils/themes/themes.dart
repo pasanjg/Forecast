@@ -18,24 +18,24 @@ class AppThemes {
 
   static final ThemeData dayTheme = ThemeData(
     textTheme: textTheme,
-    accentColor: Color(0XFF078DD9),
-    primaryColor: Color(0xFF0669BF),
+    accentColor: Color(0XFF21C8F6),
+    primaryColor: Color(0xFF637BFF),
     canvasColor: Color(0xFF141414),
     fontFamily: fontFamily,
   );
 
   static final ThemeData eveningTheme = ThemeData(
     textTheme: textTheme,
-    accentColor: Color(0XFFCE6955),
-    primaryColor: Color(0XFF27213D),
-    canvasColor: Color(0xFF141414),
+    accentColor: Color(0XFFCF5C36),
+    primaryColor: Color(0XFF160F29),
+    canvasColor: Color(0xFF641514),
     fontFamily: fontFamily,
   );
 
   static final ThemeData nightTheme = ThemeData(
     textTheme: textTheme,
-    accentColor: Color(0xFF010A5D),
-    primaryColor: Color(0xFF010A26),
+    accentColor: Color(0xFF011526),
+    primaryColor: Color(0xFF024873),
     canvasColor: Color(0xFF141414),
     fontFamily: fontFamily,
   );
