@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/shared_preferences.dart';
+import 'package:forecast/widgets/background/default_gradient.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -29,18 +30,7 @@ class _SettingsPageState extends State<SettingsPage> {
         title: Text("Settings"),
         backgroundColor: Theme.of(context).accentColor,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            stops: [0.0, 1.0],
-            colors: <Color>[
-              Theme.of(context).accentColor,
-              Theme.of(context).primaryColor,
-            ],
-          ),
-        ),
+      body: DefaultGradient(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Column(
