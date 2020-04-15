@@ -48,23 +48,25 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   @override
   void initState() {
     super.initState();
-    _getLocation().then((position) {
+
+    _getLocation().then((position) async {
       userLocation = position;
       print(userLocation);
+
       if (widget.cityName == null) {
-        openWeatherMapAPI = OpenWeatherMapAPI(
-          coordinates: {
-            'lat': userLocation.latitude.toString(),
-            'lon': userLocation.longitude.toString(),
-          },
-          units: units,
-        );
+        await _getLocationAddress(userLocation).then((address) {
+          openWeatherMapAPI = OpenWeatherMapAPI(
+            cityName: "${address[0].locality},${address[0].isoCountryCode}",
+            units: units,
+          );
+        });
       } else {
         openWeatherMapAPI = OpenWeatherMapAPI(
           cityName: widget.cityName,
           units: units,
         );
       }
+
       currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
     });
 
@@ -89,6 +91,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   Future<Position> _getLocation() async {
     var currentLocation;
+
     try {
       currentLocation = await geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.best,
@@ -96,10 +99,21 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     } catch (e) {
       currentLocation = null;
     }
+
     return currentLocation;
   }
 
-  handleAutoScroll() {
+  Future<List<Placemark>> _getLocationAddress(Position userLocation) async {
+    var latitude = userLocation.latitude;
+    var longitude = userLocation.longitude;
+
+    List<Placemark> placemark =
+        await Geolocator().placemarkFromCoordinates(latitude, longitude);
+
+    return placemark;
+  }
+
+  _handleAutoScroll() {
     _controller.animateTo(
       _controller.position.maxScrollExtent,
       duration: Duration(milliseconds: 400),
@@ -107,8 +121,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     );
   }
 
-  String getTodayDate(int timeZone) {
+  String _getTodayDate(int timeZone) {
     DateTime today = new DateTime.now();
+
     if (timeZone >= 0) {
       this.locationDate = today
           .add(
@@ -143,6 +158,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
     Color _cardColor = Colors.black.withAlpha(20);
+
     return NotificationListener<OverscrollIndicatorNotification>(
       onNotification: (scroll) {
         scroll.disallowGlow();
@@ -162,7 +178,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                   Column(
                     children: <Widget>[
                       Text(
-                        getTodayDate(currentWeather.timeZone),
+                        _getTodayDate(currentWeather.timeZone),
                         style: TextStyle(
                           letterSpacing: 1.5,
                           fontWeight: FontWeight.w400,
@@ -391,7 +407,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           if (_animatedHeight == _animatedMaxHeight)
                             Timer(
                               Duration(milliseconds: 500),
-                              handleAutoScroll,
+                              _handleAutoScroll,
                             );
                         },
                         ////////////////////////////////////////////////////////
