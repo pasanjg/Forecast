@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/shared_preferences.dart';
 import 'package:forecast/utils/themes/app_theme.dart';
@@ -175,352 +176,361 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  Column(
-                    children: <Widget>[
-                      Text(
-                        _getTodayDate(currentWeather.timeZone),
-                        style: TextStyle(
-                          letterSpacing: 1.5,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 18.0,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                      Text(
-                        currentWeather.name.toUpperCase(),
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          letterSpacing: 2,
-                          fontWeight: FontWeight.w700,
-                          fontSize: 24.0,
-                        ),
-                      ),
-                      SizedBox(
-                        height: 10.0,
-                      ),
-                    ],
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: <Widget>[
-                          Column(
-                            children: <Widget>[
-                              Container(
-                                height: MediaQuery.of(context).size.width * 0.4,
-                                width: MediaQuery.of(context).size.width * 0.4,
-                                child: FlareActor(
-                                  "assets/flare_animations/weather_icons/weather_${currentWeather.weatherIcon}.flr",
-                                  fit: BoxFit.contain,
-                                  animation: currentWeather.weatherIcon,
-                                ),
-                              ),
-                            ],
+                  FadeAnimation(
+                    delay: 0.5,
+                    child: Column(
+                      children: <Widget>[
+                        Text(
+                          _getTodayDate(currentWeather.timeZone),
+                          style: TextStyle(
+                            letterSpacing: 1.5,
+                            fontWeight: FontWeight.w400,
+                            fontSize: 18.0,
                           ),
-                          Column(
-                            children: <Widget>[
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: <Widget>[
-                                  Text(
-                                    "${currentWeather.temp}",
-                                    style: TextStyle(
-                                      height: 1.2,
-                                      fontSize: 50.0,
-                                    ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                        Text(
+                          currentWeather.name.toUpperCase(),
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 24.0,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10.0,
+                        ),
+                      ],
+                    ),
+                  ),
+                  FadeAnimation(
+                    delay: 0.8,
+                    child: Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[
+                            Column(
+                              children: <Widget>[
+                                Container(
+                                  height: MediaQuery.of(context).size.width * 0.4,
+                                  width: MediaQuery.of(context).size.width * 0.4,
+                                  child: FlareActor(
+                                    "assets/flare_animations/weather_icons/weather_${currentWeather.weatherIcon}.flr",
+                                    fit: BoxFit.contain,
+                                    animation: currentWeather.weatherIcon,
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      left: 3.0,
-                                      top: 7.0,
-                                    ),
-                                    child: Text(
-                                      temperatureUnit,
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text(
+                                      "${currentWeather.temp}",
                                       style: TextStyle(
                                         height: 1.2,
-                                        fontSize: 18.0,
+                                        fontSize: 50.0,
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                currentWeather.weatherDescription.toUpperCase(),
-                                style: TextStyle(fontSize: 14.0),
-                              ),
-                              SizedBox(
-                                height: 5.0,
-                              ),
-                              Text(
-                                "${currentWeather.feelsLike} $temperatureUnit",
-                                style: TextStyle(fontSize: 16.0),
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      /////// MAX.TEMP | MIN.TEMP | PRESSURE | HUMIDITY ////////
-                      Row(
-                        children: <Widget>[
-                          TempDataCard(
-                            cardColor: _cardColor,
-                            cardData: CardData(
-                              topElement: Icon(
-                                FontAwesomeIcons.thermometerFull,
-                                color: Colors.white,
-                                size: 24.0,
-                              ),
-                              middleElement: Text(
-                                "${currentWeather.tempMax} $temperatureUnit",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 16.0,
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                        left: 3.0,
+                                        top: 7.0,
+                                      ),
+                                      child: Text(
+                                        temperatureUnit,
+                                        style: TextStyle(
+                                          height: 1.2,
+                                          fontSize: 18.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ),
-                              bottomElement: Text(
-                                "Max. Temp",
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                          TempDataCard(
-                            cardColor: _cardColor,
-                            cardData: CardData(
-                              topElement: Icon(
-                                FontAwesomeIcons.thermometerQuarter,
-                                color: Colors.white,
-                                size: 24.0,
-                              ),
-                              middleElement: Text(
-                                "${currentWeather.tempMin} $temperatureUnit",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 16.0),
-                              ),
-                              bottomElement: Text(
-                                "Min. Temp",
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                          TempDataCard(
-                            cardColor: _cardColor,
-                            cardData: CardData(
-                              topElement: Icon(
-                                FontAwesome.tachometer,
-                                color: Colors.white,
-                                size: 24.0,
-                              ),
-                              middleElement: Text(
-                                "${currentWeather.pressure} hPa",
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 16.0),
-                              ),
-                              bottomElement: Text(
-                                "Pressure",
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                          TempDataCard(
-                            cardColor: _cardColor,
-                            cardData: CardData(
-                              topElement: Icon(
-                                Entypo.drop,
-                                color: Colors.white,
-                                size: 24.0,
-                              ),
-                              middleElement: Text(
-                                "${currentWeather.humidity}%",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize: 16.0,
+                                Text(
+                                  currentWeather.weatherDescription.toUpperCase(),
+                                  style: TextStyle(fontSize: 14.0),
                                 ),
-                              ),
-                              bottomElement: Text(
-                                "Humidity",
-                                textAlign: TextAlign.center,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      /////////////////// END OF TEMP CARD DATA ////////////////
-
-                      ////////////////////// OTHER DATA ////////////////////////
-                      Card(
-                        elevation: 0.3,
-                        color: _cardColor,
-                        child: Padding(
-                          padding: const EdgeInsets.all(15.0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(
-                                    FontAwesomeIcons.cloud,
-                                    color: Colors.white,
-                                    size: 15.0,
-                                  ),
-                                  SizedBox(width: 15.0),
-                                  Text("${currentWeather.clouds}%"),
-                                ],
-                              ),
-                              Row(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Icon(
-                                    FontAwesomeIcons.wind,
-                                    color: Colors.white,
-                                    size: 15.0,
-                                  ),
-                                  SizedBox(width: 15.0),
-                                  Text("${currentWeather.windSpeed} m/s"),
-                                ],
-                              ),
-                            ],
-                          ),
+                                SizedBox(
+                                  height: 5.0,
+                                ),
+                                Text(
+                                  "${currentWeather.feelsLike} $temperatureUnit",
+                                  style: TextStyle(fontSize: 16.0),
+                                ),
+                              ],
+                            )
+                          ],
                         ),
-                      ),
-                      ////////////////// END OF OTHER DATA /////////////////////
+                      ],
+                    ),
+                  ),
+                  FadeAnimation(
+                    delay: 1.2,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        /////// MAX.TEMP | MIN.TEMP | PRESSURE | HUMIDITY ////////
+                        Row(
+                          children: <Widget>[
+                            TempDataCard(
+                              cardColor: _cardColor,
+                              cardData: CardData(
+                                topElement: Icon(
+                                  FontAwesomeIcons.thermometerFull,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                middleElement: Text(
+                                  "${currentWeather.tempMax} $temperatureUnit",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                                bottomElement: Text(
+                                  "Max. Temp",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            TempDataCard(
+                              cardColor: _cardColor,
+                              cardData: CardData(
+                                topElement: Icon(
+                                  FontAwesomeIcons.thermometerQuarter,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                middleElement: Text(
+                                  "${currentWeather.tempMin} $temperatureUnit",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 16.0),
+                                ),
+                                bottomElement: Text(
+                                  "Min. Temp",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            TempDataCard(
+                              cardColor: _cardColor,
+                              cardData: CardData(
+                                topElement: Icon(
+                                  FontAwesome.tachometer,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                middleElement: Text(
+                                  "${currentWeather.pressure} hPa",
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 16.0),
+                                ),
+                                bottomElement: Text(
+                                  "Pressure",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                            TempDataCard(
+                              cardColor: _cardColor,
+                              cardData: CardData(
+                                topElement: Icon(
+                                  Entypo.drop,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                                middleElement: Text(
+                                  "${currentWeather.humidity}%",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                                bottomElement: Text(
+                                  "Humidity",
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        /////////////////// END OF TEMP CARD DATA ////////////////
 
-                      InkWell(
-                        onTap: () {
-                          setState(() {
-                            _animatedHeight =
-                                _animatedHeight == _animatedMaxHeight
-                                    ? 0
-                                    : _animatedMaxHeight;
-                          });
-
-                          if (_animatedHeight == _animatedMaxHeight)
-                            Timer(
-                              Duration(milliseconds: 500),
-                              _handleAutoScroll,
-                            );
-                        },
-                        ////////////////////////////////////////////////////////
-                        child: Card(
+                        ////////////////////// OTHER DATA ////////////////////////
+                        Card(
                           elevation: 0.3,
                           color: _cardColor,
                           child: Padding(
                             padding: const EdgeInsets.all(15.0),
-                            child: IntrinsicHeight(
-                              //////////////////////////////////////////////////
-                              child: Row(
-                                children: <Widget>[
-                                  Expanded(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text("SUN"),
-                                        Container(
-                                          height: 30.0,
-                                          child: FlareActor(
-                                            "assets/flare_animations/weather_icons/weather_02d.flr",
-                                            fit: BoxFit.contain,
-                                            animation: "02d",
-                                          ),
-                                        ),
-                                        Text("30 $temperatureUnit")
-                                      ],
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(
+                                      FontAwesomeIcons.cloud,
+                                      color: Colors.white,
+                                      size: 15.0,
                                     ),
-                                  ),
-                                  VerticalDivider(
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text("MON"),
-                                        Container(
-                                          height: 30.0,
-                                          child: FlareActor(
-                                            "assets/flare_animations/weather_icons/weather_11d.flr",
-                                            fit: BoxFit.contain,
-                                            animation: "11d",
-                                          ),
-                                        ),
-                                        Text("30 $temperatureUnit")
-                                      ],
+                                    SizedBox(width: 15.0),
+                                    Text("${currentWeather.clouds}%"),
+                                  ],
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(
+                                      FontAwesomeIcons.wind,
+                                      color: Colors.white,
+                                      size: 15.0,
                                     ),
-                                  ),
-                                  VerticalDivider(
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text("TUE"),
-                                        Container(
-                                          height: 30.0,
-                                          child: FlareActor(
-                                            "assets/flare_animations/weather_icons/weather_04d.flr",
-                                            fit: BoxFit.contain,
-                                            animation: "04d",
-                                          ),
-                                        ),
-                                        Text("30 $temperatureUnit")
-                                      ],
-                                    ),
-                                  ),
-                                  VerticalDivider(
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text("WED"),
-                                        Container(
-                                          height: 30.0,
-                                          child: FlareActor(
-                                            "assets/flare_animations/weather_icons/weather_09d.flr",
-                                            fit: BoxFit.contain,
-                                            animation: "09d",
-                                          ),
-                                        ),
-                                        Text("30 $temperatureUnit")
-                                      ],
-                                    ),
-                                  ),
-                                  VerticalDivider(
-                                    color: Colors.white.withOpacity(0.3),
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      children: <Widget>[
-                                        Text("THU"),
-                                        Container(
-                                          height: 30.0,
-                                          child: FlareActor(
-                                            "assets/flare_animations/weather_icons/weather_50d.flr",
-                                            fit: BoxFit.contain,
-                                            animation: "50d",
-                                          ),
-                                        ),
-                                        Text("30 $temperatureUnit"),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              //////////////////////////////////////////////////
+                                    SizedBox(width: 15.0),
+                                    Text("${currentWeather.windSpeed} m/s"),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        ////////////////////////////////////////////////////////
-                      ),
-                    ],
+                        ////////////////// END OF OTHER DATA /////////////////////
+
+                        InkWell(
+                          onTap: () {
+                            setState(() {
+                              _animatedHeight =
+                                  _animatedHeight == _animatedMaxHeight
+                                      ? 0
+                                      : _animatedMaxHeight;
+                            });
+
+                            if (_animatedHeight == _animatedMaxHeight)
+                              Timer(
+                                Duration(milliseconds: 500),
+                                _handleAutoScroll,
+                              );
+                          },
+                          ////////////////////////////////////////////////////////
+                          child: Card(
+                            elevation: 0.3,
+                            color: _cardColor,
+                            child: Padding(
+                              padding: const EdgeInsets.all(15.0),
+                              child: IntrinsicHeight(
+                                //////////////////////////////////////////////////
+                                child: Row(
+                                  children: <Widget>[
+                                    Expanded(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Text("SUN"),
+                                          Container(
+                                            height: 30.0,
+                                            child: FlareActor(
+                                              "assets/flare_animations/weather_icons/weather_02d.flr",
+                                              fit: BoxFit.contain,
+                                              animation: "02d",
+                                            ),
+                                          ),
+                                          Text("30 $temperatureUnit")
+                                        ],
+                                      ),
+                                    ),
+                                    VerticalDivider(
+                                      color: Colors.white.withOpacity(0.3),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Text("MON"),
+                                          Container(
+                                            height: 30.0,
+                                            child: FlareActor(
+                                              "assets/flare_animations/weather_icons/weather_11d.flr",
+                                              fit: BoxFit.contain,
+                                              animation: "11d",
+                                            ),
+                                          ),
+                                          Text("30 $temperatureUnit")
+                                        ],
+                                      ),
+                                    ),
+                                    VerticalDivider(
+                                      color: Colors.white.withOpacity(0.3),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Text("TUE"),
+                                          Container(
+                                            height: 30.0,
+                                            child: FlareActor(
+                                              "assets/flare_animations/weather_icons/weather_04d.flr",
+                                              fit: BoxFit.contain,
+                                              animation: "04d",
+                                            ),
+                                          ),
+                                          Text("30 $temperatureUnit")
+                                        ],
+                                      ),
+                                    ),
+                                    VerticalDivider(
+                                      color: Colors.white.withOpacity(0.3),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Text("WED"),
+                                          Container(
+                                            height: 30.0,
+                                            child: FlareActor(
+                                              "assets/flare_animations/weather_icons/weather_09d.flr",
+                                              fit: BoxFit.contain,
+                                              animation: "09d",
+                                            ),
+                                          ),
+                                          Text("30 $temperatureUnit")
+                                        ],
+                                      ),
+                                    ),
+                                    VerticalDivider(
+                                      color: Colors.white.withOpacity(0.3),
+                                    ),
+                                    Expanded(
+                                      child: Column(
+                                        children: <Widget>[
+                                          Text("THU"),
+                                          Container(
+                                            height: 30.0,
+                                            child: FlareActor(
+                                              "assets/flare_animations/weather_icons/weather_50d.flr",
+                                              fit: BoxFit.contain,
+                                              animation: "50d",
+                                            ),
+                                          ),
+                                          Text("30 $temperatureUnit"),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                //////////////////////////////////////////////////
+                              ),
+                            ),
+                          ),
+                          ////////////////////////////////////////////////////////
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
