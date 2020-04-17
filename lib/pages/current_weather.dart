@@ -56,10 +56,23 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
       if (widget.cityName == null) {
         await _getLocationAddress(userLocation).then((address) {
-          openWeatherMapAPI = OpenWeatherMapAPI(
-            cityName: "${address[0].locality},${address[0].isoCountryCode}",
-            units: units,
-          );
+          print(address[0].toJson());
+          print("LOCALITY: " + (address[0].locality != "").toString());
+
+          if (address[0].locality != "") {
+            openWeatherMapAPI = OpenWeatherMapAPI(
+              cityName: "${address[0].locality},${address[0].isoCountryCode}",
+              units: units,
+            );
+          } else {
+            openWeatherMapAPI = OpenWeatherMapAPI(
+              coordinates: {
+                'lat': userLocation.latitude,
+                'lon': userLocation.longitude
+              },
+              units: units,
+            );
+          }
         });
       } else {
         openWeatherMapAPI = OpenWeatherMapAPI(
@@ -216,8 +229,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                             Column(
                               children: <Widget>[
                                 Container(
-                                  height: MediaQuery.of(context).size.width * 0.4,
-                                  width: MediaQuery.of(context).size.width * 0.4,
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
                                   child: FlareActor(
                                     "assets/flare_animations/weather_icons/weather_${currentWeather.weatherIcon}.flr",
                                     fit: BoxFit.contain,
@@ -254,7 +269,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   ],
                                 ),
                                 Text(
-                                  currentWeather.weatherDescription.toUpperCase(),
+                                  currentWeather.weatherDescription
+                                      .toUpperCase(),
                                   style: TextStyle(fontSize: 14.0),
                                 ),
                                 SizedBox(
