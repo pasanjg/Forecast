@@ -19,6 +19,7 @@ class WeatherModel {
   int _timeZone;
   String _name;
   String _cod;
+  String _error;
 
   String get weatherMain => _weatherMain;
 
@@ -60,6 +61,8 @@ class WeatherModel {
 
   String get cod => _cod;
 
+  String get error => _error;
+
   WeatherModel.fromJSON(Map<String, dynamic> parsedJSON) {
 //    print(parsedJSON.length);
 //    print(parsedJSON['timezone']);
@@ -80,5 +83,10 @@ class WeatherModel {
     _timeZone = parsedJSON['timezone'];
     _name = parsedJSON['name'];
     _cod = parsedJSON['cod'].toString();
+  }
+
+  WeatherModel.fromError(String cod, String error){
+    _cod = cod;
+    _error = error;
   }
 }

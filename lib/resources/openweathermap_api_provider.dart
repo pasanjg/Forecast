@@ -6,13 +6,19 @@ class OpenWeatherMapAPIProvider {
   var client = http.Client();
 
   Future<WeatherModel> fetchCurrentWeather(String requestURL) async {
-    final response = await client.get(requestURL);
-    final jsonResponse = json.decode(response.body);
+    try {
+      final response = await client.get(requestURL);
+      final jsonResponse = json.decode(response.body);
+      print("STATUS_CODE: " + response.statusCode.toString());
 
-    if (response.statusCode == 200) {
-      return WeatherModel.fromJSON(jsonResponse);
-    } else {
-      print(jsonResponse['message']);
+      if (response.statusCode == 200) {
+        return WeatherModel.fromJSON(jsonResponse);
+      } else {
+        print(jsonResponse['message']);
+        return WeatherModel.fromError(
+            response.statusCode.toString(), jsonResponse['message']);
+      }
+    } catch (e) {
       throw Exception("Failed to load data :(");
     }
   }

@@ -37,7 +37,6 @@ class _HomePageState extends State<HomePage> {
           filteredCities = cities;
         } else {
           _searchText = _searchTextField.text;
-          print(_searchText);
         }
       });
     });
@@ -60,6 +59,7 @@ class _HomePageState extends State<HomePage> {
   Widget _appBarTitle() {
     return isSearching
         ? TextField(
+            autofocus: true,
             controller: _searchTextField,
             decoration: InputDecoration(
               border: InputBorder.none,
@@ -74,26 +74,29 @@ class _HomePageState extends State<HomePage> {
 
   void _onSearchPressed() {
     setState(() {
-      isSearching = isSearching ? false : true;
-      if (isSearching) {
-        _searchIcon = Icon(Icons.close);
+      if (_searchTextField.text == "" || _searchTextField.text == null) {
+        isSearching = isSearching ? false : true;
+        if (isSearching) {
+          _searchIcon = Icon(Icons.close);
+        } else {
+          _searchIcon = Icon(Icons.search);
+          filteredCities = cities;
+          _searchTextField.clear();
+        }
       } else {
-        _searchIcon = Icon(Icons.search);
-        filteredCities = cities;
-        _searchTextField.clear();
+        _searchTextField.text = "";
       }
     });
   }
 
   Widget _searchList() {
-    print(filteredCities.length);
     if (_searchText.isNotEmpty) {
       List tempList = List();
-      for (int i = 0; i < filteredCities.length; i++) {
-        if (filteredCities[i]['name']
+      for (int i = 0; i < cities.length; i++) {
+        if (cities[i]['name']
             .toLowerCase()
             .contains(_searchText.toLowerCase())) {
-          tempList.add(filteredCities[i]);
+          tempList.add(cities[i]);
         }
       }
       filteredCities = tempList;
@@ -103,10 +106,11 @@ class _HomePageState extends State<HomePage> {
       children: <Widget>[
         ListTile(
           onTap: () {
-            _onSearchPressed();
             setState(() {
+              _searchTextField.text = "";
               this.cityName = null;
             });
+            _onSearchPressed();
           },
           title: Row(
             children: <Widget>[
@@ -129,6 +133,7 @@ class _HomePageState extends State<HomePage> {
                         "," +
                         filteredCities[index]['country']);
                   });
+                  _searchTextField.text = "";
                   _onSearchPressed();
                 },
                 title: Text(
@@ -157,6 +162,7 @@ class _HomePageState extends State<HomePage> {
       onWillPop: () async {
         if (this.isSearching) {
           setState(() {
+            _searchTextField.text = "";
             this._onSearchPressed();
           });
         } else {
