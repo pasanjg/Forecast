@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:forecast/pages/no_internet.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/shared_preferences.dart';
@@ -30,6 +32,7 @@ class CurrentWeatherDetailsPage extends StatefulWidget {
 }
 
 class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
+  bool hasInternet = true;
   OpenWeatherMapAPI openWeatherMapAPI;
   Geolocator geolocator = Geolocator();
   Position userLocation;
@@ -49,6 +52,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   @override
   void initState() {
     super.initState();
+    checkInternet();
 
     _getLocation().then((position) async {
       userLocation = position;
@@ -101,6 +105,23 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   void dispose() {
 //    currentWeatherBloc.dispose();
     super.dispose();
+  }
+
+  void checkInternet() async {
+    try {
+      final result = await InternetAddress.lookup('example.com');
+      if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
+        print('connected');
+        setState(() {
+          hasInternet = true;
+        });
+      }
+    } on SocketException catch (_) {
+      print('not connected');
+      setState(() {
+        hasInternet = false;
+      });
+    }
   }
 
   Future<Position> _getLocation() async {
@@ -791,21 +812,30 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) => _onAfterBuild(context));
     return StreamBuilder(
-      stream: currentWeatherBloc.currentWeather,
-      builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
-        if (snapshot.hasData) {
-          return _buildCurrentWeatherData(snapshot.data);
-        } else if (snapshot.hasError) {
-          Fluttertoast.showToast(msg: snapshot.error);
-          return Center(child: Text(snapshot.error));
-        } else {
-          return Center(
-            child: CircularProgressIndicator(
-              backgroundColor: Colors.white,
-            ),
-          );
-        }
-      },
-    );
+        stream: currentWeatherBloc.currentWeather,
+        builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data.cod == "200") {
+              return _buildCurrentWeatherData(snapshot.data);
+            } else {
+              return Center(
+                child: Text(snapshot.data.error.toUpperCase()),
+              );
+            }
+          } else if (snapshot.hasError) {
+            Fluttertoast.showToast(msg: snapshot.error);
+            return Center(child: Text(snapshot.error));
+          } else {
+            if (hasInternet) {
+              return Center(
+                child: CircularProgressIndicator(
+                  backgroundColor: Colors.white,
+                ),
+              );
+            } else {
+              return NoInternetPage();
+            }
+          }
+        });
   }
 }
