@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/pages/no_internet.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/common_utils.dart';
@@ -216,23 +217,15 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                       children: <Widget>[
                         Text(
                           _getTodayDate(currentWeather.timeZone),
-                          style: TextStyle(
-                            letterSpacing: 1.5,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 18.0,
-                          ),
+                          style: TitleTextStyle,
                         ),
                         SizedBox(
-                          height: 10.0,
+                          height: 0.0,
                         ),
                         Text(
                           currentWeather.name.toUpperCase(),
                           textAlign: TextAlign.center,
-                          style: TextStyle(
-                            letterSpacing: 2,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 24.0,
-                          ),
+                          style: HeadingTextStyle,
                         ),
                         SizedBox(
                           height: 10.0,
@@ -269,21 +262,15 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   children: <Widget>[
                                     Text(
                                       "${currentWeather.temp}",
-                                      style: TextStyle(
-                                        height: 1.2,
-                                        fontSize: 50.0,
-                                      ),
+                                      style: MainTextStyle,
                                     ),
                                     Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 3.0,
-                                        top: 7.0,
-                                      ),
+                                      padding: const EdgeInsets.only(left: 4.0),
                                       child: Text(
                                         temperatureUnit,
                                         style: TextStyle(
+                                          fontSize: 22.0,
                                           height: 1.2,
-                                          fontSize: 18.0,
                                         ),
                                       ),
                                     ),
@@ -292,14 +279,14 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 Text(
                                   currentWeather.weatherDescription
                                       .toUpperCase(),
-                                  style: TextStyle(fontSize: 14.0),
+                                  style: RegularTextStyle,
                                 ),
                                 SizedBox(
                                   height: 5.0,
                                 ),
                                 Text(
                                   "${currentWeather.feelsLike} $temperatureUnit",
-                                  style: TextStyle(fontSize: 16.0),
+                                  style: RegularTextStyle,
                                 ),
                               ],
                             )
@@ -325,15 +312,13 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 middleElement: Text(
-                                  "${currentWeather.tempMax} $temperatureUnit",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 16.0,
-                                  ),
+                                  "${currentWeather.tempMax}$temperatureUnit",
+                                  style: MediumTextStyle,
                                 ),
                                 bottomElement: Text(
                                   "Max. Temp",
                                   textAlign: TextAlign.center,
+                                  style: SmallTextStyle,
                                 ),
                               ),
                             ),
@@ -346,14 +331,13 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 middleElement: Text(
-                                  "${currentWeather.tempMin} $temperatureUnit",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16.0),
+                                  "${currentWeather.tempMin}$temperatureUnit",
+                                  style: MediumTextStyle,
                                 ),
                                 bottomElement: Text(
                                   "Min. Temp",
                                   textAlign: TextAlign.center,
+                                  style: SmallTextStyle,
                                 ),
                               ),
                             ),
@@ -366,14 +350,13 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   size: 24.0,
                                 ),
                                 middleElement: Text(
-                                  "${currentWeather.pressure} hPa",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 16.0),
+                                  "${currentWeather.pressure}hPa",
+                                  style: MediumTextStyle,
                                 ),
                                 bottomElement: Text(
                                   "Pressure",
                                   textAlign: TextAlign.center,
+                                  style: SmallTextStyle,
                                 ),
                               ),
                             ),
@@ -387,14 +370,12 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 ),
                                 middleElement: Text(
                                   "${currentWeather.humidity}%",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 16.0,
-                                  ),
+                                  style: MediumTextStyle,
                                 ),
                                 bottomElement: Text(
                                   "Humidity",
                                   textAlign: TextAlign.center,
+                                  style: SmallTextStyle,
                                 ),
                               ),
                             ),
@@ -420,7 +401,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                       size: 15.0,
                                     ),
                                     SizedBox(width: 15.0),
-                                    Text("${currentWeather.clouds}%"),
+                                    Text(
+                                      "${currentWeather.clouds}%",
+                                      style: RegularTextStyle,
+                                    ),
                                   ],
                                 ),
                                 Row(
@@ -432,7 +416,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                       size: 15.0,
                                     ),
                                     SizedBox(width: 15.0),
-                                    Text("${currentWeather.windSpeed} m/s"),
+                                    Text(
+                                      "${currentWeather.windSpeed} m/s",
+                                      style: RegularTextStyle,
+                                    ),
                                   ],
                                 ),
                               ],

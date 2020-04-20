@@ -1,42 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:forecast/utils/common/constants.dart';
 
 enum AppThemeKeys { DAY, EVENING, NIGHT }
 
 class AppThemes {
-  static final fontFamily = 'AvenirNextLTPro';
+  static final fontFamily = 'BalooPaaji2';
 
-  static final TextTheme textTheme = TextTheme(
-    title: TextStyle(color: Colors.white),
-    subhead: TextStyle(color: Colors.white),
-    subtitle: TextStyle(color: Colors.white),
-    body1: TextStyle(color: Colors.white),
-    body2: TextStyle(color: Colors.white),
-  ).apply(
-    bodyColor: Colors.white,
-    displayColor: Colors.white,
+  static final TextTheme textTheme = AppTextTheme.apply(
+    bodyColor: defaultFontColor,
+    displayColor: defaultFontColor,
   );
 
   static final ThemeData dayTheme = ThemeData(
     textTheme: textTheme,
-    accentColor: Color(0XFF21C8F6),
-    primaryColor: Color(0xFF637BFF),
-    canvasColor: Color(0xFF141414),
+    accentColor: dayThemeAccentColor,
+    primaryColor: dayThemePrimaryColor,
     fontFamily: fontFamily,
   );
 
   static final ThemeData eveningTheme = ThemeData(
     textTheme: textTheme,
-    accentColor: Color(0XFFCF5C36),
-    primaryColor: Color(0XFF160F29),
-    canvasColor: Color(0xFF641514),
+    accentColor: eveningThemeAccentColor,
+    primaryColor: eveningThemePrimaryColor,
     fontFamily: fontFamily,
   );
 
   static final ThemeData nightTheme = ThemeData(
     textTheme: textTheme,
-    accentColor: Color(0xFF011526),
-    primaryColor: Color(0xFF024873),
-    canvasColor: Color(0xFF141414),
+    accentColor: nightThemeAccentColor,
+    primaryColor: nightThemePrimaryColor,
     fontFamily: fontFamily,
   );
 
