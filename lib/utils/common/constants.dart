@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // Colors
 const defaultFontColor = Colors.white;
+const canvasColor = Color(0xFF141414);
 const dayThemeAccentColor = Color(0XFF21C8F6);
 const dayThemePrimaryColor = Color(0xFF637BFF);
 const eveningThemeAccentColor = Color(0XFFCF5C36);
@@ -11,11 +12,11 @@ const nightThemePrimaryColor = Color(0xFF024873);
 
 // Text Style
 const AppTextTheme = TextTheme(
-  title: TextStyle(color: Colors.white),
-  subhead: TextStyle(color: Colors.white),
-  subtitle: TextStyle(color: Colors.white),
-  body1: TextStyle(color: Colors.white),
-  body2: TextStyle(color: Colors.white),
+  title: TextStyle(color: defaultFontColor),
+  subhead: TextStyle(color: defaultFontColor),
+  subtitle: TextStyle(color: defaultFontColor),
+  body1: TextStyle(color: defaultFontColor),
+  body2: TextStyle(color: defaultFontColor),
 );
 
 const HeadingTextStyle = TextStyle(

@@ -15,6 +15,7 @@ class AppThemes {
     textTheme: textTheme,
     accentColor: dayThemeAccentColor,
     primaryColor: dayThemePrimaryColor,
+    canvasColor: canvasColor,
     fontFamily: fontFamily,
   );
 
@@ -22,6 +23,7 @@ class AppThemes {
     textTheme: textTheme,
     accentColor: eveningThemeAccentColor,
     primaryColor: eveningThemePrimaryColor,
+    canvasColor: canvasColor,
     fontFamily: fontFamily,
   );
 
@@ -29,6 +31,7 @@ class AppThemes {
     textTheme: textTheme,
     accentColor: nightThemeAccentColor,
     primaryColor: nightThemePrimaryColor,
+    canvasColor: canvasColor,
     fontFamily: fontFamily,
   );
 

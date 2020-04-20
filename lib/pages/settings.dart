@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/shared_preferences.dart';
 import 'package:forecast/widgets/background/default_gradient.dart';
@@ -34,117 +35,123 @@ class _SettingsPageState extends State<SettingsPage> {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  height: 60.0,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.1),
-                        width: 1,
-                      ),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Text(
-                        "Temperature unit",
-                        style: TextStyle(
-                          fontSize: 15.0,
+              Column(
+                children: <Widget>[
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      height: 60.0,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
                         ),
                       ),
-                      DropdownButton<String>(
-                        value: unitDropdownValue,
-                        icon: Icon(null),
-                        iconSize: 15,
-                        elevation: 16,
-                        underline: Container(
-                          height: 0.0,
-                          color: Colors.grey,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Text(
+                            "Temperature unit",
+                            style: RegularTextStyle,
+                          ),
+                          DropdownButton<String>(
+                            value: unitDropdownValue,
+                            icon: Icon(null),
+                            iconSize: 15,
+                            elevation: 16,
+                            underline: Container(
+                              height: 0.0,
+                              color: Colors.grey,
+                            ),
+                            style: MediumTextStyle,
+                            onChanged: (String newValue) {
+                              setState(() {
+                                unitDropdownValue = newValue;
+                                AppSharedPreferences.setStringSharedPreferences(
+                                    "units",
+                                    CommonUtils.getTemperatureAPIUnit(
+                                        newValue));
+                              });
+                            },
+                            items: <String>["Celsius", "Fahrenheit", "Kelvin"]
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      height: 60.0,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
                         ),
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                      ),
+                      child: Text(
+                        "Terms of service",
+                        style: RegularTextStyle,
+                      ),
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: Container(
+                      alignment: Alignment.centerLeft,
+                      height: 60.0,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(
+                            color: Colors.white.withOpacity(0.1),
+                            width: 1,
+                          ),
                         ),
-                        onChanged: (String newValue) {
-                          setState(() {
-                            unitDropdownValue = newValue;
-                            AppSharedPreferences.setStringSharedPreferences(
-                                "units",
-                                CommonUtils.getTemperatureAPIUnit(newValue));
-                          });
-                        },
-                        items: <String>["Celsius", "Fahrenheit", "Kelvin"]
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  height: 60.0,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.1),
-                        width: 1,
+                      child: Text(
+                        "Privacy policy",
+                        style: RegularTextStyle,
                       ),
                     ),
                   ),
-                  child: Text(
-                    "Terms of service",
-                    style: TextStyle(
-                      fontSize: 15.0,
-                    ),
-                  ),
-                ),
+                ],
               ),
-              InkWell(
-                onTap: () {},
-                child: Container(
-                  alignment: Alignment.centerLeft,
-                  height: 60.0,
-                  width: MediaQuery.of(context).size.width,
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                        color: Colors.white.withOpacity(0.1),
-                        width: 1,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 15.0),
+                child: Column(
+                  children: <Widget>[
+                    Text(
+                      "Version 1.0.0",
+                      style: SmallTextStyle.apply(
+                        color: Colors.white30,
                       ),
                     ),
-                  ),
-                  child: Text(
-                    "Privacy policy",
-                    style: TextStyle(
-                      fontSize: 15.0,
+                    SizedBox(height: 5.0),
+                    Container(
+                      height: 18.0,
+                      child: Image.asset(
+                        "assets/images/openweathermap-logo.png",
+                        color: Colors.white.withOpacity(0.5),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              Container(
-                alignment: Alignment.center,
-                height: 60.0,
-                width: MediaQuery.of(context).size.width,
-                child: Text(
-                  "Version 1.0",
-                  style: TextStyle(
-                    color: Colors.white30,
-                    fontSize: 15.0,
-                  ),
+                  ],
                 ),
               ),
             ],

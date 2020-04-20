@@ -20,8 +20,8 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchTextField = TextEditingController();
   String _searchText = " ";
   List cities = new List();
-  List filteredCities = new List();
-  Icon _searchIcon = new Icon(Icons.search);
+  List filteredCities = List();
+  Icon _searchIcon = Icon(Icons.search);
   bool isSearching = false;
   String cityName;
 
