@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/pages/no_internet.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
@@ -25,7 +26,8 @@ import 'package:fl_chart/fl_chart.dart';
 class CurrentWeatherDetailsPage extends StatefulWidget {
   final String cityName;
 
-  CurrentWeatherDetailsPage({Key key, this.cityName}) : super(key: key);
+  CurrentWeatherDetailsPage({Key key, this.cityName})
+      : super(key: key);
 
   @override
   _CurrentWeatherDetailsPageState createState() =>
@@ -38,8 +40,15 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   Geolocator geolocator = Geolocator();
   Position userLocation;
   DateTime locationDate;
+  String cityName;
+  bool isSaved = false;
+  String userId = "VEzdLJ6PPSXJxI7QN6od";
   String units;
   String temperatureUnit;
+
+  List savedLocations;
+  DocumentReference documentReference;
+  var subscribe;
 
   double _animatedHeight = 0;
   double _animatedMaxHeight = 250;
@@ -54,7 +63,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   void initState() {
     super.initState();
     checkInternet();
-
     _getLocation().then((position) async {
       userLocation = position;
       print(userLocation);
@@ -65,27 +73,38 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           print("LOCALITY: " + (address[0].locality != "").toString());
 
           if (address[0].locality != "") {
-            openWeatherMapAPI = OpenWeatherMapAPI(
-              cityName: "${address[0].locality},${address[0].isoCountryCode}",
-              units: units,
-            );
+            setState(() {
+              this.cityName =
+                  "${address[0].locality},${address[0].isoCountryCode}";
+              print(this.cityName);
+              openWeatherMapAPI = OpenWeatherMapAPI(
+                cityName: this.cityName,
+                units: units,
+              );
+            });
           } else {
-            openWeatherMapAPI = OpenWeatherMapAPI(
-              coordinates: {
-                'lat': userLocation.latitude,
-                'lon': userLocation.longitude
-              },
-              units: units,
-            );
+            setState(() {
+              openWeatherMapAPI = OpenWeatherMapAPI(
+                coordinates: {
+                  'lat': userLocation.latitude,
+                  'lon': userLocation.longitude
+                },
+                units: units,
+              );
+            });
           }
         });
       } else {
+        setState(() {
+          this.cityName = widget.cityName;
+          print(this.cityName);
+        });
         openWeatherMapAPI = OpenWeatherMapAPI(
-          cityName: widget.cityName,
+          cityName: this.cityName,
           units: units,
         );
       }
-
+      _checkSaved();
       currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
     });
 
@@ -192,6 +211,49 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     });
   }
 
+  void _checkSaved() {
+    Firestore.instance
+        .collection(usersCollection)
+        .document(this.userId)
+        .snapshots()
+        .listen((DocumentSnapshot documentSnapshot) {
+      Map<String, dynamic> documentData = documentSnapshot.data;
+      if(this.mounted){
+        setState(() {
+          savedLocations = documentData[userFavourites];
+          isSaved = savedLocations.contains(this.cityName);
+          print(savedLocations);
+        });
+      }
+    });
+  }
+
+  void _handleSave(bool isSaved, String cityName) async {
+    print(savedLocations);
+    print(this.cityName);
+
+    this.documentReference =
+        Firestore.instance.collection(usersCollection).document(this.userId);
+
+    if (isSaved) {
+      print("YES");
+      this.documentReference.updateData({
+        userFavourites: FieldValue.arrayRemove([cityName])
+      });
+      setState(() {
+        this.isSaved = false;
+      });
+    } else {
+      print("NOOO");
+      this.documentReference.updateData({
+        userFavourites: FieldValue.arrayUnion([cityName])
+      });
+      setState(() {
+        this.isSaved = true;
+      });
+    }
+  }
+
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
     Color _cardColor = Colors.black.withAlpha(20);
 
@@ -225,7 +287,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                         Text(
                           currentWeather.name.toUpperCase(),
                           textAlign: TextAlign.center,
-                          style: HeadingTextStyle,
+                          style: HeadingTextStyle.apply(heightFactor: 0.8),
                         ),
                         SizedBox(
                           height: 10.0,
@@ -279,6 +341,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 Text(
                                   currentWeather.weatherDescription
                                       .toUpperCase(),
+                                  textAlign: TextAlign.center,
                                   style: RegularTextStyle,
                                 ),
                                 SizedBox(
@@ -287,6 +350,27 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 Text(
                                   "${currentWeather.feelsLike} $temperatureUnit",
                                   style: RegularTextStyle,
+                                ),
+                                IconButton(
+                                  padding: const EdgeInsets.all(0.0),
+                                  onPressed: () {
+                                    setState(() {
+                                      String details = this.cityName;
+                                      _handleSave(isSaved, details);
+//                                      this.isFavourite =
+//                                      isFavourite ? false : true;
+                                    });
+                                  },
+                                  icon: isSaved
+                                      ? Icon(
+                                          Icons.favorite,
+                                          color: Colors.redAccent,
+                                        )
+                                      : Icon(
+                                          Icons.favorite_border,
+                                          color: Colors.white30,
+                                        ),
+                                  iconSize: 30.0,
                                 ),
                               ],
                             )
@@ -403,7 +487,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     SizedBox(width: 15.0),
                                     Text(
                                       "${currentWeather.clouds}%",
-                                      style: RegularTextStyle,
+                                      style: RegularTextStyle.apply(heightFactor: 2),
                                     ),
                                   ],
                                 ),
@@ -418,7 +502,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     SizedBox(width: 15.0),
                                     Text(
                                       "${currentWeather.windSpeed} m/s",
-                                      style: RegularTextStyle,
+                                      style: RegularTextStyle.apply(heightFactor: 2),
                                     ),
                                   ],
                                 ),
@@ -803,7 +887,15 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
         builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.cod == "200") {
-              return _buildCurrentWeatherData(snapshot.data);
+              return GestureDetector(
+                onDoubleTap: () {
+//                  this.isFavourite = isFavourite ? false : true;
+                  print("DOUBLE TAP!!");
+                  String details = this.cityName;
+                  _handleSave(isSaved, details);
+                },
+                child: _buildCurrentWeatherData(snapshot.data),
+              );
             } else {
               return Center(
                 child: Text(snapshot.data.error.toUpperCase()),

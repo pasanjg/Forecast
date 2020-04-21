@@ -51,3 +51,8 @@ const SmallTextStyle = TextStyle(
   fontSize: 14.0,
   height: 1.0,
 );
+
+// Firestore
+
+const usersCollection = "users";
+const userFavourites = "favourites";
