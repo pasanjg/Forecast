@@ -88,13 +88,13 @@ flutter:
   #         weight: 700
 
   fonts:
-    - family: AvenirNextLTPro
+    - family: BalooPaaji2
       fonts:
-        - asset: assets/fonts/AvenirNextLTPro-Regular.otf
-        - asset: assets/fonts/AvenirNextLTPro-Bold.otf
+        - asset: assets/fonts/BalooPaaji2-Regular.ttf
+        - asset: assets/fonts/BalooPaaji2-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/BalooPaaji2-Bold.ttf
           weight: 700
-        - asset: assets/fonts/AvenirNextLTPro-Demi.otf
-          weight: 400
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages

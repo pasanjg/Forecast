@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:forecast/utils/animations/FadeAnimation.dart';
+import 'package:forecast/utils/common/constants.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:convert' as convert;
@@ -18,8 +20,8 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchTextField = TextEditingController();
   String _searchText = " ";
   List cities = new List();
-  List filteredCities = new List();
-  Icon _searchIcon = new Icon(Icons.search);
+  List filteredCities = List();
+  Icon _searchIcon = Icon(Icons.search);
   bool isSearching = false;
   String cityName;
 
@@ -63,7 +65,7 @@ class _HomePageState extends State<HomePage> {
             controller: _searchTextField,
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Search city name",
+              hintText: "Where do you want to check?",
               hintStyle: TextStyle(
                 color: Colors.white70,
               ),
@@ -116,7 +118,10 @@ class _HomePageState extends State<HomePage> {
             children: <Widget>[
               Icon(FontAwesome.location_arrow, color: Colors.white),
               SizedBox(width: 10.0),
-              Text("Current Location"),
+              Text(
+                "Current Location",
+                style: RegularTextStyle,
+              ),
             ],
           ),
         ),
@@ -124,27 +129,31 @@ class _HomePageState extends State<HomePage> {
           child: ListView.builder(
             itemCount: filteredCities.length,
             itemBuilder: (BuildContext context, int index) {
-              return ListTile(
-                onTap: () {
-                  setState(() {
-                    this.cityName =
-                        "${filteredCities[index]['name']},${filteredCities[index]['country']}";
-                    print(filteredCities[index]['name'] +
-                        "," +
-                        filteredCities[index]['country']);
-                  });
-                  _searchTextField.text = "";
-                  _onSearchPressed();
-                },
-                title: Text(
-                  "${filteredCities[index]['name']}",
-                ),
-                trailing: Container(
-                  height: 30.0,
-                  child: FadeInImage.assetNetwork(
-                    placeholder: "assets/images/flag-loading.png",
-                    image:
-                        "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
+              return FadeAnimation(
+                delay: index * 0.001,
+                child: ListTile(
+                  onTap: () {
+                    setState(() {
+                      this.cityName =
+                          "${filteredCities[index]['name']},${filteredCities[index]['country']}";
+                      print(filteredCities[index]['name'] +
+                          "," +
+                          filteredCities[index]['country']);
+                    });
+                    _searchTextField.text = "";
+                    _onSearchPressed();
+                  },
+                  title: Text(
+                    "${filteredCities[index]['name']}",
+                    style: RegularTextStyle,
+                  ),
+                  trailing: Container(
+                    height: 30.0,
+                    child: FadeInImage.assetNetwork(
+                      placeholder: "assets/images/flag-loading.png",
+                      image:
+                          "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
+                    ),
                   ),
                 ),
               );
@@ -198,8 +207,14 @@ class _HomePageState extends State<HomePage> {
                   Column(
                     children: <Widget>[
                       UserAccountsDrawerHeader(
-                        accountName: Text("Bruce Wayne"),
-                        accountEmail: Text("bruce@wayne.inc"),
+                        accountName: Text(
+                          "Bruce Wayne",
+                          style: RegularTextStyle,
+                        ),
+                        accountEmail: Text(
+                          "bruce@wayne.inc",
+                          style: RegularTextStyle,
+                        ),
                         currentAccountPicture: CircleAvatar(
                           child: Text(
                             "B",
@@ -212,24 +227,6 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       ListTile(
-                        leading: Icon(
-                          FontAwesome5.moon,
-                          color: Colors.white70,
-                        ),
-                        title: Text(
-                          "Switch mode",
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        trailing: Switch(
-                          value: false,
-                          onChanged: (value) {
-                            setState(() {
-//                          mode = value;
-                            });
-                          },
-                        ),
-                      ),
-                      ListTile(
                         onTap: () {
                           Navigator.of(context).pop();
                         },
@@ -237,7 +234,10 @@ class _HomePageState extends State<HomePage> {
                           FontAwesomeIcons.heart,
                           color: Colors.white70,
                         ),
-                        title: Text("Favourites"),
+                        title: Text(
+                          "Favourites",
+                          style: RegularTextStyle,
+                        ),
                         trailing: Icon(
                           FontAwesomeIcons.angleRight,
                           color: Colors.white70,
@@ -257,7 +257,10 @@ class _HomePageState extends State<HomePage> {
                           FontAwesomeIcons.cloudSunRain,
                           color: Colors.white70,
                         ),
-                        title: Text("Weather Animations"),
+                        title: Text(
+                          "Weather Animations",
+                          style: RegularTextStyle,
+                        ),
                         trailing: Icon(
                           FontAwesomeIcons.angleRight,
                           color: Colors.white70,
@@ -281,7 +284,10 @@ class _HomePageState extends State<HomePage> {
                           FontAwesomeIcons.cog,
                           color: Colors.white70,
                         ),
-                        title: Text("Settings"),
+                        title: Text(
+                          "Settings",
+                          style: RegularTextStyle,
+                        ),
                         trailing: Icon(
                           FontAwesomeIcons.angleRight,
                           color: Colors.white70,
@@ -295,7 +301,10 @@ class _HomePageState extends State<HomePage> {
                           FontAwesomeIcons.powerOff,
                           color: Colors.white70,
                         ),
-                        title: Text("Log out"),
+                        title: Text(
+                          "Log out",
+                          style: RegularTextStyle,
+                        ),
                         trailing: Icon(
                           FontAwesomeIcons.angleRight,
                           color: Colors.white70,
