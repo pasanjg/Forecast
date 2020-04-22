@@ -1,12 +1,31 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:forecast/pages/signup.dart';
+
+
+import 'home.dart';
 
 class LoginPage extends StatefulWidget {
   @override
-  _FlareAnimationsPageState createState() => _FlareAnimationsPageState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _FlareAnimationsPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final email = TextEditingController();
+  final password = TextEditingController();
+
+  bool _loadingVisible = false;
+  bool _autoValidate = false;
+  String _emailError;
+  String _passwordError;
+  bool _success;
+  String _userEmail;
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,78 +47,33 @@ class _FlareAnimationsPageState extends State<LoginPage> {
                     children: <Widget>[
                       CircleAvatar(
                         backgroundImage:
-                        AssetImage('assets/images/shop_logo.png'),
-                        radius: 25.0,
+                        AssetImage('assets/images/forecast-logo.png'),
+                        radius: 50.0,
                       ),
                       SizedBox(
-                        width: 15.0,
-                      ),
-                      Text(
-                        "Forecast",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20.0,
-                        ),
-                      ),
+                        height: 50.0,
+                      )
                     ],
                   ),
                   Center(
                     child: Column(
                       children: <Widget>[
-                        Container(
-                          height: 45.0,
-                          child: FlatButton(
-                            color: Colors.white,
-                            onPressed: () {},
-                            shape: RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(40.0),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Container(
-                                  height: 20.0,
-                                  child: Image.asset(
-                                      'assets/images/google_logo.png'),
-                                ),
-                                SizedBox(
-                                  width: 10.0,
-                                ),
-                                Text(
-                                  "Login with Google",
-                                  style: TextStyle(
-                                    fontSize: 15.0,
-                                    color: Colors.black54,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20.0),
-                          child: Text(
-                            "OR",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
                         Column(
                           children: <Widget>[
                             Material(
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10.0),
                               ),
+                              color: Colors.white,
                               child: Padding(
                                 padding:
                                 const EdgeInsets.symmetric(horizontal: 15.0),
                                 child: TextFormField(
+                                  controller: email,
+                                  style: new TextStyle(color: Colors.black),
                                   decoration: InputDecoration(
                                     hintText: "Email",
+                                    errorText: _emailError,
                                     icon: Icon(
                                       Icons.mail,
                                     ),
@@ -115,12 +89,17 @@ class _FlareAnimationsPageState extends State<LoginPage> {
                               borderRadius: BorderRadius.all(
                                 Radius.circular(10.0),
                               ),
+                              color: Colors.white,
                               child: Padding(
                                 padding:
                                 const EdgeInsets.symmetric(horizontal: 15.0),
                                 child: TextFormField(
+                                  obscureText: true,
+                                  controller: password,
+                                  style: new TextStyle(color: Colors.black),
                                   decoration: InputDecoration(
                                     hintText: "Password",
+                                    errorText: _passwordError,
                                     icon: Icon(Icons.vpn_key),
                                     border: InputBorder.none,
                                   ),
@@ -128,7 +107,7 @@ class _FlareAnimationsPageState extends State<LoginPage> {
                               ),
                             ),
                             SizedBox(
-                              height: 20.0,
+                              height: 10.0,
                             ),
                           ],
                         ),
@@ -140,12 +119,21 @@ class _FlareAnimationsPageState extends State<LoginPage> {
                     child: FlatButton(
                       padding: const EdgeInsets.all(0.0),
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-//                            builder: (context) => ReviewsPage(),
-                          ),
-                        );
+                        print(email.text.toString().trim());
+                        print(password.text.toString().trim());
+                        try {
+                          _validate();
+//                          if(_success) {
+//                            Navigator.pushReplacement(
+//                              context,
+//                              MaterialPageRoute(
+//                                builder: (context) => HomePage(),
+//                              ),
+//                            );
+//                          }
+                        } catch(e) {
+                          print(e);
+                        }
                       },
                       shape: RoundedRectangleBorder(
                         borderRadius: new BorderRadius.circular(40.0),
@@ -172,13 +160,122 @@ class _FlareAnimationsPageState extends State<LoginPage> {
                       ),
                     ),
                   ),
-                  Text(),
+                  Container(
+                    child: Column(
+                      children: <Widget>[
+                        new InkWell(
+                          child: new Text("Forget Password"),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+//                            builder: (context) => HomePage(),
+                              ),
+                            );
+                          },
+                        ),
+                        SizedBox(
+                          height: 20.0,
+                        ),
+                        new InkWell(
+                          child: new Text("Signup"),
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                               builder: (context) => SignupPage(),
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
         ),
     );
-
   }
+
+  void _currentUser() async {
+    final FirebaseUser user = (await _auth.currentUser());
+    if (user != null) {
+      setState(() {
+        _userEmail = user.email;
+        var _uid = user.uid;
+        print("User Email  curr $_userEmail");
+        print("User UID curr $_uid");
+      });
+    } else {
+      print("Unsuccess!");
+    }
+  }
+  void _signin(String email, String password) async {
+    final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    ))
+        .user;
+    if (user != null) {
+      setState(() {
+        _success = true;
+        _userEmail = user.email;
+        var _uid = user.uid;
+        print("User Email $_userEmail");
+        print("User UID $_uid");
+
+        if(_success) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(),
+            ),
+          );
+        }
+      });
+    } else {
+      _success = false;
+    }
+  }
+
+    bool _passwordValidate(String value) {
+      String pattern = r'^[a-zA-Z0-9]{8,}$';
+      RegExp regExp = new RegExp(pattern);
+      return regExp.hasMatch(value);
+    }
+
+    bool _emailValidate(String value) {
+      String pattern = r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+      RegExp regExp = new RegExp(pattern);
+      return regExp.hasMatch(value);
+    }
+
+    void _validate() async{
+      bool pw = true;
+      bool em = true;
+
+      if(!_passwordValidate(password.text)){
+        _passwordError = "Please Enter 8 Character Password";
+        pw = false;
+        return;
+      } else {
+        _passwordError = null;
+      }
+
+      if(!_emailValidate(email.text.trim())) {
+        _emailError = "Please Enter Valid Email";
+        em = false;
+        return;
+      } else {
+        _emailError = null;
+      }
+      if((em == true) && (pw == true)) {
+        _signin(email.text.trim(), password.text.trim());
+      }
+  }
+
 }
+
+
