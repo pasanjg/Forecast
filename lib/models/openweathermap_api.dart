@@ -5,26 +5,28 @@ class OpenWeatherMapAPI {
   final String apiBaseURL = DotEnv().env['OPENWEATHERMAP_API_BASE_URL'];
   final String cityName;
   final String cityId;
-  final bool coordinates;
-  final String lon;
-  final String lat;
+  final Map coordinates;
   final String zipCode;
   final String units;
   final bool forecast;
   String _requestURL;
-
 
   String get requestURL => _requestURL;
 
   // cityName = https://api.openweathermap.org/data/2.5/weather?q=Malabe&appid=0966efbf0506aeb829958876034e452e&units=metric
   // coordinates = http://api.openweathermap.org/data/2.5/weather?lat=6.9&lon=79.95&appid=0966efbf0506aeb829958876034e452e&units=metric
 
+  /// Temperature is available in Fahrenheit, Celsius and Kelvin units.
+
+  /// For temperature in Fahrenheit use units=imperial
+  /// For temperature in Celsius use units=metric
+  /// Temperature in Kelvin is used by default, no need to use units parameter in API call
+  /// List of all API parameters with units openweathermap.org/weather-data
+
   OpenWeatherMapAPI(
       {this.cityName,
       this.cityId,
       this.coordinates,
-      this.lon,
-      this.lat,
       this.zipCode,
       this.units,
       this.forecast = false})
@@ -44,8 +46,10 @@ class OpenWeatherMapAPI {
                 "$apiBaseURL/$weatherType?id=$cityId&appid=$apiKey&units=$units"
             : coordinates != null
                 ? this._requestURL =
-                    "$apiBaseURL/$weatherType?lat=$lat&lon=$lon&appid=$apiKey&units=$units"
+                    "$apiBaseURL/$weatherType?lat=${coordinates['lat']}&lon=${coordinates['lon']}&appid=$apiKey&units=$units"
                 : this._requestURL =
                     "$apiBaseURL/$weatherType?zip=$zipCode&appid=$apiKey&units=$units";
+
+    print(requestURL);
   }
 }

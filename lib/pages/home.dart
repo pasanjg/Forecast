@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:forecast/pages/login.dart';
+import 'package:forecast/utils/animations/FadeAnimation.dart';
+import 'package:forecast/utils/common/constants.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert' as convert;
 
 import 'package:forecast/pages/current_weather.dart';
+import 'package:forecast/pages/settings.dart';
+import 'package:forecast/widgets/background/default_gradient.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -19,9 +23,10 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _searchTextField = TextEditingController();
   String _searchText = " ";
   List cities = new List();
-  List filteredCities = new List();
-  Icon _searchIcon = new Icon(Icons.search);
+  List filteredCities = List();
+  Icon _searchIcon = Icon(Icons.search);
   bool isSearching = false;
+  String cityName;
 
   @override
   void initState() {
@@ -37,7 +42,6 @@ class _HomePageState extends State<HomePage> {
           filteredCities = cities;
         } else {
           _searchText = _searchTextField.text;
-          print(_searchText);
         }
       });
     });
@@ -50,7 +54,6 @@ class _HomePageState extends State<HomePage> {
     List tempList = new List();
     for (int i = 0; i < jsonResponse.length; i++) {
       tempList.add(jsonResponse[i]);
-      print(jsonResponse.length);
     }
     setState(() {
       cities = tempList;
@@ -61,10 +64,11 @@ class _HomePageState extends State<HomePage> {
   Widget _appBarTitle() {
     return isSearching
         ? TextField(
+            autofocus: true,
             controller: _searchTextField,
             decoration: InputDecoration(
               border: InputBorder.none,
-              hintText: "Search city name",
+              hintText: "Where do you want to check?",
               hintStyle: TextStyle(
                 color: Colors.white70,
               ),
@@ -75,13 +79,17 @@ class _HomePageState extends State<HomePage> {
 
   void _onSearchPressed() {
     setState(() {
-      isSearching = isSearching ? false : true;
-      if (isSearching) {
-        _searchIcon = Icon(Icons.close);
+      if (_searchTextField.text == "" || _searchTextField.text == null) {
+        isSearching = isSearching ? false : true;
+        if (isSearching) {
+          _searchIcon = Icon(Icons.close);
+        } else {
+          _searchIcon = Icon(Icons.search);
+          filteredCities = cities;
+          _searchTextField.clear();
+        }
       } else {
-        _searchIcon = Icon(Icons.search);
-        filteredCities = cities;
-        _searchTextField.clear();
+        _searchTextField.text = "";
       }
     });
   }
@@ -91,192 +99,141 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _searchList() {
-    print(filteredCities.length);
     if (_searchText.isNotEmpty) {
       List tempList = List();
-      for (int i = 0; i < filteredCities.length; i++) {
-        if (filteredCities[i]['name']
+      for (int i = 0; i < cities.length; i++) {
+        if (cities[i]['name']
             .toLowerCase()
             .contains(_searchText.toLowerCase())) {
-          tempList.add(filteredCities[i]);
+          tempList.add(cities[i]);
         }
       }
       filteredCities = tempList;
     }
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          stops: [0.0, 1.0],
-          colors: <Color>[
-            Theme.of(context).accentColor,
-            Theme.of(context).primaryColor,
-          ],
-        ),
-      ),
-      child: ListView.builder(
-        itemCount: filteredCities.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            onTap: () {},
-            title: Text(
-              "${filteredCities[index]['name']}",
-            ),
-            trailing: Container(
-              height: 30.0,
-              child: Image.network(
-                "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
+    return Column(
+      children: <Widget>[
+        ListTile(
+          onTap: () {
+            setState(() {
+              _searchTextField.text = "";
+              this.cityName = null;
+            });
+            _onSearchPressed();
+          },
+          title: Row(
+            children: <Widget>[
+              Icon(FontAwesome.location_arrow, color: Colors.white),
+              SizedBox(width: 10.0),
+              Text(
+                "Current Location",
+                style: RegularTextStyle,
               ),
-            ),
-          );
-        },
-      ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: ListView.builder(
+            itemCount: filteredCities.length,
+            itemBuilder: (BuildContext context, int index) {
+              return FadeAnimation(
+                delay: index * 0.001,
+                child: ListTile(
+                  onTap: () {
+                    setState(() {
+                      this.cityName =
+                          "${filteredCities[index]['name']},${filteredCities[index]['country']}";
+                      print(filteredCities[index]['name'] +
+                          "," +
+                          filteredCities[index]['country']);
+                    });
+                    _searchTextField.text = "";
+                    _onSearchPressed();
+                  },
+                  title: Text(
+                    "${filteredCities[index]['name']}",
+                    style: RegularTextStyle,
+                  ),
+                  trailing: Container(
+                    height: 30.0,
+                    child: FadeInImage.assetNetwork(
+                      placeholder: "assets/images/flag-loading.png",
+                      image:
+                          "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
     );
-  }
-
-  Widget _snappedScroll(int itemIndex) {
-    switch (itemIndex) {
-      case 0:
-        {
-          return CurrentWeatherDetailsPage();
-        }
-        break;
-
-      case 1:
-        {
-          return Text(
-            "TODAY FORECAST DETAILS",
-            style: TextStyle(fontSize: 20.0),
-          );
-        }
-        break;
-
-      default:
-        {
-          return CurrentWeatherDetailsPage();
-        }
-        break;
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        title: _appBarTitle(),
-        centerTitle: true,
-        backgroundColor: Theme.of(context).accentColor,
-        actions: <Widget>[
-          IconButton(
-            onPressed: _onSearchPressed,
-            icon: _searchIcon,
-          ),
-        ],
-      ),
-      resizeToAvoidBottomInset: false,
-      drawer: Theme(
-        data: Theme.of(context).copyWith(
-          canvasColor: Colors.transparent,
-        ),
-        child: Drawer(
+    return WillPopScope(
+      onWillPop: () async {
+        if (this.isSearching) {
+          setState(() {
+            _searchTextField.text = "";
+            this._onSearchPressed();
+          });
+        } else {
+          return true;
+        }
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
           elevation: 0.0,
-          child: Container(
-            color: Colors.black.withOpacity(0.8),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                Column(
-                  children: <Widget>[
-                    UserAccountsDrawerHeader(
-                      accountName: Text("Bruce Wayne"),
-                      accountEmail: Text("bruce@wayne.inc"),
-                      currentAccountPicture: CircleAvatar(
-                        child: Text(
-                          "B",
-                          style: TextStyle(fontSize: 30.0),
+          title: _appBarTitle(),
+          centerTitle: true,
+          backgroundColor: Theme.of(context).accentColor,
+          actions: <Widget>[
+            IconButton(
+              onPressed: _onSearchPressed,
+              icon: _searchIcon,
+            ),
+          ],
+        ),
+        resizeToAvoidBottomInset: false,
+        drawer: Theme(
+          data: Theme.of(context).copyWith(
+            canvasColor: Colors.transparent,
+          ),
+          child: Drawer(
+            elevation: 0.0,
+            child: Container(
+              color: Colors.black.withOpacity(0.8),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  Column(
+                    children: <Widget>[
+                      UserAccountsDrawerHeader(
+                        accountName: Text(
+                          "Bruce Wayne",
+                          style: RegularTextStyle,
                         ),
-                        backgroundColor: Colors.white,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.transparent,
-                      ),
-                    ),
-                    ListTile(
-                      leading: Icon(
-                        FontAwesome5.moon,
-                        color: Colors.white70,
-                      ),
-                      title: Text(
-                        "Switch mode",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      trailing: Switch(
-                        value: false,
-                        onChanged: (value) {
-                          setState(() {
-//                          mode = value;
-                          });
-                        },
-                      ),
-                    ),
-                    ListTile(
-                      onTap: () {},
-                      leading: Icon(
-                        FontAwesomeIcons.heart,
-                        color: Colors.white70,
-                      ),
-                      title: Text("Favourites"),
-                      trailing: Icon(
-                        FontAwesomeIcons.angleRight,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => LoginPage(),
+                        accountEmail: Text(
+                          "bruce@wayne.inc",
+                          style: RegularTextStyle,
+                        ),
+                        currentAccountPicture: CircleAvatar(
+                          child: Text(
+                            "B",
+                            style: TextStyle(fontSize: 30.0),
                           ),
-                        );
-                      },
-                      leading: Icon(
-                        FontAwesomeIcons.heart,
-                        color: Colors.white70,
+                          backgroundColor: Colors.white,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.transparent,
+                        ),
                       ),
-                      title: Text("LOGIN"),
-                      trailing: Icon(
-                        FontAwesomeIcons.angleRight,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    
-                    ListTile(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => FlareAnimationsPage(),
-                          ),
-                        );
-                      },
-                      leading: Icon(
-                        FontAwesomeIcons.cloudSunRain,
-                        color: Colors.white70,
-                      ),
-                      title: Text("Weather Animations"),
-                      trailing: Icon(
-                        FontAwesomeIcons.angleRight,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    ListTile(
+                      ListTile(
                         onTap: () {
                           Navigator.of(context).pop();
                           Navigator.push(
@@ -287,77 +244,116 @@ class _HomePageState extends State<HomePage> {
                           );
                         },
                         leading: Icon(
-                          FontAwesomeIcons.heart,
+                          FontAwesomeIcons.user,
                           color: Colors.white70,
                         ),
-                        title: Text("LOGIN"),
+                        title: Text(
+                          "Login",
+                          style: RegularTextStyle,
+                        ),
                         trailing: Icon(
                           FontAwesomeIcons.angleRight,
                           color: Colors.white70,
                         ),
                       ),
-                  ],
-                ),
-                Column(
-                  children: <Widget>[
-                    ListTile(
-                      onTap: () {},
-                      leading: Icon(
-                        FontAwesomeIcons.cog,
-                        color: Colors.white70,
-                      ),
-                      title: Text("Settings"),
-                      trailing: Icon(
-                        FontAwesomeIcons.angleRight,
-                        color: Colors.white70,
-                      ),
-                    ),
-                    ListTile(
-                      onTap: () {
-                        _signout();
+                      ListTile(
+                        onTap: () {
                           Navigator.of(context).pop();
-                      },
-                      leading: Icon(
-                        FontAwesomeIcons.powerOff,
-                        color: Colors.white70,
+                        },
+                        leading: Icon(
+                          FontAwesomeIcons.heart,
+                          color: Colors.white70,
+                        ),
+                        title: Text(
+                          "Favourites",
+                          style: RegularTextStyle,
+                        ),
+                        trailing: Icon(
+                          FontAwesomeIcons.angleRight,
+                          color: Colors.white70,
+                        ),
                       ),
-                      title: Text("Log out"),
-                      trailing: Icon(
-                        FontAwesomeIcons.angleRight,
-                        color: Colors.white70,
+                      ListTile(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FlareAnimationsPage(),
+                            ),
+                          );
+                        },
+                        leading: Icon(
+                          FontAwesomeIcons.cloudSunRain,
+                          color: Colors.white70,
+                        ),
+                        title: Text(
+                          "Weather Animations",
+                          style: RegularTextStyle,
+                        ),
+                        trailing: Icon(
+                          FontAwesomeIcons.angleRight,
+                          color: Colors.white70,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      ListTile(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SettingsPage(),
+                            ),
+                          );
+                        },
+                        leading: Icon(
+                          FontAwesomeIcons.cog,
+                          color: Colors.white70,
+                        ),
+                        title: Text(
+                          "Settings",
+                          style: RegularTextStyle,
+                        ),
+                        trailing: Icon(
+                          FontAwesomeIcons.angleRight,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      ListTile(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          _signout();
+                        },
+                        leading: Icon(
+                          FontAwesomeIcons.powerOff,
+                          color: Colors.white70,
+                        ),
+                        title: Text(
+                          "Log out",
+                          style: RegularTextStyle,
+                        ),
+                        trailing: Icon(
+                          FontAwesomeIcons.angleRight,
+                          color: Colors.white70,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
+        body: DefaultGradient(
+          child: isSearching
+              ? _searchList()
+              : CurrentWeatherDetailsPage(cityName: this.cityName),
+        ),
       ),
-      body: isSearching
-          ? _searchList()
-//          : CurrentWeatherDetails(),
-          : Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  stops: [0.0, 1.0],
-                  colors: <Color>[
-                    Theme.of(context).accentColor,
-                    Theme.of(context).primaryColor,
-                  ],
-                ),
-              ),
-              child: PageView.builder(
-                scrollDirection: Axis.vertical,
-                controller: PageController(viewportFraction: 1),
-                itemCount: 2,
-                itemBuilder: (BuildContext context, int itemIndex) {
-                  return _snappedScroll(itemIndex);
-                },
-              ),
-            ),
     );
   }
 }
