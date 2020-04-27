@@ -9,10 +9,14 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert' as convert;
-
+import 'package:forecast/models/user.dart';
+import 'package:forecast/utils/common/user_profile.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:forecast/pages/current_weather.dart';
 import 'package:forecast/pages/settings.dart';
 import 'package:forecast/widgets/background/default_gradient.dart';
+import 'package:forecast/pages/profile.dart';
 
 class HomePage extends StatefulWidget {
   final String cityName;
@@ -26,17 +30,25 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _searchTextField = TextEditingController();
+  UserProfileService db = new UserProfileService();
   String _searchText = " ";
   List cities = new List();
   List filteredCities = List();
   Icon _searchIcon = Icon(Icons.search);
   bool isSearching = false;
   String cityName;
-  String savedLocation;
+  String savedLocation;String _uid;
+  User _user;
+  String _fName = null;
+  String _lName = null;
+  String _email = null;
+  String url;
+  bool _loginStatus = false;
 
   @override
   void initState() {
     super.initState();
+    _currentUser();
     this._getCities();
     this.savedLocation = widget.cityName;
   }
@@ -100,10 +112,6 @@ class _HomePageState extends State<HomePage> {
         _searchTextField.text = "";
       }
     });
-  }
-
-  void _signout() async {
-    await _auth.signOut();
   }
 
   Widget _searchList() {
@@ -227,25 +235,33 @@ class _HomePageState extends State<HomePage> {
                 children: <Widget>[
                   Column(
                     children: <Widget>[
-                      UserAccountsDrawerHeader(
-                        accountName: Text(
-                          "Bruce Wayne",
-                          style: RegularTextStyle,
-                        ),
-                        accountEmail: Text(
-                          "bruce@wayne.inc",
-                          style: RegularTextStyle,
-                        ),
-                        currentAccountPicture: CircleAvatar(
-                          child: Text(
-                            "B",
-                            style: TextStyle(fontSize: 30.0),
+                      new GestureDetector(
+                        child: UserAccountsDrawerHeader(
+                          accountName: _fName == null ? Text("John Smith") : Text(_user.firstName+" "+_user.lastName),
+                          accountEmail: _email == null ? Text("johns@email.com") : Text(_user.email),
+                          currentAccountPicture: CircleAvatar(
+                              radius: 100,
+                              backgroundColor: Colors.white,
+                              child: ClipOval(
+                                  child: SizedBox(
+                                    width: 140.0,
+                                    height: 140.0,
+                                    child: url == null ? Image.asset('assets/images/user.jpg') : Image.network(url),
+                                  )
+                              )
                           ),
-                          backgroundColor: Colors.white,
+                          decoration: BoxDecoration(
+                            color: Colors.transparent,
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.transparent,
-                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ProfilePage(),
+                            ),
+                          );
+                        },
                       ),
                       ListTile(
                         onTap: () {
@@ -345,17 +361,28 @@ class _HomePageState extends State<HomePage> {
                       ),
                       ListTile(
                         onTap: () {
-                          Navigator.of(context).pop();
-                          _signout();
+                          if(_loginStatus) {
+                            _signout();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => HomePage(),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LoginPage(),
+                              ),
+                            );
+                          }
                         },
                         leading: Icon(
                           FontAwesomeIcons.powerOff,
                           color: Colors.white70,
                         ),
-                        title: Text(
-                          "Log out",
-                          style: RegularTextStyle,
-                        ),
+                        title: _loginStatus == true ? Text("Sign Out") : Text("Sign In"),
                         trailing: Icon(
                           FontAwesomeIcons.angleRight,
                           color: Colors.white70,
@@ -375,5 +402,41 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+  void _currentUser() async {
+    final FirebaseUser user = (await _auth.currentUser());
+    if (user != null) {
+      setState(() {
+        _uid = user.uid;
+        _loginStatus = true;
+      });
+      DocumentSnapshot snapshot = await db.getUserById(_uid);
+      print(snapshot.data);
+      _user = new User(
+          snapshot.data['id'],
+          snapshot.data['firstName'],
+          snapshot.data['lastName'],
+          snapshot.data['email']
+      );
+      _email = _user.email;
+      _fName = _user.firstName;
+      _lName = _user.lastName;
+      _getImageUrl();
+    } else {
+      print("Unsuccess!");
+    }
+  }
+
+  void _getImageUrl() async {
+    StorageReference ref =
+    FirebaseStorage.instance.ref().child("images/$_uid");
+    String _url = (await ref.getDownloadURL()).toString();
+    url = _url;
+  }
+
+  void _signout() async {
+    await _auth.signOut();
+    _loginStatus = false;
+    Navigator.of(context).pop();
   }
 }
