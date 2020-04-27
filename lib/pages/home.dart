@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:forecast/pages/saved_locations.dart';
+import 'package:forecast/pages/weather_animations_list.dart';
+import 'package:forecast/pages/login.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert' as convert;
 
 import 'package:forecast/pages/current_weather.dart';
 import 'package:forecast/pages/settings.dart';
-import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:forecast/widgets/background/default_gradient.dart';
 
 class HomePage extends StatefulWidget {
@@ -22,6 +24,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _searchTextField = TextEditingController();
   String _searchText = " ";
   List cities = new List();
@@ -97,6 +100,10 @@ class _HomePageState extends State<HomePage> {
         _searchTextField.text = "";
       }
     });
+  }
+
+  void _signout() async {
+    await _auth.signOut();
   }
 
   Widget _searchList() {
@@ -246,6 +253,29 @@ class _HomePageState extends State<HomePage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
+                              builder: (context) => LoginPage(),
+                            ),
+                          );
+                        },
+                        leading: Icon(
+                          FontAwesomeIcons.heart,
+                          color: Colors.white70,
+                        ),
+                        title: Text(
+                          "Login",
+                          style: RegularTextStyle,
+                        ),
+                        trailing: Icon(
+                          FontAwesomeIcons.angleRight,
+                          color: Colors.white70,
+                        ),
+                      ),
+                      ListTile(
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
                               builder: (context) => SavedLocationsPage(),
                             ),
                           );
@@ -316,6 +346,7 @@ class _HomePageState extends State<HomePage> {
                       ListTile(
                         onTap: () {
                           Navigator.of(context).pop();
+                          _signout();
                         },
                         leading: Icon(
                           FontAwesomeIcons.powerOff,
