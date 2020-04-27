@@ -5,9 +5,14 @@ import 'package:forecast/resources/repository.dart';
 
 class CurrentWeatherBloc {
   final _repository = Repository();
-  final _currentWeatherFetcher = PublishSubject<WeatherModel>();
+  PublishSubject<WeatherModel> _currentWeatherFetcher = PublishSubject<WeatherModel>();
 
-  Stream<WeatherModel> get currentWeather => _currentWeatherFetcher.stream;
+  Stream<WeatherModel> get currentWeather {
+    if (_currentWeatherFetcher.isClosed) {
+      _currentWeatherFetcher = PublishSubject<WeatherModel>();
+    }
+    return _currentWeatherFetcher.stream;
+  }
 
   fetchCurrentWeather(String requestURL) async {
     WeatherModel weatherModel =

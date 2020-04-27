@@ -163,12 +163,12 @@ class _LoginPageState extends State<LoginPage> {
                       new InkWell(
                         child: new Text("Forget Password"),
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => HomePage(),
-                            ),
-                          );
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => HomePage(),
+                          //   ),
+                          // );
                         },
                       ),
                       SizedBox(
