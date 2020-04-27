@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:forecast/pages/saved_locations.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:flutter_icons/flutter_icons.dart';
@@ -12,6 +13,10 @@ import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:forecast/widgets/background/default_gradient.dart';
 
 class HomePage extends StatefulWidget {
+  final String cityName;
+
+  HomePage({Key key, this.cityName}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -24,11 +29,13 @@ class _HomePageState extends State<HomePage> {
   Icon _searchIcon = Icon(Icons.search);
   bool isSearching = false;
   String cityName;
+  String savedLocation;
 
   @override
   void initState() {
     super.initState();
     this._getCities();
+    this.savedLocation = widget.cityName;
   }
 
   _HomePageState() {
@@ -76,6 +83,7 @@ class _HomePageState extends State<HomePage> {
 
   void _onSearchPressed() {
     setState(() {
+      this.savedLocation = null;
       if (_searchTextField.text == "" || _searchTextField.text == null) {
         isSearching = isSearching ? false : true;
         if (isSearching) {
@@ -139,6 +147,7 @@ class _HomePageState extends State<HomePage> {
                       print(filteredCities[index]['name'] +
                           "," +
                           filteredCities[index]['country']);
+                      this.savedLocation = null;
                     });
                     _searchTextField.text = "";
                     _onSearchPressed();
@@ -167,6 +176,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+
+    if (savedLocation != null) {
+      this.cityName = savedLocation;
+    }
+
     return WillPopScope(
       onWillPop: () async {
         if (this.isSearching) {
@@ -229,13 +243,19 @@ class _HomePageState extends State<HomePage> {
                       ListTile(
                         onTap: () {
                           Navigator.of(context).pop();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SavedLocationsPage(),
+                            ),
+                          );
                         },
                         leading: Icon(
                           FontAwesomeIcons.heart,
                           color: Colors.white70,
                         ),
                         title: Text(
-                          "Favourites",
+                          "Saved Locations",
                           style: RegularTextStyle,
                         ),
                         trailing: Icon(

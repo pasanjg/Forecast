@@ -9,7 +9,6 @@ class OpenWeatherMapAPIProvider {
     try {
       final response = await client.get(requestURL);
       final jsonResponse = json.decode(response.body);
-      print("STATUS_CODE: " + response.statusCode.toString());
 
       if (response.statusCode == 200) {
         return WeatherModel.fromJSON(jsonResponse);

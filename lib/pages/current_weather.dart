@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:forecast/utils/common/constants.dart';
-import 'package:forecast/pages/no_internet.dart';
+import 'package:forecast/pages/error/no_internet.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/shared_preferences.dart';
@@ -26,8 +26,7 @@ import 'package:fl_chart/fl_chart.dart';
 class CurrentWeatherDetailsPage extends StatefulWidget {
   final String cityName;
 
-  CurrentWeatherDetailsPage({Key key, this.cityName})
-      : super(key: key);
+  CurrentWeatherDetailsPage({Key key, this.cityName}) : super(key: key);
 
   @override
   _CurrentWeatherDetailsPageState createState() =>
@@ -41,6 +40,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   Position userLocation;
   DateTime locationDate;
   String cityName;
+  String country;
   bool isSaved = false;
   String userId = "VEzdLJ6PPSXJxI7QN6od";
   String units;
@@ -48,7 +48,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   List savedLocations;
   DocumentReference documentReference;
-  var subscribe;
 
   double _animatedHeight = 0;
   double _animatedMaxHeight = 250;
@@ -67,7 +66,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       userLocation = position;
       print(userLocation);
 
-      if (widget.cityName == null) {
+      if (widget.cityName == null && userLocation != null) {
         await _getLocationAddress(userLocation).then((address) {
           print(address[0].toJson());
           print("LOCALITY: " + (address[0].locality != "").toString());
@@ -104,7 +103,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           units: units,
         );
       }
-      _checkSaved();
+      _checkSavedLocations();
       currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
     });
 
@@ -123,8 +122,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   @override
   void dispose() {
-//    currentWeatherBloc.dispose();
     super.dispose();
+    currentWeatherBloc.dispose();
   }
 
   void checkInternet() async {
@@ -162,8 +161,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     var latitude = userLocation.latitude;
     var longitude = userLocation.longitude;
 
-    List<Placemark> placemark =
-        await Geolocator().placemarkFromCoordinates(latitude, longitude);
+    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(
+      latitude,
+      longitude,
+    );
 
     return placemark;
   }
@@ -211,17 +212,22 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     });
   }
 
-  void _checkSaved() {
+  void _checkSavedLocations() {
     Firestore.instance
         .collection(usersCollection)
         .document(this.userId)
         .snapshots()
         .listen((DocumentSnapshot documentSnapshot) {
       Map<String, dynamic> documentData = documentSnapshot.data;
-      if(this.mounted){
+      if (this.mounted) {
         setState(() {
-          savedLocations = documentData[userFavourites];
-          isSaved = savedLocations.contains(this.cityName);
+          savedLocations = documentData[userSavedLocations];
+          if (savedLocations != null && savedLocations.isNotEmpty) {
+            if (!this.cityName.contains(",")) {
+              this.cityName = "$cityName,${this.country}";
+            }
+            isSaved = savedLocations.contains(this.cityName);
+          }
           print(savedLocations);
         });
       }
@@ -232,26 +238,40 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     print(savedLocations);
     print(this.cityName);
 
+    if (!cityName.contains(",")) {
+      cityName = "${cityName},${this.country}";
+    }
+
     this.documentReference =
         Firestore.instance.collection(usersCollection).document(this.userId);
 
     if (isSaved) {
-      print("YES");
       this.documentReference.updateData({
-        userFavourites: FieldValue.arrayRemove([cityName])
+        userSavedLocations: FieldValue.arrayRemove([cityName])
       });
       setState(() {
         this.isSaved = false;
       });
+      _showFlutterToast("Location removed");
     } else {
-      print("NOOO");
       this.documentReference.updateData({
-        userFavourites: FieldValue.arrayUnion([cityName])
+        userSavedLocations: FieldValue.arrayUnion([cityName])
       });
       setState(() {
         this.isSaved = true;
       });
+      _showFlutterToast("Location saved");
     }
+  }
+
+  void _showFlutterToast(String message) {
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(
+      msg: message,
+      backgroundColor: Colors.black87,
+      toastLength: Toast.LENGTH_SHORT,
+      textColor: Colors.white,
+    );
   }
 
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
@@ -281,9 +301,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           _getTodayDate(currentWeather.timeZone),
                           style: TitleTextStyle,
                         ),
-                        SizedBox(
-                          height: 0.0,
-                        ),
                         Text(
                           currentWeather.name.toUpperCase(),
                           textAlign: TextAlign.center,
@@ -302,78 +319,104 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: <Widget>[
-                            Column(
-                              children: <Widget>[
-                                Container(
-                                  height:
-                                      MediaQuery.of(context).size.width * 0.4,
-                                  width:
-                                      MediaQuery.of(context).size.width * 0.4,
-                                  child: FlareActor(
-                                    "assets/flare_animations/weather_icons/weather_${currentWeather.weatherIcon}.flr",
-                                    fit: BoxFit.contain,
-                                    animation: currentWeather.weatherIcon,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      "${currentWeather.temp}",
-                                      style: MainTextStyle,
+                            Expanded(
+                              child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    height:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    width:
+                                        MediaQuery.of(context).size.width * 0.4,
+                                    child: FlareActor(
+                                      "assets/flare_animations/weather_icons/weather_${currentWeather.weatherIcon}.flr",
+                                      fit: BoxFit.contain,
+                                      animation: currentWeather.weatherIcon,
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 4.0),
-                                      child: Text(
-                                        temperatureUnit,
-                                        style: TextStyle(
-                                          fontSize: 22.0,
-                                          height: 1.2,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        "${currentWeather.temp}",
+                                        style: MainTextStyle,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 4.0),
+                                        child: Text(
+                                          temperatureUnit,
+                                          style: TextStyle(
+                                            fontSize: 22.0,
+                                            height: 1.2,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  currentWeather.weatherDescription
-                                      .toUpperCase(),
-                                  textAlign: TextAlign.center,
-                                  style: RegularTextStyle,
-                                ),
-                                SizedBox(
-                                  height: 5.0,
-                                ),
-                                Text(
-                                  "${currentWeather.feelsLike} $temperatureUnit",
-                                  style: RegularTextStyle,
-                                ),
-                                IconButton(
-                                  padding: const EdgeInsets.all(0.0),
-                                  onPressed: () {
-                                    setState(() {
-                                      String details = this.cityName;
-                                      _handleSave(isSaved, details);
-//                                      this.isFavourite =
-//                                      isFavourite ? false : true;
-                                    });
-                                  },
-                                  icon: isSaved
-                                      ? Icon(
-                                          Icons.favorite,
-                                          color: Colors.redAccent,
-                                        )
-                                      : Icon(
-                                          Icons.favorite_border,
-                                          color: Colors.white30,
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 5.0,
+                                  ),
+                                  Text(
+                                    currentWeather.weatherDescription
+                                        .toUpperCase(),
+                                    textAlign: TextAlign.center,
+                                    style: RegularTextStyle,
+                                  ),
+                                  SizedBox(
+                                    height: 10.0,
+                                  ),
+                                  Text(
+                                    "${currentWeather.feelsLike} $temperatureUnit",
+                                    style: RegularTextStyle,
+                                  ),
+                                  SizedBox(height: 10.0),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      InkWell(
+                                        onTap: () {
+                                          setState(() {
+                                            _handleSave(isSaved, this.cityName);
+                                          });
+                                        },
+                                        child: Container(
+                                          child: isSaved
+                                              ? Icon(
+                                                  Icons.favorite,
+                                                  color: Colors.redAccent,
+                                                  size: 30.0,
+                                                )
+                                              : Icon(
+                                                  Icons.favorite_border,
+                                                  color: Colors.white30,
+                                                  size: 30.0,
+                                                ),
                                         ),
-                                  iconSize: 30.0,
-                                ),
-                              ],
-                            )
+                                      ),
+                                      SizedBox(width: 8.0),
+                                      Container(
+                                        height: 35.0,
+                                        child: FadeInImage.assetNetwork(
+                                          placeholder:
+                                              "assets/images/flag-loading.png",
+                                          image:
+                                              "https://www.countryflags.io/${this.country}/flat/64.png",
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ),
                       ],
@@ -472,7 +515,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           elevation: 0.3,
                           color: _cardColor,
                           child: Padding(
-                            padding: const EdgeInsets.all(15.0),
+                            padding: const EdgeInsets.all(5.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
@@ -487,7 +530,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     SizedBox(width: 15.0),
                                     Text(
                                       "${currentWeather.clouds}%",
-                                      style: RegularTextStyle.apply(heightFactor: 2),
+                                      style: RegularTextStyle.apply(
+                                          heightFactor: 2),
                                     ),
                                   ],
                                 ),
@@ -502,7 +546,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     SizedBox(width: 15.0),
                                     Text(
                                       "${currentWeather.windSpeed} m/s",
-                                      style: RegularTextStyle.apply(heightFactor: 2),
+                                      style: RegularTextStyle.apply(
+                                          heightFactor: 2),
                                     ),
                                   ],
                                 ),
@@ -532,7 +577,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                             elevation: 0.3,
                             color: _cardColor,
                             child: Padding(
-                              padding: const EdgeInsets.all(15.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 5.0,
+                                vertical: 8.0,
+                              ),
                               child: IntrinsicHeight(
                                 //////////////////////////////////////////////////
                                 child: Row(
@@ -887,10 +935,12 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
         builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.cod == "200") {
+              if (this.cityName == null) {
+                this.cityName = snapshot.data.name;
+              }
+              this.country = snapshot.data.country;
               return GestureDetector(
                 onDoubleTap: () {
-//                  this.isFavourite = isFavourite ? false : true;
-                  print("DOUBLE TAP!!");
                   String details = this.cityName;
                   _handleSave(isSaved, details);
                 },

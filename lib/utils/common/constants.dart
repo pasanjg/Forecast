@@ -55,4 +55,4 @@ const SmallTextStyle = TextStyle(
 // Firestore
 
 const usersCollection = "users";
-const userFavourites = "favourites";
+const userSavedLocations = "savedLocations";

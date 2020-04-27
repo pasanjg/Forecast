@@ -24,7 +24,8 @@ class NoInternetPage extends StatelessWidget {
           ),
           SizedBox(height: 10.0),
           Text(
-            "Slow or no internet connection.\nPlease check your internet settings",
+            "Slow or no internet connection.\n"
+            "Please check your internet settings",
             textAlign: TextAlign.center,
             style: RegularTextStyle.apply(heightFactor: 1.2),
           ),
