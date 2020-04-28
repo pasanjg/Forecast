@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:forecast/pages/error/no_saved.dart';
 import 'package:forecast/pages/home.dart';
@@ -12,7 +13,7 @@ class SavedLocationsPage extends StatefulWidget {
 }
 
 class _SavedLocationsPageState extends State<SavedLocationsPage> {
-  String userId = "VEzdLJ6PPSXJxI7QN6od";
+  String userId;
   DocumentReference documentReference;
   List savedLocations;
   String cityName, country;
@@ -20,8 +21,22 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
   @override
   void initState() {
     super.initState();
+    _getUserId();
+    _getUserSavedLocations();
+  }
+
+  void _getUserId() async {
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    setState(() {
+      if (user != null) {
+        this.userId = user.uid;
+      }
+    });
+  }
+
+  void _getUserSavedLocations(){
     documentReference =
-        Firestore.instance.collection(usersCollection).document(userId);
+        Firestore.instance.collection(usersCollection).document(this.userId);
   }
 
   Widget _buildFavouriteCard(String savedLocation) {
@@ -63,6 +78,7 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
     return Scaffold(
       appBar: AppBar(
         elevation: 0.0,
+        centerTitle: true,
         title: Text("Saved Locations"),
         backgroundColor: Theme.of(context).accentColor,
       ),
@@ -73,6 +89,9 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
               .document(userId)
               .snapshots(),
           builder: (context, snapshot) {
+            if(this.userId == null){
+              return NoFavouritesPage();
+            }
             if (snapshot.hasData) {
               this.savedLocations = snapshot.data[userSavedLocations];
               if (savedLocations != null && savedLocations.isNotEmpty) {
