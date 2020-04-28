@@ -146,7 +146,7 @@ class MapScreenState extends State<ProfilePage>
       DocumentSnapshot snapshot = await db.getUserById(_uid);
       print(snapshot.data);
       _user = User(snapshot.data['id'], snapshot.data['firstName'],
-          snapshot.data['lastName'], snapshot.data['email']);
+          snapshot.data['lastName'], snapshot.data['email'], snapshot.data['imageUrl']);
       _email = _user.email;
       _fNameController = TextEditingController(text: _user.firstName);
       _lNameController = TextEditingController(text: _user.lastName);
@@ -170,7 +170,8 @@ class MapScreenState extends State<ProfilePage>
         _fNameController.text,
         _lNameController.text,
         _user.email,
-      ),
+        _user.imageUrl
+      )
     )
         .then((onValue) {
       _status = true;
@@ -218,6 +219,14 @@ class MapScreenState extends State<ProfilePage>
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     final String url = (await downloadUrl.ref.getDownloadURL());
     print("URL is $url");
+    db.updateUser(
+        User(
+          _uid,
+          _user.firstName,
+          _user.lastName,
+          _user.email,
+          url
+        ));
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -229,7 +238,6 @@ class MapScreenState extends State<ProfilePage>
   void _getImageUrl() async {
     StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
     String _url = (await ref.getDownloadURL()).toString();
-    print("tttttttttttttttttttttt: $_url");
     url = _url;
   }
 

@@ -13,11 +13,11 @@ class UserProfileService {
   UserProfileService.internal();
 
   Future<User> createUser(
-      String firstName, String lastName, String email) async {
+      String firstName, String lastName, String email, String imageUrl) async {
     final TransactionHandler createTransaction = (Transaction tx) async {
       final DocumentSnapshot ds = await tx.get(userCollection.document());
 
-      final User user = User(ds.documentID, firstName, lastName, email);
+      final User user = User(ds.documentID, firstName, lastName, email, imageUrl);
       final Map<String, dynamic> data = user.toMap();
 
       await tx.set(ds.reference, data);
