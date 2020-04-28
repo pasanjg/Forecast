@@ -18,9 +18,9 @@ class TempDataCard extends StatelessWidget {
         elevation: 0.3,
         color: this.cardColor,
         child: Container(
-          height: 90.0,
+          height: 95.0,
           child: Padding(
-            padding: const EdgeInsets.all(4.0),
+            padding: const EdgeInsets.all(6.0),
             child: this.cardData,
           ),
         ),

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:forecast/utils/common/constants.dart';
@@ -42,7 +43,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   String cityName;
   String country;
   bool isSaved = false;
-  String userId = "VEzdLJ6PPSXJxI7QN6od";
+  String userId;
   String units;
   String temperatureUnit;
 
@@ -62,6 +63,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   void initState() {
     super.initState();
     checkInternet();
+    _getUserId();
     _getLocation().then((position) async {
       userLocation = position;
       print(userLocation);
@@ -178,7 +180,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   }
 
   String _getTodayDate(int timeZone) {
-    DateTime today = new DateTime.now();
+    DateTime today = DateTime.now();
 
     if (timeZone >= 0) {
       this.locationDate = today
@@ -204,6 +206,37 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     return DateFormat.yMMMMEEEEd().format(this.locationDate);
   }
 
+  String _getTime(int seconds, int timeZone) {
+    String time;
+    DateTime dateTime = DateTime.fromMicrosecondsSinceEpoch(seconds * 1000);
+
+    if (timeZone >= 0) {
+      dateTime
+          .add(
+            Duration(
+              hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
+              minutes: DateFormat("ss").parse(timeZone.toString(), true).minute,
+            ),
+          )
+          .toUtc();
+    } else {
+      timeZone *= -1;
+      dateTime
+          .subtract(
+            Duration(
+              hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
+              minutes: DateFormat("ss").parse(timeZone.toString(), true).minute,
+            ),
+          )
+          .toUtc();
+    }
+
+    time = DateFormat.jm().format(dateTime);
+//    print(time);
+
+    return time.toString();
+  }
+
   void _onAfterBuild(BuildContext context) {
     setState(() {
       if (this.locationDate != null)
@@ -212,34 +245,53 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     });
   }
 
-  void _checkSavedLocations() {
-    Firestore.instance
-        .collection(usersCollection)
-        .document(this.userId)
-        .snapshots()
-        .listen((DocumentSnapshot documentSnapshot) {
-      Map<String, dynamic> documentData = documentSnapshot.data;
-      if (this.mounted) {
-        setState(() {
-          savedLocations = documentData[userSavedLocations];
-          if (savedLocations != null && savedLocations.isNotEmpty) {
-            if (!this.cityName.contains(",")) {
-              this.cityName = "$cityName,${this.country}";
-            }
-            isSaved = savedLocations.contains(this.cityName);
-          }
-          print(savedLocations);
-        });
+  void _getUserId() async {
+    final FirebaseUser user = await FirebaseAuth.instance.currentUser();
+    setState(() {
+      if (user != null) {
+        this.userId = user.uid;
       }
     });
+  }
+
+  void _checkSavedLocations() {
+    if (this.userId != null) {
+      Firestore.instance
+          .collection(usersCollection)
+          .document(this.userId)
+          .snapshots()
+          .listen((DocumentSnapshot documentSnapshot) {
+        Map<String, dynamic> documentData = documentSnapshot.data;
+        if (this.mounted) {
+          setState(() {
+            savedLocations = documentData[userSavedLocations];
+            if (savedLocations != null && savedLocations.isNotEmpty) {
+              if (!this.cityName.contains(",")) {
+                this.cityName = "$cityName,${this.country}";
+              }
+              isSaved = savedLocations.contains(this.cityName);
+            } else {
+              isSaved = false;
+            }
+            print(savedLocations);
+          });
+        }
+      });
+    }
   }
 
   void _handleSave(bool isSaved, String cityName) async {
     print(savedLocations);
     print(this.cityName);
+    print("USERID: " + this.userId.toString());
+
+    if (userId == null) {
+      _showFlutterToast("You need to be logged in");
+      return;
+    }
 
     if (!cityName.contains(",")) {
-      cityName = "${cityName},${this.country}";
+      cityName = "$cityName,${this.country}";
     }
 
     this.documentReference =
@@ -299,16 +351,17 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                       children: <Widget>[
                         Text(
                           _getTodayDate(currentWeather.timeZone),
-                          style: TitleTextStyle,
+                          style: TitleTextStyle.apply(letterSpacingFactor: 1.2),
                         ),
                         Text(
                           currentWeather.name.toUpperCase(),
                           textAlign: TextAlign.center,
-                          style: HeadingTextStyle.apply(heightFactor: 0.8),
+                          style: HeadingTextStyle.apply(
+                            heightFactor: 1.2,
+                            letterSpacingFactor: 2.0,
+                          ),
                         ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
+                        SizedBox(height: 10.0),
                       ],
                     ),
                   ),
@@ -347,7 +400,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     children: <Widget>[
                                       Text(
                                         "${currentWeather.temp}",
-                                        style: MainTextStyle,
+                                        style: MainTextStyle.apply(
+                                            heightFactor: 0.5),
                                       ),
                                       Padding(
                                         padding:
@@ -356,7 +410,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                           temperatureUnit,
                                           style: TextStyle(
                                             fontSize: 22.0,
-                                            height: 1.2,
+                                            height: 0.0,
                                           ),
                                         ),
                                       ),
@@ -440,7 +494,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 ),
                                 middleElement: Text(
                                   "${currentWeather.tempMax}$temperatureUnit",
-                                  style: MediumTextStyle,
+                                  style: RegularTextStyle,
                                 ),
                                 bottomElement: Text(
                                   "Max. Temp",
@@ -459,7 +513,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 ),
                                 middleElement: Text(
                                   "${currentWeather.tempMin}$temperatureUnit",
-                                  style: MediumTextStyle,
+                                  style: RegularTextStyle,
                                 ),
                                 bottomElement: Text(
                                   "Min. Temp",
@@ -478,7 +532,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 ),
                                 middleElement: Text(
                                   "${currentWeather.pressure}hPa",
-                                  style: MediumTextStyle,
+                                  style: RegularTextStyle,
                                 ),
                                 bottomElement: Text(
                                   "Pressure",
@@ -497,7 +551,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                 ),
                                 middleElement: Text(
                                   "${currentWeather.humidity}%",
-                                  style: MediumTextStyle,
+                                  style: RegularTextStyle,
                                 ),
                                 bottomElement: Text(
                                   "Humidity",
@@ -523,6 +577,25 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: <Widget>[
                                     Icon(
+                                      Feather.sunrise,
+                                      color: Colors.white,
+                                      size: 18.0,
+                                    ),
+                                    SizedBox(width: 15.0),
+                                    Text(
+                                      _getTime(
+                                        currentWeather.sunRise,
+                                        currentWeather.timeZone,
+                                      ),
+                                      style:
+                                          SmallTextStyle.apply(heightFactor: 2),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(
                                       FontAwesomeIcons.cloud,
                                       color: Colors.white,
                                       size: 15.0,
@@ -530,8 +603,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     SizedBox(width: 15.0),
                                     Text(
                                       "${currentWeather.clouds}%",
-                                      style: RegularTextStyle.apply(
-                                          heightFactor: 2),
+                                      style:
+                                          SmallTextStyle.apply(heightFactor: 2),
                                     ),
                                   ],
                                 ),
@@ -546,8 +619,27 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     SizedBox(width: 15.0),
                                     Text(
                                       "${currentWeather.windSpeed} m/s",
-                                      style: RegularTextStyle.apply(
-                                          heightFactor: 2),
+                                      style:
+                                          SmallTextStyle.apply(heightFactor: 2),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: <Widget>[
+                                    Icon(
+                                      Feather.sunset,
+                                      color: Colors.white,
+                                      size: 18.0,
+                                    ),
+                                    SizedBox(width: 15.0),
+                                    Text(
+                                      _getTime(
+                                        currentWeather.sunSet,
+                                        currentWeather.timeZone,
+                                      ),
+                                      style:
+                                          SmallTextStyle.apply(heightFactor: 2),
                                     ),
                                   ],
                                 ),
@@ -597,7 +689,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                               animation: "02d",
                                             ),
                                           ),
-                                          Text("30 $temperatureUnit")
+                                          Text("30 $temperatureUnit"),
                                         ],
                                       ),
                                     ),
@@ -616,7 +708,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                               animation: "11d",
                                             ),
                                           ),
-                                          Text("30 $temperatureUnit")
+                                          Text("30 $temperatureUnit"),
                                         ],
                                       ),
                                     ),

@@ -9,6 +9,7 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert' as convert;
+
 import 'package:forecast/models/user.dart';
 import 'package:forecast/utils/common/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -37,11 +38,12 @@ class _HomePageState extends State<HomePage> {
   Icon _searchIcon = Icon(Icons.search);
   bool isSearching = false;
   String cityName;
-  String savedLocation;String _uid;
+  String savedLocation;
+  String _uid;
   User _user;
-  String _fName = null;
-  String _lName = null;
-  String _email = null;
+  String _fName;
+  String _lName;
+  String _email;
   String url;
   bool _loginStatus = false;
 
@@ -188,6 +190,37 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void _currentUser() async {
+    final FirebaseUser user = (await _auth.currentUser());
+    if (user != null) {
+      setState(() {
+        _uid = user.uid;
+        _loginStatus = true;
+      });
+      DocumentSnapshot snapshot = await db.getUserById(_uid);
+      print(snapshot.data);
+      _user = new User(snapshot.data['id'], snapshot.data['firstName'],
+          snapshot.data['lastName'], snapshot.data['email']);
+      _email = _user.email;
+      _fName = _user.firstName;
+      _lName = _user.lastName;
+      _getImageUrl();
+    } else {
+      print("Unsuccess!");
+    }
+  }
+
+  void _getImageUrl() {
+    StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
+    String _url = ref.getDownloadURL().toString();
+    url = _url;
+  }
+
+  void _logout() async {
+    await _auth.signOut();
+    _loginStatus = false;
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
@@ -234,58 +267,67 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      new GestureDetector(
-                        child: UserAccountsDrawerHeader(
-                          accountName: _fName == null ? Text("John Smith") : Text(_user.firstName+" "+_user.lastName),
-                          accountEmail: _email == null ? Text("johns@email.com") : Text(_user.email),
-                          currentAccountPicture: CircleAvatar(
-                              radius: 100,
-                              backgroundColor: Colors.white,
-                              child: ClipOval(
-                                  child: SizedBox(
-                                    width: 140.0,
-                                    height: 140.0,
-                                    child: url == null ? Image.asset('assets/images/user.jpg') : Image.network(url),
-                                  )
-                              )
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                          ),
-                        ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ProfilePage(),
+                      _user != null
+                          ? GestureDetector(
+                              child: UserAccountsDrawerHeader(
+                                accountName: Text(
+                                  _user.firstName + " " + _user.lastName,
+                                  style: RegularTextStyle,
+                                ),
+                                accountEmail: Text(
+                                  _user.email,
+                                  style: SmallTextStyle,
+                                ),
+                                currentAccountPicture: CircleAvatar(
+                                  radius: 100,
+                                  backgroundColor: Colors.white,
+                                  child: ClipOval(
+                                    child: SizedBox(
+                                      width: 140.0,
+                                      height: 140.0,
+                                      child: url == null
+                                          ? Image.asset(
+                                              'assets/images/forecast-logo.png',
+                                            )
+                                          : Image.network(url),
+                                    ),
+                                  ),
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.transparent,
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.of(context).pop();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ProfilePage(),
+                                  ),
+                                );
+                              },
+                            )
+                          : Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 15.0, top: 40.0, bottom: 20.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  CircleAvatar(
+                                    radius: 50.0,
+                                    backgroundImage: AssetImage(
+                                        "assets/images/forecast-logo.png"),
+                                  ),
+                                  SizedBox(height: 20.0),
+                                  Text(
+                                    "Login to Forecast for more features",
+                                    style: SmallTextStyle,
+                                  ),
+                                ],
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                      ListTile(
-                        onTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => LoginPage(),
-                            ),
-                          );
-                        },
-                        leading: Icon(
-                          FontAwesomeIcons.heart,
-                          color: Colors.white70,
-                        ),
-                        title: Text(
-                          "Login",
-                          style: RegularTextStyle,
-                        ),
-                        trailing: Icon(
-                          FontAwesomeIcons.angleRight,
-                          color: Colors.white70,
-                        ),
-                      ),
                       ListTile(
                         onTap: () {
                           Navigator.of(context).pop();
@@ -361,8 +403,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       ListTile(
                         onTap: () {
-                          if(_loginStatus) {
-                            _signout();
+                          if (_loginStatus) {
+                            _logout();
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
@@ -370,6 +412,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             );
                           } else {
+                            Navigator.of(context).pop();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -382,7 +425,10 @@ class _HomePageState extends State<HomePage> {
                           FontAwesomeIcons.powerOff,
                           color: Colors.white70,
                         ),
-                        title: _loginStatus == true ? Text("Sign Out") : Text("Sign In"),
+                        title: Text(
+                          _loginStatus == true ? "Logout" : "Login",
+                          style: RegularTextStyle,
+                        ),
                         trailing: Icon(
                           FontAwesomeIcons.angleRight,
                           color: Colors.white70,
@@ -402,41 +448,5 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-  }
-  void _currentUser() async {
-    final FirebaseUser user = (await _auth.currentUser());
-    if (user != null) {
-      setState(() {
-        _uid = user.uid;
-        _loginStatus = true;
-      });
-      DocumentSnapshot snapshot = await db.getUserById(_uid);
-      print(snapshot.data);
-      _user = new User(
-          snapshot.data['id'],
-          snapshot.data['firstName'],
-          snapshot.data['lastName'],
-          snapshot.data['email']
-      );
-      _email = _user.email;
-      _fName = _user.firstName;
-      _lName = _user.lastName;
-      _getImageUrl();
-    } else {
-      print("Unsuccess!");
-    }
-  }
-
-  void _getImageUrl() async {
-    StorageReference ref =
-    FirebaseStorage.instance.ref().child("images/$_uid");
-    String _url = (await ref.getDownloadURL()).toString();
-    url = _url;
-  }
-
-  void _signout() async {
-    await _auth.signOut();
-    _loginStatus = false;
-    Navigator.of(context).pop();
   }
 }

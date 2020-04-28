@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:forecast/pages/signup.dart';
+import 'package:forecast/utils/common/constants.dart';
+import 'package:forecast/widgets/background/default_gradient.dart';
 
 import 'home.dart';
 
@@ -26,18 +28,20 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Theme.of(context).accentColor,
       appBar: AppBar(
-        title: Text("Forecast Login"),
+        elevation: 0.0,
+        title: Text("Welcome back"),
         centerTitle: true,
         backgroundColor: Theme.of(context).accentColor,
       ),
-      body: Container(
+      body: DefaultGradient(
         child: Center(
           child: Container(
             width: MediaQuery.of(context).size.width * 0.85,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -71,25 +75,22 @@ class _LoginPageState extends State<LoginPage> {
                                 decoration: InputDecoration(
                                   hintText: "Email",
                                   errorText: _emailError,
-                                  icon: Icon(
-                                    Icons.mail,
-                                  ),
+                                  icon: Icon(Icons.mail),
                                   border: InputBorder.none,
                                 ),
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
+                          SizedBox(height: 15.0),
                           Material(
                             borderRadius: BorderRadius.all(
                               Radius.circular(10.0),
                             ),
                             color: Colors.white,
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 15.0,
+                              ),
                               child: TextFormField(
                                 obscureText: true,
                                 controller: password,
@@ -103,23 +104,23 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             ),
                           ),
-                          SizedBox(
-                            height: 10.0,
-                          ),
+                          SizedBox(height: 10.0),
                         ],
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  height: 50.0,
-                  child: FlatButton(
-                    padding: const EdgeInsets.all(0.0),
-                    onPressed: () {
-                      print(email.text.toString().trim());
-                      print(password.text.toString().trim());
-                      try {
-                        _validate();
+                Column(
+                  children: <Widget>[
+                    Container(
+                      height: 50.0,
+                      child: FlatButton(
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: () {
+                          print(email.text.toString().trim());
+                          print(password.text.toString().trim());
+                          try {
+                            _validate();
 //                          if(_success) {
 //                            Navigator.pushReplacement(
 //                              context,
@@ -128,34 +129,66 @@ class _LoginPageState extends State<LoginPage> {
 //                              ),
 //                            );
 //                          }
-                      } catch (e) {
-                        print(e);
-                      }
-                    },
-                    shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(40.0),
-                    ),
-                    child: Ink(
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          colors: <Color>[Color(0xFF311B92), Color(0xFF4A148C)],
+                          } catch (e) {
+                            print(e);
+                          }
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0),
                         ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(40.0),
-                        ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Login",
-                          style: TextStyle(
-                            fontSize: 20.0,
-                            color: Colors.white70,
-                            fontWeight: FontWeight.bold,
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).accentColor,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10.0),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Login",
+                              style: MediumTextStyle.apply(
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                    SizedBox(height: 15.0),
+                    Container(
+                      height: 50.0,
+                      child: FlatButton(
+                        padding: const EdgeInsets.all(0.0),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SignupPage(),
+                            ),
+                          );
+                        },
+                        shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(10.0),
+                        ),
+                        child: Ink(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).accentColor,
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(10.0),
+                            ),
+                          ),
+                          child: Center(
+                            child: Text(
+                              "Signup",
+                              style: MediumTextStyle.apply(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 Container(
                   child: Column(
@@ -169,20 +202,6 @@ class _LoginPageState extends State<LoginPage> {
                           //     builder: (context) => HomePage(),
                           //   ),
                           // );
-                        },
-                      ),
-                      SizedBox(
-                        height: 20.0,
-                      ),
-                      new InkWell(
-                        child: new Text("Signup"),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => SignupPage(),
-                            ),
-                          );
                         },
                       ),
                     ],
@@ -210,7 +229,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _signin(String email, String password) async {
+  void _login(String email, String password) async {
     final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
       email: email,
       password: password,
@@ -271,7 +290,7 @@ class _LoginPageState extends State<LoginPage> {
       _emailError = null;
     }
     if ((em == true) && (pw == true)) {
-      _signin(email.text.trim(), password.text.trim());
+      _login(email.text.trim(), password.text.trim());
     }
   }
 }

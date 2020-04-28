@@ -19,26 +19,26 @@ const AppTextTheme = TextTheme(
   body2: TextStyle(color: defaultFontColor),
 );
 
-const HeadingTextStyle = TextStyle(
-  fontSize: 28,
-  height: 1.5,
-  letterSpacing: 3.0,
-  fontWeight: FontWeight.bold,
-);
-
-const TitleTextStyle = TextStyle(
-  fontSize: 20,
-  letterSpacing: 1.5,
-  fontWeight: FontWeight.w500,
-);
-
 const MainTextStyle = TextStyle(
   height: 1.0,
   fontSize: 50.0,
 );
 
+const HeadingTextStyle = TextStyle(
+  fontSize: 28,
+  height: 1.0,
+  letterSpacing: 1.0,
+  fontWeight: FontWeight.bold,
+);
+
+const TitleTextStyle = TextStyle(
+  fontSize: 22,
+  letterSpacing: 1.0,
+  fontWeight: FontWeight.w500,
+);
+
 const MediumTextStyle = TextStyle(
-  fontSize: 18.0,
+  fontSize: 20.0,
   fontWeight: FontWeight.w500,
 );
 

@@ -2,21 +2,22 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:forecast/models/user.dart';
 
-final CollectionReference userCollection = Firestore.instance.collection('users');
+final CollectionReference userCollection =
+    Firestore.instance.collection('users');
 
 class UserProfileService {
-
-  static final UserProfileService _instance = new UserProfileService.internal();
+  static final UserProfileService _instance = UserProfileService.internal();
 
   factory UserProfileService() => _instance;
 
   UserProfileService.internal();
 
-  Future<User> createUser(String firstName, String lastName, String email) async {
+  Future<User> createUser(
+      String firstName, String lastName, String email) async {
     final TransactionHandler createTransaction = (Transaction tx) async {
       final DocumentSnapshot ds = await tx.get(userCollection.document());
 
-      final User user = new User(ds.documentID, firstName, lastName, email);
+      final User user = User(ds.documentID, firstName, lastName, email);
       final Map<String, dynamic> data = user.toMap();
 
       await tx.set(ds.reference, data);
@@ -48,7 +49,8 @@ class UserProfileService {
 
   Future<dynamic> updateUser(User user) async {
     final TransactionHandler updateTransaction = (Transaction tx) async {
-      final DocumentSnapshot ds = await tx.get(userCollection.document(user.id));
+      final DocumentSnapshot ds =
+          await tx.get(userCollection.document(user.id));
 
       await tx.update(ds.reference, user.toMap());
       return {'updated': true};
@@ -62,6 +64,7 @@ class UserProfileService {
       return false;
     });
   }
+
   Future<dynamic> getUserById(String id) async {
     DocumentSnapshot snapshot = await userCollection.document(id).get();
     return snapshot;

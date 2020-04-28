@@ -14,8 +14,8 @@ class WeatherModel {
   String _windDirection;
   String _clouds;
   String _country;
-  DateTime _sunRise;
-  DateTime _sunSet;
+  int _sunRise;
+  int _sunSet;
   int _timeZone;
   String _name;
   String _cod;
@@ -51,9 +51,9 @@ class WeatherModel {
 
   String get country => _country;
 
-  DateTime get sunRise => _sunRise;
+  int get sunRise => _sunRise;
 
-  DateTime get sunSet => _sunSet;
+  int get sunSet => _sunSet;
 
   int get timeZone => _timeZone;
 
@@ -78,8 +78,8 @@ class WeatherModel {
     _windSpeed = parsedJSON['wind']['speed'].toString();
     _clouds = parsedJSON['clouds']['all'].toString();
     _country = parsedJSON['sys']['country'];
-    _sunRise = DateTime.parse(parsedJSON['sys']['sunrise'].toString());
-    _sunSet = DateTime.parse(parsedJSON['sys']['sunset'].toString());
+    _sunRise = parsedJSON['sys']['sunrise'];
+    _sunSet = parsedJSON['sys']['sunset'];
     _timeZone = parsedJSON['timezone'];
     _name = parsedJSON['name'];
     _cod = parsedJSON['cod'].toString();

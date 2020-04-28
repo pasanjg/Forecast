@@ -29,6 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
       appBar: AppBar(
         elevation: 0.0,
         title: Text("Settings"),
+        centerTitle: true,
         backgroundColor: Theme.of(context).accentColor,
       ),
       body: DefaultGradient(
@@ -63,7 +64,6 @@ class _SettingsPageState extends State<SettingsPage> {
                           DropdownButton<String>(
                             value: unitDropdownValue,
                             icon: Icon(null),
-                            iconSize: 15,
                             elevation: 16,
                             underline: Container(
                               height: 0.0,
@@ -74,16 +74,19 @@ class _SettingsPageState extends State<SettingsPage> {
                               setState(() {
                                 unitDropdownValue = newValue;
                                 AppSharedPreferences.setStringSharedPreferences(
-                                    "units",
-                                    CommonUtils.getTemperatureAPIUnit(
-                                        newValue));
+                                  "units",
+                                  CommonUtils.getTemperatureAPIUnit(newValue),
+                                );
                               });
                             },
                             items: <String>["Celsius", "Fahrenheit", "Kelvin"]
                                 .map<DropdownMenuItem<String>>((String value) {
                               return DropdownMenuItem<String>(
                                 value: value,
-                                child: Text(value),
+                                child: Text(
+                                  value,
+                                  style: SmallTextStyle,
+                                ),
                               );
                             }).toList(),
                           ),
