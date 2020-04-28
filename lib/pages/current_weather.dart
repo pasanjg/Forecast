@@ -208,40 +208,36 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   String _getTime(int seconds, int timeZone) {
     String time;
-    DateTime dateTime = DateTime.fromMicrosecondsSinceEpoch(seconds * 1000);
+    DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toUtc();
 
     if (timeZone >= 0) {
-      dateTime
-          .add(
-            Duration(
-              hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
-              minutes: DateFormat("ss").parse(timeZone.toString(), true).minute,
-            ),
-          )
-          .toUtc();
+      dateTime = dateTime.add(
+        Duration(
+          hours: DateFormat("ss").parse(timeZone.toString()).hour,
+          minutes: DateFormat("ss").parse(timeZone.toString()).minute,
+        ),
+      );
     } else {
       timeZone *= -1;
-      dateTime
-          .subtract(
-            Duration(
-              hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
-              minutes: DateFormat("ss").parse(timeZone.toString(), true).minute,
-            ),
-          )
-          .toUtc();
+      dateTime = dateTime.subtract(
+        Duration(
+          hours: DateFormat("ss").parse(timeZone.toString()).hour,
+          minutes: DateFormat("ss").parse(timeZone.toString()).minute,
+        ),
+      );
     }
 
     time = DateFormat.jm().format(dateTime);
-//    print(time);
-
     return time.toString();
   }
 
   void _onAfterBuild(BuildContext context) {
     setState(() {
       if (this.locationDate != null)
-        AppTheme.instanceOf(context)
-            .changeTheme(AppThemes.getThemeKeyFromTime(this.locationDate));
+        AppTheme.instanceOf(context).changeTheme(
+          AppThemes.getThemeKeyFromTime(this.locationDate),
+        );
     });
   }
 
