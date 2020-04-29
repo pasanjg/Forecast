@@ -5,7 +5,8 @@ import 'package:forecast/resources/repository.dart';
 
 class CurrentWeatherBloc {
   final _repository = Repository();
-  PublishSubject<WeatherModel> _currentWeatherFetcher = PublishSubject<WeatherModel>();
+  PublishSubject<WeatherModel> _currentWeatherFetcher =
+      PublishSubject<WeatherModel>();
 
   Stream<WeatherModel> get currentWeather {
     if (_currentWeatherFetcher.isClosed) {
