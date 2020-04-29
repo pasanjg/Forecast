@@ -25,6 +25,91 @@ class _LoginPageState extends State<LoginPage> {
   bool _success;
   String _userEmail;
 
+
+  //Get the current user using firebase authentication
+  void _currentUser() async {
+    final FirebaseUser user = (await _auth.currentUser());
+    if (user != null) {
+      setState(() {
+        _userEmail = user.email;
+        var _uid = user.uid;
+        print("User Email  curr $_userEmail");
+        print("User UID curr $_uid");
+      });
+    } else {
+      print("Unsuccess!");
+    }
+  }
+
+// Login function using firebse authentication
+  void _login(String email, String password) async {
+    final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    ))
+        .user;
+    if (user != null) {
+      setState(() {
+        _success = true;
+        _userEmail = user.email;
+        var _uid = user.uid;
+        print("User Email $_userEmail");
+        print("User UID $_uid");
+
+        if (_success) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(),
+            ),
+          );
+        }
+      });
+    } else {
+      _success = false;
+    }
+  }
+
+//Password validator
+  bool _passwordValidate(String value) {
+    String pattern = r'^[a-zA-Z0-9]{8,}$';
+    RegExp regExp = new RegExp(pattern);
+    return regExp.hasMatch(value);
+  }
+
+//Email validator
+  bool _emailValidate(String value) {
+    String pattern =
+        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
+    RegExp regExp = new RegExp(pattern);
+    return regExp.hasMatch(value);
+  }
+
+//Validate user inputs
+  void _validate() async {
+    bool pw = true;
+    bool em = true;
+
+    if (!_passwordValidate(password.text)) {
+      _passwordError = "Please Enter 8 Character Password";
+      pw = false;
+      return;
+    } else {
+      _passwordError = null;
+    }
+
+    if (!_emailValidate(email.text.trim())) {
+      _emailError = "Please Enter Valid Email";
+      em = false;
+      return;
+    } else {
+      _emailError = null;
+    }
+    if ((em == true) && (pw == true)) {
+      _login(email.text.trim(), password.text.trim());
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,14 +206,6 @@ class _LoginPageState extends State<LoginPage> {
                           print(password.text.toString().trim());
                           try {
                             _validate();
-//                          if(_success) {
-//                            Navigator.pushReplacement(
-//                              context,
-//                              MaterialPageRoute(
-//                                builder: (context) => HomePage(),
-//                              ),
-//                            );
-//                          }
                           } catch (e) {
                             print(e);
                           }
@@ -196,12 +273,6 @@ class _LoginPageState extends State<LoginPage> {
                       new InkWell(
                         child: new Text("Forget Password"),
                         onTap: () {
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => HomePage(),
-                          //   ),
-                          // );
                         },
                       ),
                     ],
@@ -213,84 +284,5 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
     );
-  }
-
-  void _currentUser() async {
-    final FirebaseUser user = (await _auth.currentUser());
-    if (user != null) {
-      setState(() {
-        _userEmail = user.email;
-        var _uid = user.uid;
-        print("User Email  curr $_userEmail");
-        print("User UID curr $_uid");
-      });
-    } else {
-      print("Unsuccess!");
-    }
-  }
-
-  void _login(String email, String password) async {
-    final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    ))
-        .user;
-    if (user != null) {
-      setState(() {
-        _success = true;
-        _userEmail = user.email;
-        var _uid = user.uid;
-        print("User Email $_userEmail");
-        print("User UID $_uid");
-
-        if (_success) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePage(),
-            ),
-          );
-        }
-      });
-    } else {
-      _success = false;
-    }
-  }
-
-  bool _passwordValidate(String value) {
-    String pattern = r'^[a-zA-Z0-9]{8,}$';
-    RegExp regExp = new RegExp(pattern);
-    return regExp.hasMatch(value);
-  }
-
-  bool _emailValidate(String value) {
-    String pattern =
-        r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
-    RegExp regExp = new RegExp(pattern);
-    return regExp.hasMatch(value);
-  }
-
-  void _validate() async {
-    bool pw = true;
-    bool em = true;
-
-    if (!_passwordValidate(password.text)) {
-      _passwordError = "Please Enter 8 Character Password";
-      pw = false;
-      return;
-    } else {
-      _passwordError = null;
-    }
-
-    if (!_emailValidate(email.text.trim())) {
-      _emailError = "Please Enter Valid Email";
-      em = false;
-      return;
-    } else {
-      _emailError = null;
-    }
-    if ((em == true) && (pw == true)) {
-      _login(email.text.trim(), password.text.trim());
-    }
   }
 }
