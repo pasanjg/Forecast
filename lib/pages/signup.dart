@@ -22,6 +22,7 @@ class _FlareAnimationsPageState extends State<SignupPage> {
   bool _success;
   String _userEmail;
 
+// Signup function using firebse authentication
   void _signup(String email, String password) async {
     final FirebaseUser user = (await _auth.createUserWithEmailAndPassword(
       email: email,
@@ -47,12 +48,14 @@ class _FlareAnimationsPageState extends State<SignupPage> {
     }
   }
 
+//Password validator
   bool _passwordValidate(String value) {
     String pattern = r'^[a-zA-Z0-9]{8,}$';
     RegExp regExp = RegExp(pattern);
     return regExp.hasMatch(value);
   }
 
+//Email validator
   bool _emailValidate(String value) {
     String pattern =
         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
@@ -60,6 +63,7 @@ class _FlareAnimationsPageState extends State<SignupPage> {
     return regExp.hasMatch(value);
   }
 
+//Validate user inputs
   void _validate() {
     _success = false;
     bool pw = true;

@@ -12,6 +12,7 @@ class UserProfileService {
 
   UserProfileService.internal();
 
+//User create function
   Future<User> createUser(
       String firstName, String lastName, String email, String imageUrl) async {
     final TransactionHandler createTransaction = (Transaction tx) async {
@@ -33,20 +34,7 @@ class UserProfileService {
     });
   }
 
-  Stream<QuerySnapshot> getUserList({int offset, int limit}) {
-    Stream<QuerySnapshot> snapshots = userCollection.snapshots();
-
-    if (offset != null) {
-      snapshots = snapshots.skip(offset);
-    }
-
-    if (limit != null) {
-      snapshots = snapshots.take(limit);
-    }
-
-    return snapshots;
-  }
-
+//User update function
   Future<dynamic> updateUser(User user) async {
     final TransactionHandler updateTransaction = (Transaction tx) async {
       final DocumentSnapshot ds =
@@ -65,11 +53,13 @@ class UserProfileService {
     });
   }
 
+//Get user by id function
   Future<dynamic> getUserById(String id) async {
     DocumentSnapshot snapshot = await userCollection.document(id).get();
     return snapshot;
   }
-
+ 
+//Delete user function
   Future<dynamic> deleteUser(String id) async {
     final TransactionHandler deleteTransaction = (Transaction tx) async {
       final DocumentSnapshot ds = await tx.get(userCollection.document(id));

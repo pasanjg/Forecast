@@ -50,6 +50,7 @@ class MapScreenState extends State<ProfilePage>
     super.dispose();
   }
 
+//Aaction buttions widget
   Widget _getActionButtons() {
     return Padding(
       padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
@@ -118,6 +119,7 @@ class MapScreenState extends State<ProfilePage>
     );
   }
 
+//Edit icon widget
   Widget _getEditIcon() {
     return GestureDetector(
       child: CircleAvatar(
@@ -137,6 +139,7 @@ class MapScreenState extends State<ProfilePage>
     );
   }
 
+//Get the current user data function
   void _currentUser() async {
     final FirebaseUser user = (await _auth.currentUser());
     if (user != null) {
@@ -162,6 +165,7 @@ class MapScreenState extends State<ProfilePage>
     }
   }
 
+//User dat update function
   void _updateUser(String id) async {
     db
         .updateUser(
@@ -179,6 +183,7 @@ class MapScreenState extends State<ProfilePage>
     });
   }
 
+//File picker function
   Future filePicker(BuildContext context) async {
     try {
       if (fileType == 'image') {
@@ -209,6 +214,7 @@ class MapScreenState extends State<ProfilePage>
     }
   }
 
+//Profile picture upload function
   Future<void> _uploadFile(File file, String filename) async {
     StorageReference storageReference;
     if (fileType == 'image') {
@@ -235,6 +241,7 @@ class MapScreenState extends State<ProfilePage>
     );
   }
 
+//Image url generate function
   void _getImageUrl() async {
     StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
     String _url = (await ref.getDownloadURL()).toString();
