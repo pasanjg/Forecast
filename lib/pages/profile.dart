@@ -438,7 +438,9 @@ class MapScreenState extends State<ProfilePage>
                                 child: TextField(
                                   controller: _fNameController,
                                   decoration: const InputDecoration(
-                                      hintText: "Enter First Name "),
+                                      hintText: "Enter First Name ",
+                                      hintStyle: TextStyle(color: Colors.white),
+                                  ),
                                   enabled: !_status,
                                 ),
                               ),
@@ -477,6 +479,9 @@ class MapScreenState extends State<ProfilePage>
                                   controller: _lNameController,
                                   decoration: const InputDecoration(
                                     hintText: "Enter Last Name",
+                                    hintStyle: TextStyle(
+                                      color: Colors.white
+                                      ),
                                   ),
                                   enabled: !_status,
                                 ),
