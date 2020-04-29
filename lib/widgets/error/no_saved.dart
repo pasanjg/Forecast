@@ -31,7 +31,7 @@ class NoFavouritesPage extends StatelessWidget {
             ),
             SizedBox(height: 15.0),
             Text(
-              "Whoops!",
+              "Nothing here",
               style: HeadingTextStyle.apply(
                 letterSpacingFactor: 0,
                 heightFactor: 0.5,

@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:forecast/pages/error/no_saved.dart';
+import 'package:forecast/widgets/error/no_saved.dart';
 import 'package:forecast/pages/home.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/constants.dart';
@@ -34,7 +34,7 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
     });
   }
 
-  void _getUserSavedLocations(){
+  void _getUserSavedLocations() {
     documentReference =
         Firestore.instance.collection(usersCollection).document(this.userId);
   }
@@ -89,7 +89,7 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
               .document(userId)
               .snapshots(),
           builder: (context, snapshot) {
-            if(this.userId == null){
+            if (this.userId == null) {
               return NoFavouritesPage();
             }
             if (snapshot.hasData) {

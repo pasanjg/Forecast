@@ -44,7 +44,7 @@ class _HomePageState extends State<HomePage> {
   String _fName;
   String _lName;
   String _email;
-  String url;
+  String _url;
   bool _loginStatus = false;
 
   @override
@@ -200,21 +200,22 @@ class _HomePageState extends State<HomePage> {
       DocumentSnapshot snapshot = await db.getUserById(_uid);
       print(snapshot.data);
       _user = new User(snapshot.data['id'], snapshot.data['firstName'],
-          snapshot.data['lastName'], snapshot.data['email']);
+          snapshot.data['lastName'], snapshot.data['email'], snapshot.data['imageUrl']);
       _email = _user.email;
       _fName = _user.firstName;
       _lName = _user.lastName;
-      _getImageUrl();
+      _url = _user.imageUrl;
+//      _getImageUrl();
     } else {
       print("Unsuccess!");
     }
   }
 
-  void _getImageUrl() {
-    StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
-    String _url = ref.getDownloadURL().toString();
-    url = _url;
-  }
+//  void _getImageUrl() {
+//    StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
+//    String _url = ref.getDownloadURL().toString();
+//    url = _url;
+//  }
 
   void _logout() async {
     await _auth.signOut();
@@ -287,11 +288,11 @@ class _HomePageState extends State<HomePage> {
                                     child: SizedBox(
                                       width: 140.0,
                                       height: 140.0,
-                                      child: url == null
+                                      child: _url == null
                                           ? Image.asset(
                                               'assets/images/forecast-logo.png',
                                             )
-                                          : Image.network(url),
+                                          : Image.network(_url),
                                     ),
                                   ),
                                 ),

@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:forecast/pages/weather_forecast.dart';
 import 'package:forecast/utils/common/constants.dart';
-import 'package:forecast/pages/error/no_internet.dart';
+import 'package:forecast/widgets/error/no_internet.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/shared_preferences.dart';
@@ -18,11 +19,10 @@ import 'package:forecast/widgets/current_weather/temp_data_card.dart';
 import 'package:flare_flutter/flare_actor.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:forecast/blocs/current_weather/current_weather_bloc.dart';
+import 'package:forecast/blocs/current_weather_bloc.dart';
 import 'package:forecast/models/weather_model.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:fl_chart/fl_chart.dart';
 
 class CurrentWeatherDetailsPage extends StatefulWidget {
   final String cityName;
@@ -50,14 +50,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   List savedLocations;
   DocumentReference documentReference;
 
-  double _animatedHeight = 0;
-  double _animatedMaxHeight = 250;
+  double _containerHeightFactor = 0.88;
   ScrollController _controller = ScrollController();
-
-  List<Color> gradientColors = [
-    Colors.grey,
-    Colors.white,
-  ];
 
   @override
   void initState() {
@@ -171,14 +165,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     return placemark;
   }
 
-  _handleAutoScroll() {
-    _controller.animateTo(
-      _controller.position.maxScrollExtent,
-      duration: Duration(milliseconds: 400),
-      curve: Curves.easeInOut,
-    );
-  }
-
   String _getTodayDate(int timeZone) {
     DateTime today = DateTime.now();
 
@@ -208,40 +194,36 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   String _getTime(int seconds, int timeZone) {
     String time;
-    DateTime dateTime = DateTime.fromMicrosecondsSinceEpoch(seconds * 1000);
+    DateTime dateTime =
+        DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toUtc();
 
     if (timeZone >= 0) {
-      dateTime
-          .add(
-            Duration(
-              hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
-              minutes: DateFormat("ss").parse(timeZone.toString(), true).minute,
-            ),
-          )
-          .toUtc();
+      dateTime = dateTime.add(
+        Duration(
+          hours: DateFormat("ss").parse(timeZone.toString()).hour,
+          minutes: DateFormat("ss").parse(timeZone.toString()).minute,
+        ),
+      );
     } else {
       timeZone *= -1;
-      dateTime
-          .subtract(
-            Duration(
-              hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
-              minutes: DateFormat("ss").parse(timeZone.toString(), true).minute,
-            ),
-          )
-          .toUtc();
+      dateTime = dateTime.subtract(
+        Duration(
+          hours: DateFormat("ss").parse(timeZone.toString()).hour,
+          minutes: DateFormat("ss").parse(timeZone.toString()).minute,
+        ),
+      );
     }
 
     time = DateFormat.jm().format(dateTime);
-//    print(time);
-
     return time.toString();
   }
 
   void _onAfterBuild(BuildContext context) {
     setState(() {
       if (this.locationDate != null)
-        AppTheme.instanceOf(context)
-            .changeTheme(AppThemes.getThemeKeyFromTime(this.locationDate));
+        AppTheme.instanceOf(context).changeTheme(
+          AppThemes.getThemeKeyFromTime(this.locationDate),
+        );
     });
   }
 
@@ -340,40 +322,45 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           controller: _controller,
           children: <Widget>[
             Container(
-              height: MediaQuery.of(context).size.height * 0.86,
-              width: MediaQuery.of(context).size.width,
+              constraints: BoxConstraints(
+                minHeight:
+                    MediaQuery.of(context).size.height * _containerHeightFactor,
+                minWidth: MediaQuery.of(context).size.width,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
-                  FadeAnimation(
-                    delay: 0.5,
+                  Container(
                     child: Column(
                       children: <Widget>[
-                        Text(
-                          _getTodayDate(currentWeather.timeZone),
-                          style: TitleTextStyle.apply(letterSpacingFactor: 1.2),
-                        ),
-                        Text(
-                          currentWeather.name.toUpperCase(),
-                          textAlign: TextAlign.center,
-                          style: HeadingTextStyle.apply(
-                            heightFactor: 1.2,
-                            letterSpacingFactor: 2.0,
+                        FadeAnimation(
+                          delay: 0.5,
+                          child: Column(
+                            children: <Widget>[
+                              Text(
+                                _getTodayDate(currentWeather.timeZone),
+                                style: TitleTextStyle.apply(
+                                    letterSpacingFactor: 1.2),
+                              ),
+                              Text(
+                                currentWeather.name.toUpperCase(),
+                                textAlign: TextAlign.center,
+                                style: HeadingTextStyle.apply(
+                                  heightFactor: 1.2,
+                                  letterSpacingFactor: 2.0,
+                                ),
+                              ),
+                              SizedBox(height: 10.0),
+                            ],
                           ),
                         ),
-                        SizedBox(height: 10.0),
-                      ],
-                    ),
-                  ),
-                  FadeAnimation(
-                    delay: 0.8,
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[
-                            Expanded(
-                              child: Column(
+                        FadeAnimation(
+                          delay: 0.8,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Column(
                                 children: <Widget>[
                                   Container(
                                     height:
@@ -388,96 +375,126 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                   ),
                                 ],
                               ),
-                            ),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: <Widget>[
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        "${currentWeather.temp}",
-                                        style: MainTextStyle.apply(
-                                            heightFactor: 0.5),
-                                      ),
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 4.0),
-                                        child: Text(
-                                          temperatureUnit,
-                                          style: TextStyle(
-                                            fontSize: 22.0,
-                                            height: 0.0,
+                              Expanded(
+                                flex: 1,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          "${currentWeather.temp}",
+                                          style: MainTextStyle.apply(
+                                            fontSizeFactor: 1.1,
+                                            heightFactor: 0.5,
                                           ),
                                         ),
-                                      ),
-                                    ],
-                                  ),
-                                  SizedBox(
-                                    height: 5.0,
-                                  ),
-                                  Text(
-                                    currentWeather.weatherDescription
-                                        .toUpperCase(),
-                                    textAlign: TextAlign.center,
-                                    style: RegularTextStyle,
-                                  ),
-                                  SizedBox(
-                                    height: 10.0,
-                                  ),
-                                  Text(
-                                    "${currentWeather.feelsLike} $temperatureUnit",
-                                    style: RegularTextStyle,
-                                  ),
-                                  SizedBox(height: 10.0),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      InkWell(
-                                        onTap: () {
-                                          setState(() {
-                                            _handleSave(isSaved, this.cityName);
-                                          });
-                                        },
-                                        child: Container(
-                                          child: isSaved
-                                              ? Icon(
-                                                  Icons.favorite,
-                                                  color: Colors.redAccent,
-                                                  size: 30.0,
-                                                )
-                                              : Icon(
-                                                  Icons.favorite_border,
-                                                  color: Colors.white30,
-                                                  size: 30.0,
-                                                ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                            left: 4.0,
+                                          ),
+                                          child: Text(
+                                            temperatureUnit,
+                                            style: TextStyle(
+                                              fontSize: 22.0,
+                                              height: 0.0,
+                                            ),
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 8.0),
-                                      Container(
-                                        height: 35.0,
-                                        child: FadeInImage.assetNetwork(
-                                          placeholder:
-                                              "assets/images/flag-loading.png",
-                                          image:
-                                              "https://www.countryflags.io/${this.country}/flat/64.png",
+                                        SizedBox(
+                                          width: 10.0,
                                         ),
+                                      ],
+                                    ),
+                                    SizedBox(
+                                      height: 5.0,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(right: 10.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.end,
+                                        children: <Widget>[
+                                          Text(
+                                            currentWeather.weatherDescription
+                                                .toUpperCase(),
+                                            textAlign: TextAlign.right,
+                                            style: RegularTextStyle,
+                                          ),
+                                          SizedBox(
+                                            height: 5.0,
+                                          ),
+                                          Text(
+                                            "FEELS  ${currentWeather.feelsLike} $temperatureUnit",
+                                            style: RegularTextStyle.apply(
+                                              fontSizeFactor: 0.85,
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                  ],
+                                ),
                               ),
+                            ],
+                          ),
+                        ),
+                        ///////////////////////////////////////////////
+                        FadeAnimation(
+                          delay: 1.2,
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0,
+                              vertical: 20.0,
                             ),
-                          ],
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: <Widget>[
+                                InkWell(
+                                  onTap: () {
+                                    setState(() {
+                                      _handleSave(isSaved, this.cityName);
+                                    });
+                                  },
+                                  child: Container(
+                                    child: isSaved
+                                        ? Icon(
+                                            Icons.favorite,
+                                            color: Colors.redAccent,
+                                            size: 45.0,
+                                          )
+                                        : Icon(
+                                            Icons.favorite_border,
+                                            color: Colors.white30,
+                                            size: 45.0,
+                                          ),
+                                  ),
+                                ),
+                                SizedBox(width: 15.0),
+                                Container(
+                                  height: 45.0,
+                                  child: FadeInImage.assetNetwork(
+                                    placeholder:
+                                        "assets/images/flag-loading.png",
+                                    image:
+                                        "https://www.countryflags.io/${this.country}/flat/64.png",
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ],
                     ),
                   ),
                   FadeAnimation(
-                    delay: 1.2,
+                    delay: 1.6,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: <Widget>[
@@ -569,7 +586,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                           elevation: 0.3,
                           color: _cardColor,
                           child: Padding(
-                            padding: const EdgeInsets.all(5.0),
+                            padding: const EdgeInsets.symmetric(vertical: 10.0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                               children: <Widget>[
@@ -587,8 +604,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                         currentWeather.sunRise,
                                         currentWeather.timeZone,
                                       ),
-                                      style:
-                                          SmallTextStyle.apply(heightFactor: 2),
+                                      style: SmallTextStyle.apply(
+                                        heightFactor: 2,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -603,8 +621,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     SizedBox(width: 15.0),
                                     Text(
                                       "${currentWeather.clouds}%",
-                                      style:
-                                          SmallTextStyle.apply(heightFactor: 2),
+                                      style: SmallTextStyle.apply(
+                                        heightFactor: 2,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -619,8 +638,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     SizedBox(width: 15.0),
                                     Text(
                                       "${currentWeather.windSpeed} m/s",
-                                      style:
-                                          SmallTextStyle.apply(heightFactor: 2),
+                                      style: SmallTextStyle.apply(
+                                        heightFactor: 2,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -638,8 +658,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                         currentWeather.sunSet,
                                         currentWeather.timeZone,
                                       ),
-                                      style:
-                                          SmallTextStyle.apply(heightFactor: 2),
+                                      style: SmallTextStyle.apply(
+                                        heightFactor: 2,
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -649,133 +670,11 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                         ),
                         ////////////////// END OF OTHER DATA /////////////////////
 
-                        InkWell(
-                          onTap: () {
-                            setState(() {
-                              _animatedHeight =
-                                  _animatedHeight == _animatedMaxHeight
-                                      ? 0
-                                      : _animatedMaxHeight;
-                            });
-
-                            if (_animatedHeight == _animatedMaxHeight)
-                              Timer(
-                                Duration(milliseconds: 500),
-                                _handleAutoScroll,
-                              );
-                          },
-                          ////////////////////////////////////////////////////////
-                          child: Card(
-                            elevation: 0.3,
-                            color: _cardColor,
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 5.0,
-                                vertical: 8.0,
-                              ),
-                              child: IntrinsicHeight(
-                                //////////////////////////////////////////////////
-                                child: Row(
-                                  children: <Widget>[
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("SUN"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_02d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "02d",
-                                            ),
-                                          ),
-                                          Text("30 $temperatureUnit"),
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("MON"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_11d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "11d",
-                                            ),
-                                          ),
-                                          Text("30 $temperatureUnit"),
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("TUE"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_04d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "04d",
-                                            ),
-                                          ),
-                                          Text("30 $temperatureUnit")
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("WED"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_09d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "09d",
-                                            ),
-                                          ),
-                                          Text("30 $temperatureUnit")
-                                        ],
-                                      ),
-                                    ),
-                                    VerticalDivider(
-                                      color: Colors.white.withOpacity(0.3),
-                                    ),
-                                    Expanded(
-                                      child: Column(
-                                        children: <Widget>[
-                                          Text("THU"),
-                                          Container(
-                                            height: 30.0,
-                                            child: FlareActor(
-                                              "assets/flare_animations/weather_icons/weather_50d.flr",
-                                              fit: BoxFit.contain,
-                                              animation: "50d",
-                                            ),
-                                          ),
-                                          Text("30 $temperatureUnit"),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                //////////////////////////////////////////////////
-                              ),
-                            ),
-                          ),
-                          ////////////////////////////////////////////////////////
+                        WeatherForecastPage(
+                          controller: _controller,
+                          cityName: this.cityName,
+                          units: this.units,
+                          temperatureUnit: this.temperatureUnit,
                         ),
                       ],
                     ),
@@ -784,238 +683,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
               ),
             ),
             // TODAY'S FORECAST DETAILS //
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: AnimatedContainer(
-                // color: Colors.red,
-                curve: Curves.easeInOut,
-                duration: Duration(milliseconds: 500),
-                height: _animatedHeight,
-                child: AnimatedOpacity(
-                  curve: Curves.easeInOut,
-                  duration: Duration(milliseconds: 500),
-                  opacity: this._animatedHeight == this._animatedMaxHeight
-                      ? 1.0
-                      : 0.0,
-                  child: Wrap(
-                    children: <Widget>[
-                      Stack(
-                        children: <Widget>[
-                          Container(
-                            height: _animatedMaxHeight,
-                            child: Card(
-                              elevation: 0.3,
-                              color: _cardColor,
-                              child: Padding(
-                                padding: const EdgeInsets.all(15.0),
-                                child: IntrinsicHeight(
-                                  child: Row(
-                                    children: <Widget>[
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 0.0,
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: <Widget>[
-                                              Container(
-                                                height: 30.0,
-                                                child: FlareActor(
-                                                  "assets/flare_animations/weather_icons/weather_02d.flr",
-                                                  fit: BoxFit.contain,
-                                                  animation: "02d",
-                                                ),
-                                              ),
-                                              Text("30 °C")
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      VerticalDivider(
-                                        color: Colors.white.withOpacity(0.3),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 0.0,
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: <Widget>[
-                                              Container(
-                                                height: 30.0,
-                                                child: FlareActor(
-                                                  "assets/flare_animations/weather_icons/weather_11d.flr",
-                                                  fit: BoxFit.contain,
-                                                  animation: "11d",
-                                                ),
-                                              ),
-                                              Text("30 °C")
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      VerticalDivider(
-                                        color: Colors.white.withOpacity(0.3),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 0.0,
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: <Widget>[
-                                              Container(
-                                                height: 30.0,
-                                                child: FlareActor(
-                                                  "assets/flare_animations/weather_icons/weather_04d.flr",
-                                                  fit: BoxFit.contain,
-                                                  animation: "04d",
-                                                ),
-                                              ),
-                                              Text("30 °C")
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      VerticalDivider(
-                                        color: Colors.white.withOpacity(0.3),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 0.0,
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: <Widget>[
-                                              Container(
-                                                height: 30.0,
-                                                child: FlareActor(
-                                                  "assets/flare_animations/weather_icons/weather_09d.flr",
-                                                  fit: BoxFit.contain,
-                                                  animation: "09d",
-                                                ),
-                                              ),
-                                              Text("30 °C")
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      VerticalDivider(
-                                        color: Colors.white.withOpacity(0.3),
-                                      ),
-                                      Expanded(
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                            bottom: 0.0,
-                                          ),
-                                          child: Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: <Widget>[
-                                              Container(
-                                                height: 30.0,
-                                                child: FlareActor(
-                                                  "assets/flare_animations/weather_icons/weather_50d.flr",
-                                                  fit: BoxFit.contain,
-                                                  animation: "50d",
-                                                ),
-                                              ),
-                                              Text("30 °C"),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(
-                                top: 25.0, left: 8.0, right: 8.0),
-                            child: AspectRatio(
-                              aspectRatio: 5 / 2, // width / height
-                              child: LineChart(
-                                mainData(),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
           ],
         ),
       ),
-    );
-  }
-
-  LineChartData mainData() {
-    return LineChartData(
-      gridData: FlGridData(
-        show: false,
-        drawVerticalLine: false,
-        getDrawingHorizontalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 0,
-          );
-        },
-        getDrawingVerticalLine: (value) {
-          return const FlLine(
-            color: Color(0xff37434d),
-            strokeWidth: 1,
-          );
-        },
-      ),
-      titlesData: FlTitlesData(
-        show: false,
-      ),
-      borderData: FlBorderData(
-        show: false,
-      ),
-      minX: 0,
-      maxX: 10,
-      minY: 25.75,
-      maxY: 33.55,
-      lineBarsData: [
-        LineChartBarData(
-          spots: const [
-//            FlSpot(0, 28.75),
-            FlSpot(1, 25.75),
-            FlSpot(3, 31.97),
-            FlSpot(5, 33.55),
-            FlSpot(7, 28.52),
-            FlSpot(9, 26.46),
-//            FlSpot(10, 30.46),
-          ],
-          isCurved: true,
-          colors: gradientColors,
-          barWidth: 2,
-          isStrokeCapRound: true,
-          dotData: const FlDotData(
-            show: true,
-            dotColor: Colors.white,
-          ),
-          belowBarData: BarAreaData(
-            show: true,
-            colors:
-                gradientColors.map((color) => color.withOpacity(0.3)).toList(),
-          ),
-        ),
-      ],
     );
   }
 

@@ -50,6 +50,7 @@ class MapScreenState extends State<ProfilePage>
     super.dispose();
   }
 
+//Aaction buttions widget
   Widget _getActionButtons() {
     return Padding(
       padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
@@ -118,6 +119,7 @@ class MapScreenState extends State<ProfilePage>
     );
   }
 
+//Edit icon widget
   Widget _getEditIcon() {
     return GestureDetector(
       child: CircleAvatar(
@@ -137,6 +139,7 @@ class MapScreenState extends State<ProfilePage>
     );
   }
 
+//Get the current user data function
   void _currentUser() async {
     final FirebaseUser user = (await _auth.currentUser());
     if (user != null) {
@@ -146,7 +149,7 @@ class MapScreenState extends State<ProfilePage>
       DocumentSnapshot snapshot = await db.getUserById(_uid);
       print(snapshot.data);
       _user = User(snapshot.data['id'], snapshot.data['firstName'],
-          snapshot.data['lastName'], snapshot.data['email']);
+          snapshot.data['lastName'], snapshot.data['email'], snapshot.data['imageUrl']);
       _email = _user.email;
       _fNameController = TextEditingController(text: _user.firstName);
       _lNameController = TextEditingController(text: _user.lastName);
@@ -162,6 +165,7 @@ class MapScreenState extends State<ProfilePage>
     }
   }
 
+//User dat update function
   void _updateUser(String id) async {
     db
         .updateUser(
@@ -170,7 +174,8 @@ class MapScreenState extends State<ProfilePage>
         _fNameController.text,
         _lNameController.text,
         _user.email,
-      ),
+        _user.imageUrl
+      )
     )
         .then((onValue) {
       _status = true;
@@ -178,6 +183,7 @@ class MapScreenState extends State<ProfilePage>
     });
   }
 
+//File picker function
   Future filePicker(BuildContext context) async {
     try {
       if (fileType == 'image') {
@@ -208,6 +214,7 @@ class MapScreenState extends State<ProfilePage>
     }
   }
 
+//Profile picture upload function
   Future<void> _uploadFile(File file, String filename) async {
     StorageReference storageReference;
     if (fileType == 'image') {
@@ -218,6 +225,14 @@ class MapScreenState extends State<ProfilePage>
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     final String url = (await downloadUrl.ref.getDownloadURL());
     print("URL is $url");
+    db.updateUser(
+        User(
+          _uid,
+          _user.firstName,
+          _user.lastName,
+          _user.email,
+          url
+        ));
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -226,10 +241,10 @@ class MapScreenState extends State<ProfilePage>
     );
   }
 
+//Image url generate function
   void _getImageUrl() async {
     StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
     String _url = (await ref.getDownloadURL()).toString();
-    print("tttttttttttttttttttttt: $_url");
     url = _url;
   }
 
@@ -423,7 +438,9 @@ class MapScreenState extends State<ProfilePage>
                                 child: TextField(
                                   controller: _fNameController,
                                   decoration: const InputDecoration(
-                                      hintText: "Enter First Name "),
+                                      hintText: "Enter First Name ",
+                                      hintStyle: TextStyle(color: Colors.white),
+                                  ),
                                   enabled: !_status,
                                 ),
                               ),
@@ -462,6 +479,9 @@ class MapScreenState extends State<ProfilePage>
                                   controller: _lNameController,
                                   decoration: const InputDecoration(
                                     hintText: "Enter Last Name",
+                                    hintStyle: TextStyle(
+                                      color: Colors.white
+                                      ),
                                   ),
                                   enabled: !_status,
                                 ),
