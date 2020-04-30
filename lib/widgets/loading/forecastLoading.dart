@@ -4,8 +4,9 @@ class ForecastLoading extends StatelessWidget {
 
   Widget _loadingElement(){
     return Container(
-      height: 80.0,
+      height: 90.0,
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
           Container(
             decoration: BoxDecoration(
@@ -46,12 +47,10 @@ class ForecastLoading extends StatelessWidget {
         elevation: 0.3,
         color: _cardColor,
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 5.0,
-            vertical: 20.0,
-          ),
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal:8.0),
           child: IntrinsicHeight(
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 _loadingElement(),

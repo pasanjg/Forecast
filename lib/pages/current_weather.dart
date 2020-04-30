@@ -50,7 +50,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   List savedLocations;
   DocumentReference documentReference;
 
-  double _containerHeightFactor = 0.88;
   ScrollController _controller = ScrollController();
 
   @override
@@ -321,121 +320,188 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
         child: ListView(
           controller: _controller,
           children: <Widget>[
-            Container(
-              constraints: BoxConstraints(
-                minHeight:
-                    MediaQuery.of(context).size.height * _containerHeightFactor,
-                minWidth: MediaQuery.of(context).size.width,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    child: Column(
-                      children: <Widget>[
-                        FadeAnimation(
-                          delay: 0.5,
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                _getTodayDate(currentWeather.timeZone),
-                                style: TitleTextStyle.apply(
-                                    letterSpacingFactor: 1.2),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.685,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      FadeAnimation(
+                        delay: 0.5,
+                        child: Column(
+                          children: <Widget>[
+                            Text(
+                              _getTodayDate(currentWeather.timeZone),
+                              style: TitleTextStyle.apply(
+                                  letterSpacingFactor: 1.2),
+                            ),
+                            Text(
+                              currentWeather.name.toUpperCase(),
+                              textAlign: TextAlign.center,
+                              style: HeadingTextStyle.apply(
+                                heightFactor: 1.2,
+                                letterSpacingFactor: 2.0,
                               ),
-                              Text(
-                                currentWeather.name.toUpperCase(),
-                                textAlign: TextAlign.center,
-                                style: HeadingTextStyle.apply(
-                                  heightFactor: 1.2,
-                                  letterSpacingFactor: 2.0,
-                                ),
-                              ),
-                              SizedBox(height: 10.0),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        FadeAnimation(
-                          delay: 0.8,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Column(
+                      ),
+                      SizedBox(height: 10.0),
+                      FadeAnimation(
+                        delay: 0.8,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Column(
+                              children: <Widget>[
+                                Container(
+                                  height:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.4,
+                                  child: FlareActor(
+                                    "assets/flare_animations/weather_icons/weather_${currentWeather.weatherIcon}.flr",
+                                    fit: BoxFit.contain,
+                                    animation: currentWeather.weatherIcon,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                crossAxisAlignment: CrossAxisAlignment.end,
                                 children: <Widget>[
-                                  Container(
-                                    height:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.4,
-                                    child: FlareActor(
-                                      "assets/flare_animations/weather_icons/weather_${currentWeather.weatherIcon}.flr",
-                                      fit: BoxFit.contain,
-                                      animation: currentWeather.weatherIcon,
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Text(
+                                        currentWeather.temp,
+                                        style: MainTextStyle.apply(
+                                          fontSizeFactor: 1.1,
+                                          heightFactor: 0.5,
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 4.0,
+                                        ),
+                                        child: Text(
+                                          temperatureUnit,
+                                          style: TextStyle(
+                                            fontSize: 22.0,
+                                            height: 0.0,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 10.0,
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(
+                                    height: 15.0,
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(right: 10.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: <Widget>[
+                                        Text(
+                                          currentWeather.weatherDescription
+                                              .toUpperCase(),
+                                          textAlign: TextAlign.right,
+                                          style: RegularTextStyle,
+                                        ),
+                                        SizedBox(
+                                          height: 15.0,
+                                        ),
+                                        Text(
+                                          "FEELS  ${currentWeather.feelsLike} $temperatureUnit",
+                                          style: RegularTextStyle.apply(
+                                            fontSizeFactor: 0.85,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8.0,
+                          vertical: 5.0,
+                        ),
+                        child: FadeAnimation(
+                          delay: 1.2,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: <Widget>[
                               Expanded(
-                                flex: 1,
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
+                                  flex: 2,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 3.0),
+                                    child: Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                          CrossAxisAlignment.center,
                                       children: <Widget>[
+                                        Icon(
+                                          FontAwesomeIcons.clock,
+                                          color: Colors.white70,
+                                        ),
+                                        SizedBox(width: 10.0),
                                         Text(
-                                          "${currentWeather.temp}",
-                                          style: MainTextStyle.apply(
-                                            fontSizeFactor: 1.1,
-                                            heightFactor: 0.5,
-                                          ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            left: 4.0,
-                                          ),
-                                          child: Text(
-                                            temperatureUnit,
-                                            style: TextStyle(
-                                              fontSize: 22.0,
-                                              height: 0.0,
-                                            ),
-                                          ),
-                                        ),
-                                        SizedBox(
-                                          width: 10.0,
+                                          "${_getTime(((locationDate.millisecondsSinceEpoch) / 1000).round(), 0)}",
+                                          style: MediumTextStyle,
                                         ),
                                       ],
                                     ),
-                                    SizedBox(
-                                      height: 5.0,
+                                  )),
+                              Expanded(
+                                flex: 1,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: <Widget>[
+                                    InkWell(
+                                      onTap: () {
+                                        setState(() {
+                                          _handleSave(isSaved, this.cityName);
+                                        });
+                                      },
+                                      child: Container(
+                                        child: isSaved
+                                            ? Icon(
+                                                Icons.favorite,
+                                                color: Colors.redAccent,
+                                                size: 35.0,
+                                              )
+                                            : Icon(
+                                                Icons.favorite_border,
+                                                color: Colors.white30,
+                                                size: 35.0,
+                                              ),
+                                      ),
                                     ),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(right: 10.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.end,
-                                        children: <Widget>[
-                                          Text(
-                                            currentWeather.weatherDescription
-                                                .toUpperCase(),
-                                            textAlign: TextAlign.right,
-                                            style: RegularTextStyle,
-                                          ),
-                                          SizedBox(
-                                            height: 5.0,
-                                          ),
-                                          Text(
-                                            "FEELS  ${currentWeather.feelsLike} $temperatureUnit",
-                                            style: RegularTextStyle.apply(
-                                              fontSizeFactor: 0.85,
-                                            ),
-                                          ),
-                                        ],
+                                    SizedBox(width: 10.0),
+                                    Container(
+                                      height: 40.0,
+                                      child: FadeInImage.assetNetwork(
+                                        placeholder:
+                                            "assets/images/flag-loading.png",
+                                        image:
+                                            "https://www.countryflags.io/${this.country}/flat/64.png",
                                       ),
                                     ),
                                   ],
@@ -444,62 +510,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                             ],
                           ),
                         ),
-                        ///////////////////////////////////////////////
-                        FadeAnimation(
-                          delay: 1.2,
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8.0,
-                              vertical: 20.0,
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: <Widget>[
-                                InkWell(
-                                  onTap: () {
-                                    setState(() {
-                                      _handleSave(isSaved, this.cityName);
-                                    });
-                                  },
-                                  child: Container(
-                                    child: isSaved
-                                        ? Icon(
-                                            Icons.favorite,
-                                            color: Colors.redAccent,
-                                            size: 45.0,
-                                          )
-                                        : Icon(
-                                            Icons.favorite_border,
-                                            color: Colors.white30,
-                                            size: 45.0,
-                                          ),
-                                  ),
-                                ),
-                                SizedBox(width: 15.0),
-                                Container(
-                                  height: 45.0,
-                                  child: FadeInImage.assetNetwork(
-                                    placeholder:
-                                        "assets/images/flag-loading.png",
-                                    image:
-                                        "https://www.countryflags.io/${this.country}/flat/64.png",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  FadeAnimation(
-                    delay: 1.6,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        /////// MAX.TEMP | MIN.TEMP | PRESSURE | HUMIDITY ////////
-                        Row(
+                      ),
+                      FadeAnimation(
+                        delay: 1.4,
+                        child: Row(
                           children: <Widget>[
                             TempDataCard(
                               cardColor: _cardColor,
@@ -579,10 +593,10 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                             ),
                           ],
                         ),
-                        /////////////////// END OF TEMP CARD DATA ////////////////
-
-                        ////////////////////// OTHER DATA ////////////////////////
-                        Card(
+                      ),
+                      FadeAnimation(
+                        delay: 1.4,
+                        child: Card(
                           elevation: 0.3,
                           color: _cardColor,
                           child: Padding(
@@ -668,21 +682,23 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                             ),
                           ),
                         ),
-                        ////////////////// END OF OTHER DATA /////////////////////
-
-                        WeatherForecastPage(
-                          controller: _controller,
-                          cityName: this.cityName,
-                          units: this.units,
-                          temperatureUnit: this.temperatureUnit,
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                ////////////////// END OF OTHER DATA /////////////////////
+                // TODAY'S FORECAST DETAILS //
+                FadeAnimation(
+                  delay: 1.6,
+                  child: WeatherForecastPage(
+                    controller: _controller,
+                    cityName: this.cityName,
+                    units: this.units,
+                    temperatureUnit: this.temperatureUnit,
+                  ),
+                ),
+              ],
             ),
-            // TODAY'S FORECAST DETAILS //
           ],
         ),
       ),
