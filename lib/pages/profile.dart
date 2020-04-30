@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:forecast/models/user.dart';
+import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/utils/common/user_profile.dart';
 import 'package:forecast/pages/login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,6 +26,7 @@ class MapScreenState extends State<ProfilePage>
   User _user;
   bool _status = true;
   bool isUploaded = true;
+  bool isLoading = false;
   String _uid;
   String _email = "email";
   String fileType = '';
@@ -50,71 +52,80 @@ class MapScreenState extends State<ProfilePage>
     super.dispose();
   }
 
-//Aaction buttions widget
+//Action buttons widget
   Widget _getActionButtons() {
     return Padding(
-      padding: EdgeInsets.only(left: 25.0, right: 25.0, top: 45.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(right: 10.0),
-              child: Container(
-                child: RaisedButton(
-                  child: Text(
-                    "Update",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
+      padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
+      child: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Container(
+              height: 50.0,
+              child: FlatButton(
+                padding: const EdgeInsets.all(0.0),
+                onPressed: () {
+                  setState(() {
+                    _status = false;
+                    _updateUser(_uid);
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  });
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(10.0),
+                ),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).accentColor,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10.0),
                     ),
                   ),
-                  textColor: Colors.white,
-                  color: Color(0xFF4A148C),
-                  onPressed: () {
-                    setState(() {
-                      _status = false;
-                      _updateUser(_uid);
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    });
-                  },
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0)),
-                ),
-              ),
-            ),
-            flex: 2,
-          ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: 10.0),
-              child: Container(
-                child: RaisedButton(
-                  child: Text(
-                    "Cancel",
-                    style: TextStyle(
+                  child: Center(
+                    child: Text(
+                      "Update",
+                      style: MediumTextStyle.apply(
                         color: Colors.white,
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.bold),
+                      ),
+                    ),
                   ),
-                  textColor: Colors.white,
-                  color: Colors.red,
-                  onPressed: () {
-                    setState(() {
-                      _status = true;
-                      FocusScope.of(context).requestFocus(FocusNode());
-                    });
-                  },
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20.0)),
                 ),
               ),
             ),
-            flex: 2,
-          ),
-        ],
+            SizedBox(height: 15.0),
+            Container(
+              height: 50.0,
+              child: FlatButton(
+                padding: const EdgeInsets.all(0.0),
+                onPressed: () {
+                  setState(() {
+                    _status = true;
+                    FocusScope.of(context).requestFocus(FocusNode());
+                  });
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: new BorderRadius.circular(10.0),
+                ),
+                child: Ink(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).accentColor,
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(10.0),
+                    ),
+                  ),
+                  child: Center(
+                    child: Text(
+                      "Cancel",
+                      style: MediumTextStyle.apply(
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -123,11 +134,11 @@ class MapScreenState extends State<ProfilePage>
   Widget _getEditIcon() {
     return GestureDetector(
       child: CircleAvatar(
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.white,
         radius: 14.0,
         child: Icon(
           Icons.edit,
-          color: Colors.white,
+          color: Theme.of(context).primaryColor,
           size: 16.0,
         ),
       ),
@@ -148,12 +159,15 @@ class MapScreenState extends State<ProfilePage>
       });
       DocumentSnapshot snapshot = await db.getUserById(_uid);
       print(snapshot.data);
-      _user = User(snapshot.data['id'], snapshot.data['firstName'],
-          snapshot.data['lastName'], snapshot.data['email'], snapshot.data['imageUrl']);
+      _user = User(
+          snapshot.data['id'],
+          snapshot.data['firstName'],
+          snapshot.data['lastName'],
+          snapshot.data['email'],
+          snapshot.data['imageUrl']);
       _email = _user.email;
       _fNameController = TextEditingController(text: _user.firstName);
       _lNameController = TextEditingController(text: _user.lastName);
-      _getImageUrl();
     } else {
       print("Unsuccess!");
       Navigator.pushReplacement(
@@ -168,15 +182,8 @@ class MapScreenState extends State<ProfilePage>
 //User dat update function
   void _updateUser(String id) async {
     db
-        .updateUser(
-      User(
-        id,
-        _fNameController.text,
-        _lNameController.text,
-        _user.email,
-        _user.imageUrl
-      )
-    )
+        .updateUser(User(id, _fNameController.text, _lNameController.text,
+            _user.email, _user.imageUrl))
         .then((onValue) {
       _status = true;
       initState();
@@ -220,32 +227,23 @@ class MapScreenState extends State<ProfilePage>
     if (fileType == 'image') {
       storageReference =
           FirebaseStorage.instance.ref().child("images/$filename");
+      setState(() {
+        isLoading = true;
+      });
     }
     final StorageUploadTask uploadTask = storageReference.putFile(file);
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
-    final String url = (await downloadUrl.ref.getDownloadURL());
-    print("URL is $url");
+    final String newUrl = (await downloadUrl.ref.getDownloadURL());
+    print("URL is $newUrl");
     db.updateUser(
-        User(
-          _uid,
-          _user.firstName,
-          _user.lastName,
-          _user.email,
-          url
-        ));
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ProfilePage(),
-      ),
-    );
-  }
+        User(_uid, _user.firstName, _user.lastName, _user.email, newUrl));
 
-//Image url generate function
-  void _getImageUrl() async {
-    StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
-    String _url = (await ref.getDownloadURL()).toString();
-    url = _url;
+    setState(() {
+      this.url = newUrl;
+      print("NEW URL: " + newUrl);
+      _currentUser();
+      isLoading = false;
+    });
   }
 
   @override
@@ -259,12 +257,15 @@ class MapScreenState extends State<ProfilePage>
         backgroundColor: Theme.of(context).accentColor,
       ),
       body: DefaultGradient(
-        child: ListView(
-          children: <Widget>[
-            Column(
+        child: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.85,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
                 Container(
-                  height: 250.0,
+                  height: 230,
                   child: Column(
                     children: <Widget>[
                       Padding(
@@ -276,31 +277,49 @@ class MapScreenState extends State<ProfilePage>
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                CircleAvatar(
-                                  radius: 70,
-                                  backgroundColor: Colors.transparent,
-                                  child: ClipOval(
-                                    child: SizedBox(
-                                      width: 140.0,
-                                      height: 140.0,
-                                      child: url == null
-                                          ? Image.asset(
-                                              'assets/images/forecast-logo.png')
-                                          : Image.network(url),
+                                Stack(
+                                  children: <Widget>[
+                                    CircleAvatar(
+                                      radius: 70,
+                                      backgroundColor: Colors.transparent,
+                                      child: ClipOval(
+                                        child: SizedBox(
+                                          width: 140.0,
+                                          height: 140.0,
+                                          child: _user.imageUrl != null &&
+                                                  _user.imageUrl.isNotEmpty
+                                              ? FadeInImage.assetNetwork(
+                                                  placeholder:
+                                                      "assets/images/forecast-logo.png",
+                                                  image: _user.imageUrl,
+                                                )
+                                              : Image.asset(
+                                                  'assets/images/forecast-logo.png',
+                                                ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                    isLoading
+                                        ? Positioned(
+                                            top: 50.0,
+                                            left: 50.0,
+                                            child: CircularProgressIndicator(),
+                                          )
+                                        : SizedBox(width: 1.0),
+                                  ],
                                 ),
                               ],
                             ),
-                            Padding(
-                              padding:
-                                  EdgeInsets.only(top: 130.0, right: 100.0),
+                            Positioned(
+                              top: 100.0,
+                              left: 140.0,
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: <Widget>[
                                   GestureDetector(
                                     child: CircleAvatar(
-                                      backgroundColor: Colors.red,
+                                      backgroundColor:
+                                          Theme.of(context).primaryColor,
                                       radius: 20.0,
                                       child: Icon(
                                         Icons.photo,
@@ -317,6 +336,11 @@ class MapScreenState extends State<ProfilePage>
                                   ),
                                 ],
                               ),
+                            ),
+                            Positioned(
+                              top: 30.0,
+                              right: 60.0,
+                              child: _status ? _getEditIcon() : Container(),
                             ),
                           ],
                         ),
@@ -335,67 +359,20 @@ class MapScreenState extends State<ProfilePage>
                           padding: EdgeInsets.only(
                             left: 25.0,
                             right: 25.0,
-                            top: 2.0,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(
-                                    'Personal Information',
-                                    style: TextStyle(
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  _status ? _getEditIcon() : Container(),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: 25.0,
-                            right: 25.0,
                             top: 25.0,
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(
-                                    'Email Address',
-                                    style: TextStyle(
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                              left: 25.0, right: 25.0, top: 5.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
                               Text(
-                                _email,
+                                'Email Address',
+                                style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(width: 60.0),
+                              Text(
+                                _email != null ? _email : "",
                                 style: TextStyle(
                                   fontSize: 16.0,
                                 ),
@@ -412,36 +389,25 @@ class MapScreenState extends State<ProfilePage>
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(
-                                    'First Name ',
-                                    style: TextStyle(
-                                      fontSize: 16.0,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
+                              Text(
+                                'First Name ',
+                                style: TextStyle(
+                                  fontSize: 16.0,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                              left: 25.0, right: 25.0, top: 2.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Flexible(
-                                child: TextField(
-                                  controller: _fNameController,
-                                  decoration: const InputDecoration(
+                              Padding(
+                                padding: const EdgeInsets.only(left: 80.0),
+                                child: SizedBox(
+                                  width: 150.0,
+                                  child: TextField(
+                                    controller: _fNameController,
+                                    decoration: const InputDecoration(
                                       hintText: "Enter First Name ",
                                       hintStyle: TextStyle(color: Colors.white),
+                                    ),
+                                    enabled: !_status,
                                   ),
-                                  enabled: !_status,
                                 ),
                               ),
                             ],
@@ -453,37 +419,24 @@ class MapScreenState extends State<ProfilePage>
                           child: Row(
                             mainAxisSize: MainAxisSize.max,
                             children: <Widget>[
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  Text(
-                                    'Last Name',
-                                    style: TextStyle(
-                                        fontSize: 16.0,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                ],
+                              Text(
+                                'Last Name',
+                                style: TextStyle(
+                                    fontSize: 16.0,
+                                    fontWeight: FontWeight.bold),
                               ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                              left: 25.0, right: 25.0, top: 2.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Flexible(
-                                child: TextField(
-                                  controller: _lNameController,
-                                  decoration: const InputDecoration(
-                                    hintText: "Enter Last Name",
-                                    hintStyle: TextStyle(
-                                      color: Colors.white
-                                      ),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 80.0),
+                                child: SizedBox(
+                                  width: 150.0,
+                                  child: TextField(
+                                    controller: _lNameController,
+                                    decoration: const InputDecoration(
+                                      hintText: "Enter Last Name",
+                                      hintStyle: TextStyle(color: Colors.white),
+                                    ),
+                                    enabled: !_status,
                                   ),
-                                  enabled: !_status,
                                 ),
                               ),
                             ],
@@ -496,7 +449,7 @@ class MapScreenState extends State<ProfilePage>
                 )
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

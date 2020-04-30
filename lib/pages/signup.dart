@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:forecast/pages/login.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/widgets/background/default_gradient.dart';
 
@@ -21,31 +21,76 @@ class _FlareAnimationsPageState extends State<SignupPage> {
   String _rePasswordError;
   bool _success;
   String _userEmail;
+  bool isLoading = false;
 
 // Signup function using firebse authentication
   void _signup(String email, String password) async {
-    final FirebaseUser user = (await _auth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    ))
-        .user;
-    if (user != null) {
-      setState(() {
-        _success = true;
-        _userEmail = user.email;
-        print("User Email $_userEmail");
-        if (_success) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LoginPage(),
-            ),
-          );
-        }
-      });
-    } else {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final FirebaseUser user = (await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      ))
+          .user;
+      if (user != null) {
+        setState(() {
+          _success = true;
+          _userEmail = user.email;
+          print("User Email $_userEmail");
+          if (_success) {
+            _showFlutterToast("You can login now");
+            Navigator.pop(context);
+          }
+        });
+      } else {
+        _success = false;
+      }
+    } catch (e) {
+      print(e);
       _success = false;
+      isLoading = false;
+      _showError(e.code.toString());
     }
+  }
+
+  void _showError(String errorCode) {
+    switch (errorCode) {
+      case 'ERROR_INVALID_EMAIL':
+        _showFlutterToast("Invalid email format");
+
+        break;
+      case 'ERROR_USER_NOT_FOUND':
+        _showFlutterToast("Invalid email or password");
+
+        break;
+      case 'ERROR_WRONG_PASSWORD':
+        _showFlutterToast("Invalid email or password");
+
+        break;
+      case 'ERROR_EMAIL_ALREADY_IN_USE':
+        _showFlutterToast("Email is already in use");
+
+        break;
+      case 'ERROR_WEAK_PASSWORD':
+        _showFlutterToast("Password must be atleast 8 characters");
+
+        break;
+      default:
+        _showFlutterToast("Something went wrong");
+    }
+  }
+
+  void _showFlutterToast(String message) {
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(
+      msg: message,
+      backgroundColor: Colors.black87,
+      toastLength: Toast.LENGTH_LONG,
+      textColor: Colors.white,
+    );
   }
 
 //Password validator
@@ -113,6 +158,16 @@ class _FlareAnimationsPageState extends State<SignupPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
+                isLoading
+                    ? Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: CircularProgressIndicator(
+                          backgroundColor: Theme.of(context).primaryColor,
+                        ),
+                      )
+                    : SizedBox(
+                        width: 1.0,
+                      ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[

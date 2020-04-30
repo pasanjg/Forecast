@@ -67,6 +67,12 @@ class _WeatherForecastPageState extends State<WeatherForecastPage>
     weatherForecastBloc.fetchWeatherForecast(openWeatherMapAPI.requestURL);
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    widget.controller.dispose();
+  }
+
   _handleAutoScroll() {
     widget.controller.animateTo(
       widget.controller.position.maxScrollExtent,

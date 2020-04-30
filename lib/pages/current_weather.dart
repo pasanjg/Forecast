@@ -50,64 +50,72 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   List savedLocations;
   DocumentReference documentReference;
 
-  ScrollController _controller = ScrollController();
+  ScrollController _controller;
 
   @override
   void initState() {
     super.initState();
     checkInternet();
     _getUserId();
-    _getLocation().then((position) async {
-      userLocation = position;
-      print(userLocation);
+    _checkSavedLocations();
+    _controller = ScrollController();
 
-      if (widget.cityName == null && userLocation != null) {
-        await _getLocationAddress(userLocation).then((address) {
-          print(address[0].toJson());
-          print("LOCALITY: " + (address[0].locality != "").toString());
-
-          if (address[0].locality != "") {
-            setState(() {
-              this.cityName =
-                  "${address[0].locality},${address[0].isoCountryCode}";
-              print(this.cityName);
-              openWeatherMapAPI = OpenWeatherMapAPI(
-                cityName: this.cityName,
-                units: units,
-              );
-            });
-          } else {
-            setState(() {
-              openWeatherMapAPI = OpenWeatherMapAPI(
-                coordinates: {
-                  'lat': userLocation.latitude,
-                  'lon': userLocation.longitude
-                },
-                units: units,
-              );
-            });
-          }
-        });
-      } else {
-        setState(() {
-          this.cityName = widget.cityName;
-          print(this.cityName);
-        });
-        openWeatherMapAPI = OpenWeatherMapAPI(
-          cityName: this.cityName,
-          units: units,
-        );
-      }
-      _checkSavedLocations();
-      currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
-    });
-
-    AppSharedPreferences.getStringSharedPreferences("units").then((value) {
+    AppSharedPreferences.getStringSharedPreferences("units")
+        .then((value) async {
       setState(() {
         temperatureUnit = CommonUtils.getTemperatureUnit(value);
         units = value;
       });
     });
+
+    if (widget.cityName == null) {
+      _getLocation().then((position) async {
+        userLocation = position;
+        print(userLocation);
+
+        if (userLocation != null) {
+          await _getLocationAddress(userLocation).then((address) {
+            print(address[0].toJson());
+            print("LOCALITY: " + (address[0].locality != "").toString());
+
+            if (address[0].locality != "") {
+              setState(() {
+                this.cityName =
+                    "${address[0].locality},${address[0].isoCountryCode}";
+                print(this.cityName);
+                openWeatherMapAPI = OpenWeatherMapAPI(
+                  cityName: this.cityName,
+                  units: units,
+                );
+              });
+            } else {
+              setState(() {
+                openWeatherMapAPI = OpenWeatherMapAPI(
+                  coordinates: {
+                    'lat': userLocation.latitude,
+                    'lon': userLocation.longitude
+                  },
+                  units: units,
+                );
+              });
+            }
+          });
+        } else {
+          _showFlutterToast("Oops! We cannot locate you");
+        }
+        currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
+      });
+    } else {
+      setState(() {
+        this.cityName = widget.cityName;
+        print(this.cityName);
+      });
+      openWeatherMapAPI = OpenWeatherMapAPI(
+        cityName: this.cityName,
+        units: units,
+      );
+      currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
+    }
   }
 
   @override
@@ -119,6 +127,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   void dispose() {
     super.dispose();
     currentWeatherBloc.dispose();
+    _controller.dispose();
   }
 
   void checkInternet() async {
@@ -321,7 +330,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           controller: _controller,
           children: <Widget>[
             Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
                 Container(
                   height: MediaQuery.of(context).size.height * 0.685,

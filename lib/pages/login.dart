@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forecast/pages/signup.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/widgets/background/default_gradient.dart';
@@ -14,60 +16,90 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final email = TextEditingController();
   final password = TextEditingController();
 
-  bool _loadingVisible = false;
-  bool _autoValidate = false;
   String _emailError;
   String _passwordError;
   bool _success;
   String _userEmail;
+  bool isLoading = false;
+  FirebaseUser firebaseUser;
 
+// Login function using firebase authentication
+  void _login(String email, String password) async {
+    try {
+      final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      ))
+          .user;
+      if (user != null) {
+        setState(() {
+          firebaseUser = user;
+          _success = true;
+          _userEmail = user.email;
+          var _uid = user.uid;
+          print("User Email $_userEmail");
+          print("User UID $_uid");
 
-  //Get the current user using firebase authentication
-  void _currentUser() async {
-    final FirebaseUser user = (await _auth.currentUser());
-    if (user != null) {
-      setState(() {
-        _userEmail = user.email;
-        var _uid = user.uid;
-        print("User Email  curr $_userEmail");
-        print("User UID curr $_uid");
-      });
-    } else {
-      print("Unsuccess!");
+          if (_success) {
+            setState(() {
+              isLoading = false;
+            });
+            Navigator.pop(context);
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomePage(),
+              ),
+            );
+          }
+        });
+      }
+    } catch (e) {
+      print(e);
+      _success = false;
+      isLoading = false;
+      _showError(e.code.toString());
     }
   }
 
-// Login function using firebse authentication
-  void _login(String email, String password) async {
-    final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    ))
-        .user;
-    if (user != null) {
-      setState(() {
-        _success = true;
-        _userEmail = user.email;
-        var _uid = user.uid;
-        print("User Email $_userEmail");
-        print("User UID $_uid");
+  void _showError(String errorCode) {
+    switch (errorCode) {
+      case 'ERROR_INVALID_EMAIL':
+        _showFlutterToast("Invalid email format");
 
-        if (_success) {
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) => HomePage(),
-            ),
-          );
-        }
-      });
-    } else {
-      _success = false;
+        break;
+      case 'ERROR_USER_NOT_FOUND':
+        _showFlutterToast("Invalid email or password");
+
+        break;
+      case 'ERROR_WRONG_PASSWORD':
+        _showFlutterToast("Invalid email or password");
+
+        break;
+      case 'ERROR_EMAIL_ALREADY_IN_USE':
+        _showFlutterToast("Email is already in use");
+
+        break;
+      case 'ERROR_WEAK_PASSWORD':
+        _showFlutterToast("Password must be atleast 8 characters");
+
+        break;
+      default:
+        _showFlutterToast("Something went wrong");
     }
+  }
+
+  void _showFlutterToast(String message) {
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(
+      msg: message,
+      backgroundColor: Colors.black87,
+      toastLength: Toast.LENGTH_LONG,
+      textColor: Colors.white,
+    );
   }
 
 //Password validator
@@ -107,6 +139,9 @@ class _LoginPageState extends State<LoginPage> {
     }
     if ((em == true) && (pw == true)) {
       _login(email.text.trim(), password.text.trim());
+      setState(() {
+        isLoading = true;
+      });
     }
   }
 
@@ -128,6 +163,13 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
+                isLoading
+                    ? CircularProgressIndicator(
+                        backgroundColor: Theme.of(context).primaryColor,
+                      )
+                    : SizedBox(
+                        width: 1.0,
+                      ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -255,11 +297,21 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           child: Center(
-                            child: Text(
-                              "Signup",
-                              style: MediumTextStyle.apply(
-                                color: Colors.white,
-                              ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: <Widget>[
+                                SizedBox(width: 27.0),
+                                Text(
+                                  "Signup",
+                                  style: MediumTextStyle.apply(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Icon(
+                                  FontAwesomeIcons.angleRight,
+                                  color: Colors.white70,
+                                ),
+                              ],
                             ),
                           ),
                         ),
@@ -272,8 +324,7 @@ class _LoginPageState extends State<LoginPage> {
                     children: <Widget>[
                       new InkWell(
                         child: new Text("Forget Password"),
-                        onTap: () {
-                        },
+                        onTap: () {},
                       ),
                     ],
                   ),
