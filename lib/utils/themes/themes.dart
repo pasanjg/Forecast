@@ -59,9 +59,9 @@ class AppThemes {
   static AppThemeKeys getThemeKeyFromTime(DateTime locationDate) {
     int _currentHour = locationDate.hour;
 
-    if (_currentHour >= 6 && _currentHour <= 15) {
+    if (_currentHour >= 6 && _currentHour <= 14) {
       return AppThemeKeys.DAY;
-    } else if (_currentHour >= 16 && _currentHour <= 18) {
+    } else if (_currentHour >= 15 && _currentHour <= 17) {
       return AppThemeKeys.EVENING;
     } else {
       return AppThemeKeys.NIGHT;

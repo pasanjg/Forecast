@@ -13,7 +13,6 @@ import 'dart:convert' as convert;
 import 'package:forecast/models/user.dart';
 import 'package:forecast/utils/common/user_profile.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:forecast/pages/current_weather.dart';
 import 'package:forecast/pages/settings.dart';
 import 'package:forecast/widgets/background/default_gradient.dart';
@@ -31,9 +30,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _searchTextField = TextEditingController();
-  UserProfileService db = new UserProfileService();
+  UserProfileService db = UserProfileService();
   String _searchText = " ";
-  List cities = new List();
+  List cities = List();
   List filteredCities = List();
   Icon _searchIcon = Icon(Icons.search);
   bool isSearching = false;
@@ -41,10 +40,10 @@ class _HomePageState extends State<HomePage> {
   String savedLocation;
   String _uid;
   User _user;
-  String _fName;
-  String _lName;
-  String _email;
-  String _url;
+  String fName;
+  String lName;
+  String email;
+  String url;
   bool _loginStatus = false;
 
   @override
@@ -72,7 +71,7 @@ class _HomePageState extends State<HomePage> {
     final response = await DefaultAssetBundle.of(context)
         .loadString("assets/json/current_city_list_min.json");
     final jsonResponse = convert.jsonDecode(response);
-    List tempList = new List();
+    List tempList = List();
     for (int i = 0; i < jsonResponse.length; i++) {
       tempList.add(jsonResponse[i]);
     }
@@ -197,15 +196,25 @@ class _HomePageState extends State<HomePage> {
         _uid = user.uid;
         _loginStatus = true;
       });
-      DocumentSnapshot snapshot = await db.getUserById(_uid);
-      print(snapshot.data);
-      _user = new User(snapshot.data['id'], snapshot.data['firstName'],
-          snapshot.data['lastName'], snapshot.data['email'], snapshot.data['imageUrl']);
-      _email = _user.email;
-      _fName = _user.firstName;
-      _lName = _user.lastName;
-      _url = _user.imageUrl;
-//      _getImageUrl();
+      Firestore.instance
+          .collection(usersCollection)
+          .document(_uid)
+          .snapshots()
+          .listen((DocumentSnapshot documentSnapshot) {
+        Map<String, dynamic> documentData = documentSnapshot.data;
+
+        setState(() {
+          print(documentData);
+          _user = User(
+              documentData['id'],
+              documentData['firstName'],
+              documentData['lastName'],
+              documentData['email'],
+              documentData['imageUrl']);
+        });
+
+        print(_user.email);
+      });
     } else {
       print("Unsuccess!");
     }
@@ -274,11 +283,16 @@ class _HomePageState extends State<HomePage> {
                           ? GestureDetector(
                               child: UserAccountsDrawerHeader(
                                 accountName: Text(
-                                  _user.firstName + " " + _user.lastName,
+                                  _user.firstName != null &&
+                                          _user.lastName != null
+                                      ? "${_user.firstName} ${_user.lastName}"
+                                      : "Welcome",
                                   style: RegularTextStyle,
                                 ),
                                 accountEmail: Text(
-                                  _user.email,
+                                  _user.email != null
+                                      ? "${_user.email}"
+                                      : "Update required",
                                   style: SmallTextStyle,
                                 ),
                                 currentAccountPicture: CircleAvatar(
@@ -288,11 +302,15 @@ class _HomePageState extends State<HomePage> {
                                     child: SizedBox(
                                       width: 140.0,
                                       height: 140.0,
-                                      child: _url == null
+                                      child: _user.imageUrl == null
                                           ? Image.asset(
                                               'assets/images/forecast-logo.png',
                                             )
-                                          : Image.network(_url),
+                                          : FadeInImage.assetNetwork(
+                                              placeholder:
+                                                  "assets/images/forecast-logo.png",
+                                              image: _user.imageUrl,
+                                            ),
                                     ),
                                   ),
                                 ),
@@ -319,12 +337,15 @@ class _HomePageState extends State<HomePage> {
                                   CircleAvatar(
                                     radius: 50.0,
                                     backgroundImage: AssetImage(
-                                        "assets/images/forecast-logo.png"),
+                                      "assets/images/forecast-logo.png",
+                                    ),
                                   ),
                                   SizedBox(height: 20.0),
                                   Text(
-                                    "Login to Forecast for more features",
-                                    style: SmallTextStyle,
+                                    "Login to Forecast\nfor more features",
+                                    style: SmallTextStyle.apply(
+                                      heightFactor: 1.2,
+                                    ),
                                   ),
                                 ],
                               ),
@@ -406,6 +427,7 @@ class _HomePageState extends State<HomePage> {
                         onTap: () {
                           if (_loginStatus) {
                             _logout();
+                            Navigator.of(context).pop();
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
