@@ -49,8 +49,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   List savedLocations;
   DocumentReference documentReference;
-
   ScrollController _controller;
+
+  final GlobalKey<WeatherForecastPageState> _key = GlobalKey();
 
   @override
   void initState() {
@@ -58,64 +59,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     checkInternet();
     _getUserId();
     _checkSavedLocations();
+    _fetchData();
     _controller = ScrollController();
-
-    AppSharedPreferences.getStringSharedPreferences("units")
-        .then((value) async {
-      setState(() {
-        temperatureUnit = CommonUtils.getTemperatureUnit(value);
-        units = value;
-      });
-    });
-
-    if (widget.cityName == null) {
-      _getLocation().then((position) async {
-        userLocation = position;
-        print(userLocation);
-
-        if (userLocation != null) {
-          await _getLocationAddress(userLocation).then((address) {
-            print(address[0].toJson());
-            print("LOCALITY: " + (address[0].locality != "").toString());
-
-            if (address[0].locality != "") {
-              setState(() {
-                this.cityName =
-                    "${address[0].locality},${address[0].isoCountryCode}";
-                print(this.cityName);
-                openWeatherMapAPI = OpenWeatherMapAPI(
-                  cityName: this.cityName,
-                  units: units,
-                );
-              });
-            } else {
-              setState(() {
-                openWeatherMapAPI = OpenWeatherMapAPI(
-                  coordinates: {
-                    'lat': userLocation.latitude,
-                    'lon': userLocation.longitude
-                  },
-                  units: units,
-                );
-              });
-            }
-          });
-        } else {
-          _showFlutterToast("Oops! We cannot locate you");
-        }
-        currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
-      });
-    } else {
-      setState(() {
-        this.cityName = widget.cityName;
-        print(this.cityName);
-      });
-      openWeatherMapAPI = OpenWeatherMapAPI(
-        cityName: this.cityName,
-        units: units,
-      );
-      currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
-    }
   }
 
   @override
@@ -127,7 +72,65 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   void dispose() {
     super.dispose();
     currentWeatherBloc.dispose();
-    _controller.dispose();
+  }
+
+  Future<void> _fetchData() async {
+    units = await AppSharedPreferences.getStringSharedPreferences("units");
+    temperatureUnit = CommonUtils.getTemperatureUnit(units);
+
+    if (widget.cityName == null) {
+      userLocation = await _getLocation();
+
+      if (userLocation != null) {
+        var address = await _getLocationAddress(userLocation);
+
+        print(address[0].toJson());
+        print("LOCALITY: " + (address[0].locality != "").toString());
+
+        if (address[0].locality != "") {
+          setState(() {
+            this.cityName =
+                "${address[0].locality},${address[0].isoCountryCode}";
+            print(this.cityName);
+            openWeatherMapAPI = OpenWeatherMapAPI(
+              cityName: this.cityName,
+              units: units,
+            );
+          });
+        } else {
+          setState(() {
+            openWeatherMapAPI = OpenWeatherMapAPI(
+              coordinates: {
+                'lat': userLocation.latitude,
+                'lon': userLocation.longitude
+              },
+              units: units,
+            );
+          });
+          print("GEOLOCATION");
+        }
+        currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
+      } else {
+        _showFlutterToast("Oops! We cannot locate you");
+      }
+    } else {
+      setState(() {
+        this.cityName = widget.cityName;
+        print(this.cityName);
+      });
+      openWeatherMapAPI = OpenWeatherMapAPI(
+        cityName: this.cityName,
+        units: units,
+      );
+      print("SEARCH");
+      currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
+    }
+  }
+
+  Future<void> _pullRefresh() async {
+    _fetchData();
+    _key.currentState.fetchData();
+    _showFlutterToast("You're up-to-date");
   }
 
   void checkInternet() async {
@@ -327,6 +330,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 8.0),
         child: ListView(
+          physics: AlwaysScrollableScrollPhysics(),
           controller: _controller,
           children: <Widget>[
             Column(
@@ -344,7 +348,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                             Text(
                               _getTodayDate(currentWeather.timeZone),
                               style: TitleTextStyle.apply(
-                                  letterSpacingFactor: 1.2),
+                                letterSpacingFactor: 1.2,
+                              ),
                             ),
                             Text(
                               currentWeather.name.toUpperCase(),
@@ -700,10 +705,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                 FadeAnimation(
                   delay: 1.6,
                   child: WeatherForecastPage(
+                    key: _key,
                     controller: _controller,
-                    cityName: this.cityName,
-                    units: this.units,
-                    temperatureUnit: this.temperatureUnit,
+                    cityName: cityName,
                   ),
                 ),
               ],
@@ -726,12 +730,16 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                 this.cityName = snapshot.data.name;
               }
               this.country = snapshot.data.country;
-              return GestureDetector(
-                onDoubleTap: () {
-                  String details = this.cityName;
-                  _handleSave(isSaved, details);
-                },
-                child: _buildCurrentWeatherData(snapshot.data),
+              return RefreshIndicator(
+                backgroundColor: Colors.white,
+                onRefresh: _pullRefresh,
+                child: GestureDetector(
+                  onDoubleTap: () {
+                    String details = this.cityName;
+                    _handleSave(isSaved, details);
+                  },
+                  child: _buildCurrentWeatherData(snapshot.data),
+                ),
               );
             } else {
               return Center(

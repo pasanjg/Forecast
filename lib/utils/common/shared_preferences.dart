@@ -6,7 +6,7 @@ class AppSharedPreferences {
     preferences.setString(key, value);
   }
 
-  static getStringSharedPreferences(String key) async {
+  static Future<String> getStringSharedPreferences(String key) async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     return preferences.get(key);
   }

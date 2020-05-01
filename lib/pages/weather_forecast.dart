@@ -11,28 +11,27 @@ import 'package:forecast/blocs/weather_forecast_bloc.dart';
 import 'package:forecast/models/openweathermap_api.dart';
 import 'package:forecast/models/weather_forecast_model.dart';
 import 'package:forecast/models/weather_model.dart';
+import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/constants.dart';
+import 'package:forecast/utils/common/shared_preferences.dart';
 import 'package:forecast/widgets/loading/forecastLoading.dart';
 import 'package:intl/intl.dart';
 
 class WeatherForecastPage extends StatefulWidget {
   final ScrollController controller;
   final cityName;
-  final units;
-  final temperatureUnit;
 
   WeatherForecastPage({
+    Key key,
     this.controller,
     this.cityName,
-    this.units,
-    this.temperatureUnit,
-  });
+  }) : super(key: key);
 
   @override
-  _WeatherForecastPageState createState() => _WeatherForecastPageState();
+  WeatherForecastPageState createState() => WeatherForecastPageState();
 }
 
-class _WeatherForecastPageState extends State<WeatherForecastPage>
+class WeatherForecastPageState extends State<WeatherForecastPage>
     with SingleTickerProviderStateMixin {
   String units;
   String temperatureUnit;
@@ -42,7 +41,7 @@ class _WeatherForecastPageState extends State<WeatherForecastPage>
 
   AnimationController _animationController;
 
-  List<Color> gradientColors = [
+  List<Color> graphGradient = [
     Colors.grey,
     Colors.white,
   ];
@@ -53,24 +52,30 @@ class _WeatherForecastPageState extends State<WeatherForecastPage>
   @override
   void initState() {
     super.initState();
-    this.temperatureUnit = widget.temperatureUnit;
+//    this.temperatureUnit = widget.temperatureUnit;
     this._animationController = AnimationController(
       duration: Duration(milliseconds: 500),
       vsync: this,
     );
-
-    OpenWeatherMapAPI openWeatherMapAPI = OpenWeatherMapAPI(
-      cityName: widget.cityName,
-      forecast: true,
-      units: widget.units,
-    );
-    weatherForecastBloc.fetchWeatherForecast(openWeatherMapAPI.requestURL);
+    fetchData();
   }
 
   @override
   void dispose() {
     super.dispose();
     widget.controller.dispose();
+  }
+
+  Future<void> fetchData() async {
+    units = await AppSharedPreferences.getStringSharedPreferences("units");
+    temperatureUnit = CommonUtils.getTemperatureUnit(units);
+
+    OpenWeatherMapAPI openWeatherMapAPI = OpenWeatherMapAPI(
+      cityName: widget.cityName,
+      forecast: true,
+      units: units,
+    );
+    weatherForecastBloc.fetchWeatherForecast(openWeatherMapAPI.requestURL);
   }
 
   _handleAutoScroll() {
@@ -158,7 +163,7 @@ class _WeatherForecastPageState extends State<WeatherForecastPage>
             FlSpot(9, double.parse(weatherData[4].temp)),
           ],
           isCurved: true,
-          colors: gradientColors,
+          colors: graphGradient,
           barWidth: 2,
           isStrokeCapRound: true,
           dotData: const FlDotData(
@@ -168,7 +173,7 @@ class _WeatherForecastPageState extends State<WeatherForecastPage>
           belowBarData: BarAreaData(
             show: false,
             colors:
-                gradientColors.map((color) => color.withOpacity(0.3)).toList(),
+                graphGradient.map((color) => color.withOpacity(0.3)).toList(),
           ),
         ),
       ],
@@ -358,12 +363,12 @@ class _WeatherForecastPageState extends State<WeatherForecastPage>
                       ),
                       Padding(
                         padding: const EdgeInsets.only(
-                          top: 0,
+                          top: 5,
                           left: 8.0,
                           right: 8.0,
                         ),
                         child: AspectRatio(
-                          aspectRatio: 5 / 1.5, // width / height
+                          aspectRatio: 5 / 1.4, // width / height
                           child: LineChart(
                             mainData(weatherForecast.weatherList),
                           ),
