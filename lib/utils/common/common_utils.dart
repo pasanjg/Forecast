@@ -15,10 +15,10 @@ class CommonUtils {
 
   static String getTemperatureAPIUnit(String units) {
     String value = units == "Kelvin"
-        ? "standard"
+        ? null
         : units == "Fahrenheit"
         ? "imperial"
-        : units == "Celsius" ? "metric" : "standard";
+        : units == "Celsius" ? "metric" : null;
     return value;
   }
 }
