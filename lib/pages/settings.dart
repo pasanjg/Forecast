@@ -18,7 +18,7 @@ class _SettingsPageState extends State<SettingsPage> {
     super.initState();
     AppSharedPreferences.getStringSharedPreferences("units").then((value) {
       setState(() {
-        unitDropdownValue = CommonUtils.getTemperatureValue(value);
+        unitDropdownValue = getTemperatureValue(value);
       });
     });
   }
@@ -75,7 +75,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 unitDropdownValue = newValue;
                                 AppSharedPreferences.setStringSharedPreferences(
                                   "units",
-                                  CommonUtils.getTemperatureAPIUnit(newValue),
+                                  getTemperatureAPIUnit(newValue),
                                 );
                               });
                             },

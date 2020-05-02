@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forecast/utils/common/constants.dart';
 
-class NoFavouritesPage extends StatelessWidget {
+class NoSaved extends StatelessWidget {
   final snackBar = SnackBar(
     content: Text(
       'Save locations by double tapping on the Home screen or pressing the favourite icon',

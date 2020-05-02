@@ -11,6 +11,7 @@ import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/shared_preferences.dart';
 import 'package:forecast/utils/themes/app_theme.dart';
 import 'package:forecast/utils/themes/themes.dart';
+import 'package:forecast/widgets/error/something_went_wrong.dart';
 import 'package:intl/intl.dart';
 
 import 'package:forecast/models/openweathermap_api.dart';
@@ -21,7 +22,6 @@ import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forecast/blocs/current_weather_bloc.dart';
 import 'package:forecast/models/weather_model.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
 
 class CurrentWeatherDetailsPage extends StatefulWidget {
@@ -46,6 +46,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   String userId;
   String units;
   String temperatureUnit;
+  bool hasError = false;
 
   List savedLocations;
   DocumentReference documentReference;
@@ -57,9 +58,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   void initState() {
     super.initState();
     checkInternet();
-    _getUserId();
-    _checkSavedLocations();
     _fetchData();
+
     _controller = ScrollController();
   }
 
@@ -76,22 +76,24 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   Future<void> _fetchData() async {
     units = await AppSharedPreferences.getStringSharedPreferences("units");
-    temperatureUnit = CommonUtils.getTemperatureUnit(units);
+    temperatureUnit = getTemperatureUnit(units);
 
     if (widget.cityName == null) {
       userLocation = await _getLocation();
 
       if (userLocation != null) {
+        print("PLACEMARK ");
+        print(await _getLocationAddress(userLocation));
         var address = await _getLocationAddress(userLocation);
 
         print(address[0].toJson());
         print("LOCALITY: " + (address[0].locality != "").toString());
 
-        if (address[0].locality != "") {
+        if (address != null || address[0].locality != "") {
           setState(() {
             this.cityName =
                 "${address[0].locality},${address[0].isoCountryCode}";
-            print(this.cityName);
+            print("CITY: " + this.cityName);
             openWeatherMapAPI = OpenWeatherMapAPI(
               cityName: this.cityName,
               units: units,
@@ -111,7 +113,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
         }
         currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
       } else {
-        _showFlutterToast("Oops! We cannot locate you");
+        showFlutterToast("Oops! We cannot locate you");
       }
     } else {
       setState(() {
@@ -125,12 +127,13 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       print("SEARCH");
       currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
     }
+    _checkSavedLocations();
   }
 
   Future<void> _pullRefresh() async {
-    _fetchData();
-    _key.currentState.fetchData();
-    _showFlutterToast("You're up-to-date");
+    await _fetchData();
+    await _key.currentState.fetchData();
+    showFlutterToast("You're up-to-date");
   }
 
   void checkInternet() async {
@@ -168,19 +171,27 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     var latitude = userLocation.latitude;
     var longitude = userLocation.longitude;
 
-    List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(
-      latitude,
-      longitude,
-    );
+    try {
+      List<Placemark> placemark = await Geolocator().placemarkFromCoordinates(
+        latitude,
+        longitude,
+      );
 
-    return placemark;
+      return placemark;
+    } catch (e) {
+      setState(() {
+        hasError = true;
+      });
+      showFlutterToast("Error locating your position", isLong: true);
+    }
+    return null;
   }
 
   String _getTodayDate(int timeZone) {
     DateTime today = DateTime.now();
 
     if (timeZone >= 0) {
-      this.locationDate = today
+      locationDate = today
           .add(
             Duration(
               hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
@@ -190,7 +201,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           .toUtc();
     } else {
       timeZone *= -1;
-      this.locationDate = today
+      locationDate = today
           .subtract(
             Duration(
               hours: DateFormat("ss").parse(timeZone.toString(), true).hour,
@@ -200,33 +211,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           .toUtc();
     }
 
-    return DateFormat.yMMMMEEEEd().format(this.locationDate);
-  }
-
-  String _getTime(int seconds, int timeZone) {
-    String time;
-    DateTime dateTime =
-        DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toUtc();
-
-    if (timeZone >= 0) {
-      dateTime = dateTime.add(
-        Duration(
-          hours: DateFormat("ss").parse(timeZone.toString()).hour,
-          minutes: DateFormat("ss").parse(timeZone.toString()).minute,
-        ),
-      );
-    } else {
-      timeZone *= -1;
-      dateTime = dateTime.subtract(
-        Duration(
-          hours: DateFormat("ss").parse(timeZone.toString()).hour,
-          minutes: DateFormat("ss").parse(timeZone.toString()).minute,
-        ),
-      );
-    }
-
-    time = DateFormat.jm().format(dateTime);
-    return time.toString();
+    return DateFormat.yMMMMEEEEd().format(locationDate);
   }
 
   void _onAfterBuild(BuildContext context) {
@@ -238,20 +223,26 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     });
   }
 
-  void _getUserId() async {
+  Future<void> _getUserId() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     setState(() {
+      print("FB USER: " +
+          user.toString() +
+          "STATUS: " +
+          (user != null).toString());
       if (user != null) {
-        this.userId = user.uid;
+        userId = user.uid;
       }
     });
   }
 
-  void _checkSavedLocations() {
-    if (this.userId != null) {
+  Future<void> _checkSavedLocations() async {
+    await _getUserId();
+    print("USERID SAVED: " + userId.toString());
+    if (userId != null) {
       Firestore.instance
           .collection(usersCollection)
-          .document(this.userId)
+          .document(userId)
           .snapshots()
           .listen((DocumentSnapshot documentSnapshot) {
         Map<String, dynamic> documentData = documentSnapshot.data;
@@ -259,9 +250,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           setState(() {
             savedLocations = documentData[userSavedLocations];
             if (savedLocations != null && savedLocations.isNotEmpty) {
-              if (!this.cityName.contains(",")) {
-                this.cityName = "$cityName,${this.country}";
-              }
+              print("USERID SAVED: " + userId.toString());
+              print("CHECK: " + this.cityName.toString());
               isSaved = savedLocations.contains(this.cityName);
             } else {
               isSaved = false;
@@ -279,7 +269,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     print("USERID: " + this.userId.toString());
 
     if (userId == null) {
-      _showFlutterToast("You need to be logged in");
+      showFlutterToast("You need to be logged in");
       return;
     }
 
@@ -297,7 +287,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       setState(() {
         this.isSaved = false;
       });
-      _showFlutterToast("Location removed");
+      showFlutterToast("Location removed");
     } else {
       this.documentReference.updateData({
         userSavedLocations: FieldValue.arrayUnion([cityName])
@@ -305,18 +295,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       setState(() {
         this.isSaved = true;
       });
-      _showFlutterToast("Location saved");
+      showFlutterToast("Location saved");
     }
-  }
-
-  void _showFlutterToast(String message) {
-    Fluttertoast.cancel();
-    Fluttertoast.showToast(
-      msg: message,
-      backgroundColor: Colors.black87,
-      toastLength: Toast.LENGTH_SHORT,
-      textColor: Colors.white,
-    );
   }
 
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
@@ -477,7 +457,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                         ),
                                         SizedBox(width: 10.0),
                                         Text(
-                                          "${_getTime(((locationDate.millisecondsSinceEpoch) / 1000).round(), 0)}",
+                                          "${getTime(((locationDate.millisecondsSinceEpoch) / 1000).round(), 0)}",
                                           style: MediumTextStyle,
                                         ),
                                       ],
@@ -628,7 +608,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     ),
                                     SizedBox(width: 15.0),
                                     Text(
-                                      _getTime(
+                                      getTime(
                                         currentWeather.sunRise,
                                         currentWeather.timeZone,
                                       ),
@@ -682,7 +662,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     ),
                                     SizedBox(width: 15.0),
                                     Text(
-                                      _getTime(
+                                      getTime(
                                         currentWeather.sunSet,
                                         currentWeather.timeZone,
                                       ),
@@ -726,10 +706,11 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
         builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data.cod == "200") {
-              if (this.cityName == null) {
-                this.cityName = snapshot.data.name;
-              }
               this.country = snapshot.data.country;
+              if (this.cityName == null) {
+                this.cityName =
+                    snapshot.data.name + "," + snapshot.data.country;
+              }
               return RefreshIndicator(
                 backgroundColor: Colors.white,
                 onRefresh: _pullRefresh,
@@ -743,12 +724,15 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
               );
             } else {
               return Center(
-                child: Text(snapshot.data.error.toUpperCase()),
+                child: SomethingWentWrong(
+                  message: snapshot.data.error.toUpperCase(),
+                ),
               );
             }
-          } else if (snapshot.hasError) {
-            Fluttertoast.showToast(msg: snapshot.error);
-            return Center(child: Text(snapshot.error));
+          } else if (snapshot.hasError || hasError) {
+            return Center(
+              child: SomethingWentWrong(),
+            );
           } else {
             if (hasInternet) {
               return Center(
@@ -757,7 +741,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                 ),
               );
             } else {
-              return NoInternetPage();
+              return NoInternet();
             }
           }
         });

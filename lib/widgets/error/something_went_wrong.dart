@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:forecast/utils/common/constants.dart';
 
-class NoInternet extends StatelessWidget {
+class SomethingWentWrong extends StatelessWidget {
+  final message;
+
+  SomethingWentWrong({this.message});
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -12,11 +16,11 @@ class NoInternet extends StatelessWidget {
           Container(
             height: 250.0,
             width: 250.0,
-            child: Image.asset('assets/images/no_internet.png'),
+            child: Image.asset('assets/images/something_wrong.png'),
           ),
           SizedBox(height: 15.0),
           Text(
-            "Whoops!",
+            "Something went wrong!",
             style: HeadingTextStyle.apply(
               letterSpacingFactor: 0,
               heightFactor: 0.5,
@@ -24,8 +28,9 @@ class NoInternet extends StatelessWidget {
           ),
           SizedBox(height: 10.0),
           Text(
-            "Slow or no internet connection.\n"
-            "Please check your internet settings",
+            this.message != null
+                ? this.message
+                : "Please try again, sorry",
             textAlign: TextAlign.center,
             style: RegularTextStyle.apply(heightFactor: 1.2),
           ),

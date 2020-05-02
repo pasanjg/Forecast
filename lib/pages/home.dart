@@ -11,7 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert' as convert;
 
 import 'package:forecast/models/user.dart';
-import 'package:forecast/utils/common/user_profile.dart';
+import 'package:forecast/utils/common/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:forecast/pages/current_weather.dart';
 import 'package:forecast/pages/settings.dart';
@@ -30,7 +30,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _searchTextField = TextEditingController();
-  UserProfileService db = UserProfileService();
+  UserService db = UserService();
   String _searchText = " ";
   List cities = List();
   List filteredCities = List();
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
 
   void _getCities() async {
     final response = await DefaultAssetBundle.of(context)
-        .loadString("assets/json/current_city_list_min.json");
+        .loadString("assets/json/city_list_min.json");
     final jsonResponse = convert.jsonDecode(response);
     List tempList = List();
     for (int i = 0; i < jsonResponse.length; i++) {
@@ -94,7 +94,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           )
-        : Text(" ");
+        : SizedBox();
   }
 
   void _onSearchPressed() {

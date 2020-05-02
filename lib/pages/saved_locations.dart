@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/widgets/error/no_saved.dart';
 import 'package:forecast/pages/home.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
@@ -90,7 +91,7 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
               .snapshots(),
           builder: (context, snapshot) {
             if (this.userId == null) {
-              return NoFavouritesPage();
+              return NoSaved();
             }
             if (snapshot.hasData) {
               this.savedLocations = snapshot.data[userSavedLocations];
@@ -102,6 +103,7 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
                       delay: index * 0.1,
                       child: InkWell(
                         onTap: () {
+                          showFlutterToast("Loading location");
                           Navigator.of(context).pop();
                           Navigator.pushReplacement(
                             context,
@@ -120,11 +122,13 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
                   },
                 );
               } else {
-                return NoFavouritesPage();
+                return NoSaved();
               }
             }
 
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           },
         ),
       ),

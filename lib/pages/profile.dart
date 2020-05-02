@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:forecast/models/user.dart';
 import 'package:forecast/utils/common/constants.dart';
-import 'package:forecast/utils/common/user_profile.dart';
-import 'package:forecast/pages/login.dart';
+import 'package:forecast/utils/common/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -14,14 +13,14 @@ import 'package:forecast/widgets/background/default_gradient.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
-  MapScreenState createState() => MapScreenState();
+  ProfilePageState createState() => ProfilePageState();
 }
 
-class MapScreenState extends State<ProfilePage>
+class ProfilePageState extends State<ProfilePage>
     with SingleTickerProviderStateMixin {
   final FocusNode myFocusNode = FocusNode();
   final FirebaseAuth _auth = FirebaseAuth.instance;
-  UserProfileService db = UserProfileService();
+  UserService userService = UserService();
   File file;
   User _user;
   bool _status = true;
@@ -151,47 +150,49 @@ class MapScreenState extends State<ProfilePage>
   }
 
 //Get the current user data function
-  void _currentUser() async {
-    final FirebaseUser user = (await _auth.currentUser());
+  Future<void> _currentUser() async {
+    final FirebaseUser user = await _auth.currentUser();
     if (user != null) {
       setState(() {
         _uid = user.uid;
       });
-      DocumentSnapshot snapshot = await db.getUserById(_uid);
+      DocumentSnapshot snapshot = await userService.getUserById(_uid);
       print(snapshot.data);
-      _user = User(
-          snapshot.data['id'],
-          snapshot.data['firstName'],
-          snapshot.data['lastName'],
-          snapshot.data['email'],
-          snapshot.data['imageUrl']);
-      _email = _user.email;
-      _fNameController = TextEditingController(text: _user.firstName);
-      _lNameController = TextEditingController(text: _user.lastName);
-    } else {
-      print("Unsuccess!");
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LoginPage(),
-        ),
-      );
+      setState(() {
+        this._user = User(
+            snapshot.data['id'],
+            snapshot.data['firstName'],
+            snapshot.data['lastName'],
+            snapshot.data['email'],
+            snapshot.data['imageUrl']);
+
+        _email = _user.email;
+        _fNameController = TextEditingController(text: _user.firstName);
+        _lNameController = TextEditingController(text: _user.lastName);
+      });
     }
   }
 
 //User dat update function
-  void _updateUser(String id) async {
-    db
-        .updateUser(User(id, _fNameController.text, _lNameController.text,
-            _user.email, _user.imageUrl))
-        .then((onValue) {
+  Future<void> _updateUser(String id) async {
+    await userService
+        .updateUser(
+      User(
+        id,
+        _fNameController.text,
+        _lNameController.text,
+        _user.email,
+        _user.imageUrl,
+      ),
+    )
+        .then((onValue) async {
       _status = true;
-      initState();
+      await _currentUser();
     });
   }
 
 //File picker function
-  Future filePicker(BuildContext context) async {
+  Future<void> filePicker(BuildContext context) async {
     try {
       if (fileType == 'image') {
         file = await FilePicker.getFile(type: FileType.image);
@@ -231,17 +232,25 @@ class MapScreenState extends State<ProfilePage>
         isLoading = true;
       });
     }
+
     final StorageUploadTask uploadTask = storageReference.putFile(file);
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     final String newUrl = (await downloadUrl.ref.getDownloadURL());
     print("URL is $newUrl");
-    db.updateUser(
-        User(_uid, _user.firstName, _user.lastName, _user.email, newUrl));
+    await userService.updateUser(
+      _user = User(
+        _uid,
+        _user.firstName,
+        _user.lastName,
+        _user.email,
+        newUrl,
+      ),
+    );
 
-    setState(() {
+    setState(() async {
       this.url = newUrl;
       print("NEW URL: " + newUrl);
-      _currentUser();
+
       isLoading = false;
     });
   }
@@ -286,16 +295,14 @@ class MapScreenState extends State<ProfilePage>
                                         child: SizedBox(
                                           width: 140.0,
                                           height: 140.0,
-                                          child: _user.imageUrl != null &&
-                                                  _user.imageUrl.isNotEmpty
+                                          child: _user != null
                                               ? FadeInImage.assetNetwork(
                                                   placeholder:
                                                       "assets/images/forecast-logo.png",
-                                                  image: _user.imageUrl,
+                                                  image:
+                                                      _user.imageUrl.toString(),
                                                 )
-                                              : Image.asset(
-                                                  'assets/images/forecast-logo.png',
-                                                ),
+                                              : Text(""),
                                         ),
                                       ),
                                     ),

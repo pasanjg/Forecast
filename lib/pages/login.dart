@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forecast/pages/signup.dart';
+import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/widgets/background/default_gradient.dart';
 
@@ -68,39 +68,31 @@ class _LoginPageState extends State<LoginPage> {
   void _showError(String errorCode) {
     switch (errorCode) {
       case 'ERROR_INVALID_EMAIL':
-        _showFlutterToast("Invalid email format");
+        showFlutterToast("Invalid email format");
 
         break;
       case 'ERROR_USER_NOT_FOUND':
-        _showFlutterToast("Invalid email or password");
+        showFlutterToast("Invalid email or password");
 
         break;
       case 'ERROR_WRONG_PASSWORD':
-        _showFlutterToast("Invalid email or password");
+        showFlutterToast("Invalid email or password");
 
         break;
       case 'ERROR_EMAIL_ALREADY_IN_USE':
-        _showFlutterToast("Email is already in use");
+        showFlutterToast("Email is already in use");
 
         break;
       case 'ERROR_WEAK_PASSWORD':
-        _showFlutterToast("Password must be atleast 8 characters");
+        showFlutterToast("Password must be atleast 8 characters");
 
         break;
       default:
-        _showFlutterToast("Something went wrong");
+        showFlutterToast("Something went wrong");
     }
   }
 
-  void _showFlutterToast(String message) {
-    Fluttertoast.cancel();
-    Fluttertoast.showToast(
-      msg: message,
-      backgroundColor: Colors.black87,
-      toastLength: Toast.LENGTH_LONG,
-      textColor: Colors.white,
-    );
-  }
+
 
 //Password validator
   bool _passwordValidate(String value) {

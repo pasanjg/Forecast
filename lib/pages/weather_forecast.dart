@@ -68,7 +68,7 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
 
   Future<void> fetchData() async {
     units = await AppSharedPreferences.getStringSharedPreferences("units");
-    temperatureUnit = CommonUtils.getTemperatureUnit(units);
+    temperatureUnit = getTemperatureUnit(units);
 
     OpenWeatherMapAPI openWeatherMapAPI = OpenWeatherMapAPI(
       cityName: widget.cityName,
