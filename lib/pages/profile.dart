@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:forecast/models/user.dart';
+import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/utils/common/user_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -21,6 +23,7 @@ class ProfilePageState extends State<ProfilePage>
   final FocusNode myFocusNode = FocusNode();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   UserService userService = UserService();
+
   File file;
   User _user;
   bool _status = true;
@@ -38,10 +41,13 @@ class ProfilePageState extends State<ProfilePage>
   TextEditingController _fNameController;
   TextEditingController _lNameController;
 
+  ScrollController _controller;
+
   @override
   void initState() {
     super.initState();
     _currentUser();
+    _controller = ScrollController();
   }
 
   @override
@@ -129,26 +135,6 @@ class ProfilePageState extends State<ProfilePage>
     );
   }
 
-//Edit icon widget
-  Widget _getEditIcon() {
-    return GestureDetector(
-      child: CircleAvatar(
-        backgroundColor: Colors.white,
-        radius: 14.0,
-        child: Icon(
-          Icons.edit,
-          color: Theme.of(context).primaryColor,
-          size: 16.0,
-        ),
-      ),
-      onTap: () {
-        setState(() {
-          _status = false;
-        });
-      },
-    );
-  }
-
 //Get the current user data function
   Future<void> _currentUser() async {
     final FirebaseUser user = await _auth.currentUser();
@@ -156,6 +142,7 @@ class ProfilePageState extends State<ProfilePage>
       setState(() {
         _uid = user.uid;
       });
+
       DocumentSnapshot snapshot = await userService.getUserById(_uid);
       print(snapshot.data);
       setState(() {
@@ -189,6 +176,7 @@ class ProfilePageState extends State<ProfilePage>
       _status = true;
       await _currentUser();
     });
+    showFlutterToast("Profile updated");
   }
 
 //File picker function
@@ -255,10 +243,18 @@ class ProfilePageState extends State<ProfilePage>
     });
   }
 
+  _handleAutoScroll() {
+    _controller.animateTo(
+      _controller.position.maxScrollExtent,
+      duration: Duration(milliseconds: 600),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    Color _cardColor = Colors.black.withAlpha(20);
     return Scaffold(
-      backgroundColor: Theme.of(context).accentColor,
       appBar: AppBar(
         elevation: 0.0,
         title: Text("Profile"),
@@ -266,199 +262,182 @@ class ProfilePageState extends State<ProfilePage>
         backgroundColor: Theme.of(context).accentColor,
       ),
       body: DefaultGradient(
-        child: SingleChildScrollView(
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.85,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                Container(
-                  height: 230,
-                  child: Column(
-                    children: <Widget>[
-                      Padding(
-                        padding: EdgeInsets.only(top: 20.0),
-                        child: Stack(
-                          fit: StackFit.loose,
-                          children: <Widget>[
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Stack(
-                                  children: <Widget>[
-                                    CircleAvatar(
-                                      radius: 70,
-                                      backgroundColor: Colors.transparent,
-                                      child: ClipOval(
-                                        child: SizedBox(
-                                          width: 140.0,
-                                          height: 140.0,
-                                          child: _user != null
-                                              ? FadeInImage.assetNetwork(
-                                                  placeholder:
-                                                      "assets/images/forecast-logo.png",
-                                                  image:
-                                                      _user.imageUrl.toString(),
-                                                )
-                                              : Text(""),
-                                        ),
-                                      ),
-                                    ),
-                                    isLoading
-                                        ? Positioned(
-                                            top: 50.0,
-                                            left: 50.0,
-                                            child: CircularProgressIndicator(),
-                                          )
-                                        : SizedBox(width: 1.0),
-                                  ],
+        child: ListView(
+          controller: _controller,
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Container(
+                child: Column(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.only(top: 20.0),
+                      child: Stack(
+                        children: <Widget>[
+                          InkWell(
+                            onTap: () {
+                              setState(() {
+                                fileType = 'image';
+                              });
+                              filePicker(context);
+                            },
+                            child: CircleAvatar(
+                              radius: 70,
+                              backgroundColor: Colors.transparent,
+                              child: ClipOval(
+                                child: SizedBox(
+                                  width: 140.0,
+                                  height: 140.0,
+                                  child: _user != null
+                                      ? FadeInImage.assetNetwork(
+                                          placeholder:
+                                              "assets/images/forecast-logo.png",
+                                          image: _user.imageUrl.toString(),
+                                        )
+                                      : Text(""),
                                 ),
-                              ],
-                            ),
-                            Positioned(
-                              top: 100.0,
-                              left: 140.0,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  GestureDetector(
-                                    child: CircleAvatar(
-                                      backgroundColor:
-                                          Theme.of(context).primaryColor,
-                                      radius: 20.0,
-                                      child: Icon(
-                                        Icons.photo,
-                                        color: Colors.white,
-                                        size: 25.0,
-                                      ),
-                                    ),
-                                    onTap: () {
-                                      setState(() {
-                                        fileType = 'image';
-                                      });
-                                      filePicker(context);
-                                    },
-                                  ),
-                                ],
                               ),
                             ),
-                            Positioned(
-                              top: 30.0,
-                              right: 60.0,
-                              child: _status ? _getEditIcon() : Container(),
-                            ),
-                          ],
+                          ),
+                          isLoading
+                              ? Positioned(
+                                  top: 50.0,
+                                  left: 50.0,
+                                  child: CircularProgressIndicator(),
+                                )
+                              : SizedBox(width: 1.0),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 30.0,
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Card(
+                color: _cardColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      Text(
+                        'Email Address',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(
+                        width: 180.0,
+                        child: Text(
+                          _email != null ? _email : "",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 25.0),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
+              child: Card(
+                color: _cardColor,
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Container(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: <Widget>[
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: 25.0,
-                            right: 25.0,
-                            top: 25.0,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Text(
-                                'Email Address',
-                                style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'First Name ',
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.bold,
                               ),
-                              SizedBox(width: 60.0),
-                              Text(
-                                _email != null ? _email : "",
-                                style: TextStyle(
-                                  fontSize: 16.0,
+                            ),
+                            SizedBox(
+                              width: 180.0,
+                              child: TextField(
+                                controller: _fNameController,
+                                decoration: InputDecoration(
+                                  border: _status ? InputBorder.none : null,
+                                  hintText: "Enter First Name ",
+                                  hintStyle: TextStyle(color: Colors.white),
                                 ),
+                                enabled: !_status,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                            left: 25.0,
-                            right: 25.0,
-                            top: 25.0,
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Text(
-                                'First Name ',
-                                style: TextStyle(
-                                  fontSize: 16.0,
-                                  fontWeight: FontWeight.bold,
+                        SizedBox(height: 20.0),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(
+                              'Last Name',
+                              style: TextStyle(
+                                  fontSize: 16.0, fontWeight: FontWeight.bold),
+                            ),
+                            SizedBox(
+                              width: 180.0,
+                              child: TextField(
+                                controller: _lNameController,
+                                decoration: InputDecoration(
+                                  border: _status ? InputBorder.none : null,
+                                  hintText: "Enter Last Name",
+                                  hintStyle: TextStyle(color: Colors.white),
                                 ),
+                                enabled: !_status,
                               ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 80.0),
-                                child: SizedBox(
-                                  width: 150.0,
-                                  child: TextField(
-                                    controller: _fNameController,
-                                    decoration: const InputDecoration(
-                                      hintText: "Enter First Name ",
-                                      hintStyle: TextStyle(color: Colors.white),
-                                    ),
-                                    enabled: !_status,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(
-                              left: 25.0, right: 25.0, top: 25.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.max,
-                            children: <Widget>[
-                              Text(
-                                'Last Name',
-                                style: TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(left: 80.0),
-                                child: SizedBox(
-                                  width: 150.0,
-                                  child: TextField(
-                                    controller: _lNameController,
-                                    decoration: const InputDecoration(
-                                      hintText: "Enter Last Name",
-                                      hintStyle: TextStyle(color: Colors.white),
-                                    ),
-                                    enabled: !_status,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        !_status ? _getActionButtons() : Container(),
                       ],
                     ),
                   ),
-                )
-              ],
+                ),
+              ),
             ),
-          ),
+            !_status ? _getActionButtons() : Container(),
+          ],
         ),
       ),
+      floatingActionButton: _status
+          ? Container(
+              height: 40.0,
+              width: 40.0,
+              child: FloatingActionButton(
+                onPressed: () {
+                  setState(() {
+                    _status = false;
+                  });
+                  Timer(
+                    Duration(milliseconds: 500),
+                    _handleAutoScroll,
+                  );
+                },
+                elevation: 0.1,
+                backgroundColor: Colors.white,
+                child: Icon(
+                  FontAwesomeIcons.userEdit,
+                  size: 18.0,
+                  color: Theme.of(context).primaryColor,
+                ),
+              ),
+            )
+          : Container(),
     );
   }
 }
