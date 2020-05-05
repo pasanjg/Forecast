@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/constants.dart';
 
 enum AppThemeKeys { DAY, EVENING, NIGHT }
@@ -56,15 +57,30 @@ class AppThemes {
     return AppThemes.getThemeFromKey(getThemeKeyFromTime(_dateTime));
   }
 
-  static AppThemeKeys getThemeKeyFromTime(DateTime locationDate) {
+  static AppThemeKeys getThemeKeyFromTime(DateTime locationDate,
+      {int sunRise, int sunSet, int timeZone}) {
     int _currentHour = locationDate.hour;
 
-    if (_currentHour >= 6 && _currentHour <= 14) {
-      return AppThemeKeys.DAY;
-    } else if (_currentHour >= 15 && _currentHour <= 17) {
-      return AppThemeKeys.EVENING;
+    if (sunRise != null && sunSet != null && timeZone != null) {
+      DateTime sunRiseTime = getTime(sunRise, timeZone);
+      DateTime sunSetTime = getTime(sunSet, timeZone);
+
+      if (locationDate.compareTo(sunRiseTime) >= 0 && _currentHour <= 15) {
+        return AppThemeKeys.DAY;
+      } else if (_currentHour >= 16 &&
+          locationDate.compareTo(sunSetTime) <= 0) {
+        return AppThemeKeys.EVENING;
+      } else {
+        return AppThemeKeys.NIGHT;
+      }
     } else {
-      return AppThemeKeys.NIGHT;
+      if (_currentHour >= 6 && _currentHour <= 15) {
+        return AppThemeKeys.DAY;
+      } else if (_currentHour >= 16 && _currentHour <= 17) {
+        return AppThemeKeys.EVENING;
+      } else {
+        return AppThemeKeys.NIGHT;
+      }
     }
   }
 }

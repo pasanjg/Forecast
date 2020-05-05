@@ -5,12 +5,12 @@ import 'package:forecast/models/user.dart';
 final CollectionReference userCollection =
     Firestore.instance.collection('users');
 
-class UserProfileService {
-  static final UserProfileService _instance = UserProfileService.internal();
+class UserService {
+  static final UserService _instance = UserService.internal();
 
-  factory UserProfileService() => _instance;
+  factory UserService() => _instance;
 
-  UserProfileService.internal();
+  UserService.internal();
 
 //User create function
   Future<User> createUser(

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/widgets/error/no_saved.dart';
 import 'package:forecast/pages/home.dart';
 import 'package:forecast/utils/animations/FadeAnimation.dart';
@@ -36,14 +37,14 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
 
   void _getUserSavedLocations() {
     documentReference =
-        Firestore.instance.collection(usersCollection).document(this.userId);
+        Firestore.instance.collection("savedLocations").document(this.userId);
   }
 
   Widget _buildFavouriteCard(String savedLocation) {
     List location = savedLocation.split(RegExp(",[A-Z]+\$"));
     this.cityName = location[0];
 
-    RegExp exp = new RegExp("[A-Z]+\$");
+    RegExp exp = RegExp("[A-Z]+\$");
     this.country = exp.stringMatch(savedLocation).toString();
 
     return Padding(
@@ -85,15 +86,15 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
       body: DefaultGradient(
         child: StreamBuilder<DocumentSnapshot>(
           stream: Firestore.instance
-              .collection(usersCollection)
+              .collection("users")
               .document(userId)
               .snapshots(),
           builder: (context, snapshot) {
             if (this.userId == null) {
-              return NoFavouritesPage();
+              return NoSaved();
             }
             if (snapshot.hasData) {
-              this.savedLocations = snapshot.data[userSavedLocations];
+              savedLocations = snapshot.data["savedLocations"];
               if (savedLocations != null && savedLocations.isNotEmpty) {
                 return ListView.builder(
                   itemCount: savedLocations.length,
@@ -102,6 +103,7 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
                       delay: index * 0.1,
                       child: InkWell(
                         onTap: () {
+                          showFlutterToast("Loading location");
                           Navigator.of(context).pop();
                           Navigator.pushReplacement(
                             context,
@@ -120,11 +122,13 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
                   },
                 );
               } else {
-                return NoFavouritesPage();
+                return NoSaved();
               }
             }
 
-            return Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           },
         ),
       ),

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:forecast/pages/saved_locations.dart';
 import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:forecast/pages/login.dart';
-import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -11,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'dart:convert' as convert;
 
 import 'package:forecast/models/user.dart';
-import 'package:forecast/utils/common/user_profile.dart';
+import 'package:forecast/utils/common/user_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:forecast/pages/current_weather.dart';
 import 'package:forecast/pages/settings.dart';
@@ -30,7 +29,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final TextEditingController _searchTextField = TextEditingController();
-  UserProfileService db = UserProfileService();
+  UserService db = UserService();
   String _searchText = " ";
   List cities = List();
   List filteredCities = List();
@@ -69,7 +68,7 @@ class _HomePageState extends State<HomePage> {
 
   void _getCities() async {
     final response = await DefaultAssetBundle.of(context)
-        .loadString("assets/json/current_city_list_min.json");
+        .loadString("assets/json/city_list_min.json");
     final jsonResponse = convert.jsonDecode(response);
     List tempList = List();
     for (int i = 0; i < jsonResponse.length; i++) {
@@ -94,7 +93,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           )
-        : Text(" ");
+        : SizedBox();
   }
 
   void _onSearchPressed() {
@@ -153,32 +152,29 @@ class _HomePageState extends State<HomePage> {
           child: ListView.builder(
             itemCount: filteredCities.length,
             itemBuilder: (BuildContext context, int index) {
-              return FadeAnimation(
-                delay: index * 0.001,
-                child: ListTile(
-                  onTap: () {
-                    setState(() {
-                      this.cityName =
-                          "${filteredCities[index]['name']},${filteredCities[index]['country']}";
-                      print(filteredCities[index]['name'] +
-                          "," +
-                          filteredCities[index]['country']);
-                      this.savedLocation = null;
-                    });
-                    _searchTextField.text = "";
-                    _onSearchPressed();
-                  },
-                  title: Text(
-                    "${filteredCities[index]['name']}",
-                    style: RegularTextStyle,
-                  ),
-                  trailing: Container(
-                    height: 30.0,
-                    child: FadeInImage.assetNetwork(
-                      placeholder: "assets/images/flag-loading.png",
-                      image:
-                          "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
-                    ),
+              return ListTile(
+                onTap: () {
+                  setState(() {
+                    this.cityName =
+                        "${filteredCities[index]['name']},${filteredCities[index]['country']}";
+                    print(filteredCities[index]['name'] +
+                        "," +
+                        filteredCities[index]['country']);
+                    this.savedLocation = null;
+                  });
+                  _searchTextField.text = "";
+                  _onSearchPressed();
+                },
+                title: Text(
+                  "${filteredCities[index]['name']}",
+                  style: RegularTextStyle,
+                ),
+                trailing: Container(
+                  height: 30.0,
+                  child: FadeInImage.assetNetwork(
+                    placeholder: "assets/images/flag-loading.png",
+                    image:
+                        "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
                   ),
                 ),
               );
@@ -197,7 +193,7 @@ class _HomePageState extends State<HomePage> {
         _loginStatus = true;
       });
       Firestore.instance
-          .collection(usersCollection)
+          .collection("users")
           .document(_uid)
           .snapshots()
           .listen((DocumentSnapshot documentSnapshot) {
@@ -219,12 +215,6 @@ class _HomePageState extends State<HomePage> {
       print("Unsuccess!");
     }
   }
-
-//  void _getImageUrl() {
-//    StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
-//    String _url = ref.getDownloadURL().toString();
-//    url = _url;
-//  }
 
   void _logout() async {
     await _auth.signOut();
