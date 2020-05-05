@@ -37,14 +37,14 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
 
   void _getUserSavedLocations() {
     documentReference =
-        Firestore.instance.collection(usersCollection).document(this.userId);
+        Firestore.instance.collection("savedLocations").document(this.userId);
   }
 
   Widget _buildFavouriteCard(String savedLocation) {
     List location = savedLocation.split(RegExp(",[A-Z]+\$"));
     this.cityName = location[0];
 
-    RegExp exp = new RegExp("[A-Z]+\$");
+    RegExp exp = RegExp("[A-Z]+\$");
     this.country = exp.stringMatch(savedLocation).toString();
 
     return Padding(
@@ -86,7 +86,7 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
       body: DefaultGradient(
         child: StreamBuilder<DocumentSnapshot>(
           stream: Firestore.instance
-              .collection(usersCollection)
+              .collection("users")
               .document(userId)
               .snapshots(),
           builder: (context, snapshot) {
@@ -94,7 +94,7 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
               return NoSaved();
             }
             if (snapshot.hasData) {
-              this.savedLocations = snapshot.data[userSavedLocations];
+              savedLocations = snapshot.data["savedLocations"];
               if (savedLocations != null && savedLocations.isNotEmpty) {
                 return ListView.builder(
                   itemCount: savedLocations.length,

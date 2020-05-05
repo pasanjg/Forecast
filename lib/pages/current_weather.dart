@@ -42,6 +42,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   DateTime locationDate;
   String cityName;
   String country;
+  int timeZone;
+  int _sunRise;
+  int _sunSet;
   bool isSaved = false;
   String userId;
   String units;
@@ -89,7 +92,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
         print(address[0].toJson());
         print("LOCALITY: " + (address[0].locality != "").toString());
 
-        if (address != null || address[0].locality != "") {
+        if (address != null && address[0].locality != "") {
           setState(() {
             this.cityName =
                 "${address[0].locality},${address[0].isoCountryCode}";
@@ -214,15 +217,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     return DateFormat.yMMMMEEEEd().format(locationDate);
   }
 
-  void _onAfterBuild(BuildContext context) {
-    setState(() {
-      if (this.locationDate != null)
-        AppTheme.instanceOf(context).changeTheme(
-          AppThemes.getThemeKeyFromTime(this.locationDate),
-        );
-    });
-  }
-
   Future<void> _getUserId() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     setState(() {
@@ -297,6 +291,20 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       });
       showFlutterToast("Location saved");
     }
+  }
+
+  void _onAfterBuild(BuildContext context) {
+    setState(() {
+      if (this.locationDate != null)
+        AppTheme.instanceOf(context).changeTheme(
+          AppThemes.getThemeKeyFromTime(
+            this.locationDate,
+            sunRise: this._sunRise,
+            sunSet: this._sunSet,
+            timeZone: this.timeZone
+          ),
+        );
+    });
   }
 
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
@@ -457,7 +465,16 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                         ),
                                         SizedBox(width: 10.0),
                                         Text(
-                                          "${getTime(((locationDate.millisecondsSinceEpoch) / 1000).round(), 0)}",
+                                          DateFormat.jm()
+                                              .format(
+                                                getTime(
+                                                    ((locationDate
+                                                                .millisecondsSinceEpoch) /
+                                                            1000)
+                                                        .round(),
+                                                    0),
+                                              )
+                                              .toString(),
                                           style: MediumTextStyle,
                                         ),
                                       ],
@@ -608,10 +625,12 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     ),
                                     SizedBox(width: 15.0),
                                     Text(
-                                      getTime(
-                                        currentWeather.sunRise,
-                                        currentWeather.timeZone,
-                                      ),
+                                      DateFormat.jm()
+                                          .format(getTime(
+                                            currentWeather.sunRise,
+                                            currentWeather.timeZone,
+                                          ))
+                                          .toString(),
                                       style: SmallTextStyle.apply(
                                         heightFactor: 2,
                                       ),
@@ -662,10 +681,12 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                                     ),
                                     SizedBox(width: 15.0),
                                     Text(
-                                      getTime(
-                                        currentWeather.sunSet,
-                                        currentWeather.timeZone,
-                                      ),
+                                      DateFormat.jm()
+                                          .format(getTime(
+                                            currentWeather.sunSet,
+                                            currentWeather.timeZone,
+                                          ))
+                                          .toString(),
                                       style: SmallTextStyle.apply(
                                         heightFactor: 2,
                                       ),
@@ -711,6 +732,9 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
                 this.cityName =
                     snapshot.data.name + "," + snapshot.data.country;
               }
+              this.timeZone = snapshot.data.timeZone;
+              this._sunRise = snapshot.data.sunRise;
+              this._sunSet = snapshot.data.sunSet;
               return RefreshIndicator(
                 backgroundColor: Colors.white,
                 onRefresh: _pullRefresh,

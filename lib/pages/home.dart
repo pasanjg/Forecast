@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> {
         _loginStatus = true;
       });
       Firestore.instance
-          .collection(usersCollection)
+          .collection("users")
           .document(_uid)
           .snapshots()
           .listen((DocumentSnapshot documentSnapshot) {

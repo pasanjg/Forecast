@@ -220,11 +220,11 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
                                       ),
                                       SizedBox(height: 8.0),
                                       Text(
-                                        "${getTime(
+                                        DateFormat.jm().format(getTime(
                                           weatherForecast.weatherList[index].dt,
                                           weatherForecast
                                               .weatherList[index].timeZone,
-                                        )}",
+                                        )).toString(),
                                         style: SmallTextStyle.apply(
                                           fontSizeFactor: 0.9,
                                         ),

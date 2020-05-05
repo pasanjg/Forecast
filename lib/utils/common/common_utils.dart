@@ -25,8 +25,7 @@ String getTemperatureAPIUnit(String units) {
   return value;
 }
 
-String getTime(int seconds, int timeZone) {
-  String time;
+DateTime getTime(int seconds, int timeZone) {
   DateTime dateTime =
   DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toUtc();
 
@@ -47,8 +46,7 @@ String getTime(int seconds, int timeZone) {
     );
   }
 
-  time = DateFormat.jm().format(dateTime);
-  return time.toString();
+  return dateTime;
 }
 
 void showFlutterToast(String message, {bool isLong = false}) {
