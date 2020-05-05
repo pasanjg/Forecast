@@ -1,132 +1,131 @@
 import 'package:flutter/material.dart';
 import 'package:flare_flutter/flare_actor.dart';
+import 'package:forecast/utils/common/constants.dart';
+import 'package:forecast/widgets/background/default_gradient.dart';
 
-class FlareAnimationsPage extends StatefulWidget {
+class WeatherAnimationsPage extends StatefulWidget {
   @override
-  _FlareAnimationsPageState createState() => _FlareAnimationsPageState();
+  _WeatherAnimationsPageState createState() => _WeatherAnimationsPageState();
 }
 
-class _FlareAnimationsPageState extends State<FlareAnimationsPage> {
+class _WeatherAnimationsPageState extends State<WeatherAnimationsPage> {
+  Widget _weatherItem(
+    BuildContext context,
+    String weatherIcon,
+    String description,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Card(
+        elevation: 0.2,
+        color: Theme.of(context).accentColor.withAlpha(80),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            children: <Widget>[
+              Expanded(
+                flex: 1,
+                child: Container(
+                  height: 50.0,
+                  child: FlareActor(
+                    "assets/flare_animations/weather_icons/weather_${weatherIcon}d.flr",
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    animation: "${weatherIcon}d",
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Container(
+                  height: 50.0,
+                  child: FlareActor(
+                    "assets/flare_animations/weather_icons/weather_${weatherIcon}n.flr",
+                    fit: BoxFit.contain,
+                    alignment: Alignment.center,
+                    animation: "${weatherIcon}n",
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: SmallTextStyle.apply(fontSizeFactor: 1.2),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.lightBlueAccent,
       appBar: AppBar(
-        title: Text("Temp Page"),
+        elevation: 0.0,
+        backgroundColor: Theme.of(context).accentColor,
+        centerTitle: true,
+        title: Text("Weather Animations"),
       ),
-      body: Center(
-        child: GridView.count(
-          crossAxisCount: 4,
-          children: <Widget>[
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_01d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "01d",
+      body: NotificationListener<OverscrollIndicatorNotification>(
+        onNotification: (scroll) {
+          scroll.disallowGlow();
+          return true;
+        },
+        child: DefaultGradient(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.05,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: <Widget>[
+                      Expanded(
+                        child: Text(
+                          "Day Icon",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "Night Icon",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          "Description",
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.8,
+                  child: ListView(
+                    children: <Widget>[
+                      _weatherItem(context, "01", "Clear sky"),
+                      _weatherItem(context, "02", "Few clouds"),
+                      _weatherItem(context, "03", "Scattered clouds"),
+                      _weatherItem(context, "04", "Broken clouds"),
+                      _weatherItem(context, "09", "Shower rain"),
+                      _weatherItem(context, "10", "Rain"),
+                      _weatherItem(context, "11", "Thunderstorm"),
+                      _weatherItem(context, "13", "Snow"),
+                      _weatherItem(context, "50", "Mist"),
+                    ],
+                  ),
+                ),
+              ],
             ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_01n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "01n",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_02d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "02d",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_02n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "02n",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_03d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "03d",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_03n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "03n",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_04d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "04d",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_04n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "04n",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_09d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "09d",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_09n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "09n",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_10d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "10d",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_10n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "10n",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_11d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "11d",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_11n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "11n",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_13d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "13d",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_13n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "13n",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_50d.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "50d",
-            ),
-            FlareActor(
-              "assets/flare_animations/weather_icons/weather_50n.flr",
-              fit: BoxFit.contain,
-              alignment: Alignment.center,
-              animation: "50n",
-            ),
-          ],
+          ),
         ),
       ),
     );

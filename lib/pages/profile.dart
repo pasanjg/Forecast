@@ -235,7 +235,7 @@ class ProfilePageState extends State<ProfilePage>
       ),
     );
 
-    setState(() async {
+    setState(() {
       this.url = newUrl;
       print("NEW URL: " + newUrl);
 
