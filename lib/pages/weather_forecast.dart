@@ -37,8 +37,6 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
   String temperatureUnit;
 
   DateTime today = DateTime.now();
-  List<WeatherModel> filteredWeatherForecastData;
-
   AnimationController _animationController;
 
   List<Color> graphGradient = [
@@ -52,7 +50,6 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
   @override
   void initState() {
     super.initState();
-//    this.temperatureUnit = widget.temperatureUnit;
     this._animationController = AnimationController(
       duration: Duration(milliseconds: 500),
       vsync: this,
@@ -84,32 +81,6 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
       duration: Duration(milliseconds: 600),
       curve: Curves.easeInOut,
     );
-  }
-
-  String _getTime(int seconds, int timeZone) {
-    String time;
-    DateTime dateTime =
-        DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toUtc();
-
-    if (timeZone >= 0) {
-      dateTime = dateTime.add(
-        Duration(
-          hours: DateFormat("ss").parse(timeZone.toString()).hour,
-          minutes: DateFormat("ss").parse(timeZone.toString()).minute,
-        ),
-      );
-    } else {
-      timeZone *= -1;
-      dateTime = dateTime.subtract(
-        Duration(
-          hours: DateFormat("ss").parse(timeZone.toString()).hour,
-          minutes: DateFormat("ss").parse(timeZone.toString()).minute,
-        ),
-      );
-    }
-
-    time = DateFormat.jm().format(dateTime);
-    return time.toString();
   }
 
   LineChartData mainData(List<WeatherModel> weatherData) {
@@ -249,7 +220,7 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
                                       ),
                                       SizedBox(height: 8.0),
                                       Text(
-                                        "${_getTime(
+                                        "${getTime(
                                           weatherForecast.weatherList[index].dt,
                                           weatherForecast
                                               .weatherList[index].timeZone,

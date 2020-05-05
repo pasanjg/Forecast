@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:forecast/pages/saved_locations.dart';
 import 'package:forecast/pages/weather_animations_list.dart';
 import 'package:forecast/pages/login.dart';
-import 'package:forecast/utils/animations/FadeAnimation.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -153,32 +152,29 @@ class _HomePageState extends State<HomePage> {
           child: ListView.builder(
             itemCount: filteredCities.length,
             itemBuilder: (BuildContext context, int index) {
-              return FadeAnimation(
-                delay: index * 0.001,
-                child: ListTile(
-                  onTap: () {
-                    setState(() {
-                      this.cityName =
-                          "${filteredCities[index]['name']},${filteredCities[index]['country']}";
-                      print(filteredCities[index]['name'] +
-                          "," +
-                          filteredCities[index]['country']);
-                      this.savedLocation = null;
-                    });
-                    _searchTextField.text = "";
-                    _onSearchPressed();
-                  },
-                  title: Text(
-                    "${filteredCities[index]['name']}",
-                    style: RegularTextStyle,
-                  ),
-                  trailing: Container(
-                    height: 30.0,
-                    child: FadeInImage.assetNetwork(
-                      placeholder: "assets/images/flag-loading.png",
-                      image:
-                          "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
-                    ),
+              return ListTile(
+                onTap: () {
+                  setState(() {
+                    this.cityName =
+                        "${filteredCities[index]['name']},${filteredCities[index]['country']}";
+                    print(filteredCities[index]['name'] +
+                        "," +
+                        filteredCities[index]['country']);
+                    this.savedLocation = null;
+                  });
+                  _searchTextField.text = "";
+                  _onSearchPressed();
+                },
+                title: Text(
+                  "${filteredCities[index]['name']}",
+                  style: RegularTextStyle,
+                ),
+                trailing: Container(
+                  height: 30.0,
+                  child: FadeInImage.assetNetwork(
+                    placeholder: "assets/images/flag-loading.png",
+                    image:
+                        "https://www.countryflags.io/${filteredCities[index]['country']}/flat/64.png",
                   ),
                 ),
               );
@@ -219,12 +215,6 @@ class _HomePageState extends State<HomePage> {
       print("Unsuccess!");
     }
   }
-
-//  void _getImageUrl() {
-//    StorageReference ref = FirebaseStorage.instance.ref().child("images/$_uid");
-//    String _url = ref.getDownloadURL().toString();
-//    url = _url;
-//  }
 
   void _logout() async {
     await _auth.signOut();
