@@ -52,12 +52,12 @@ class ProfilePageState extends State<ProfilePage>
 
   @override
   void dispose() {
-    // Clean up the controller when the Widget is disposed
+    /// Clean up the controller when the Widget is disposed
     myFocusNode.dispose();
     super.dispose();
   }
 
-//Action buttons widget
+  /// Action buttons widget
   Widget _getActionButtons() {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 15.0),
@@ -135,7 +135,8 @@ class ProfilePageState extends State<ProfilePage>
     );
   }
 
-//Get the current user data function
+  /// Referenced from https://pub.dev/packages/firebase_auth
+  /// Get the current user data function
   Future<void> _currentUser() async {
     final FirebaseUser user = await _auth.currentUser();
     if (user != null) {
@@ -144,7 +145,6 @@ class ProfilePageState extends State<ProfilePage>
       });
 
       DocumentSnapshot snapshot = await userService.getUserById(_uid);
-      print(snapshot.data);
       setState(() {
         this._user = User(
             snapshot.data['id'],
@@ -160,7 +160,7 @@ class ProfilePageState extends State<ProfilePage>
     }
   }
 
-//User dat update function
+  /// User details update function
   Future<void> _updateUser(String id) async {
     await userService
         .updateUser(
@@ -179,7 +179,8 @@ class ProfilePageState extends State<ProfilePage>
     showFlutterToast("Profile updated");
   }
 
-//File picker function
+  /// Reference from https://pub.dev/packages/file_picker
+  /// File picker function
   Future<void> filePicker(BuildContext context) async {
     try {
       if (fileType == 'image') {
@@ -187,7 +188,6 @@ class ProfilePageState extends State<ProfilePage>
         setState(() {
           fileName = _uid;
         });
-        print(fileName);
         _uploadFile(file, fileName);
       }
     } catch (e) {
@@ -210,7 +210,8 @@ class ProfilePageState extends State<ProfilePage>
     }
   }
 
-//Profile picture upload function
+  /// Referenced from https://pub.dev/packages/firebase_storage
+  /// Profile picture upload function
   Future<void> _uploadFile(File file, String filename) async {
     StorageReference storageReference;
     if (fileType == 'image') {
@@ -224,7 +225,6 @@ class ProfilePageState extends State<ProfilePage>
     final StorageUploadTask uploadTask = storageReference.putFile(file);
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     final String newUrl = (await downloadUrl.ref.getDownloadURL());
-    print("URL is $newUrl");
     await userService.updateUser(
       _user = User(
         _uid,
@@ -237,8 +237,6 @@ class ProfilePageState extends State<ProfilePage>
 
     setState(() {
       this.url = newUrl;
-      print("NEW URL: " + newUrl);
-
       isLoading = false;
     });
   }

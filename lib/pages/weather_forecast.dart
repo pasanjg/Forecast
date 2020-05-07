@@ -14,7 +14,7 @@ import 'package:forecast/models/weather_model.dart';
 import 'package:forecast/utils/common/common_utils.dart';
 import 'package:forecast/utils/common/constants.dart';
 import 'package:forecast/utils/common/shared_preferences.dart';
-import 'package:forecast/widgets/loading/forecastLoading.dart';
+import 'package:forecast/widgets/loading/weather_forecast_loading.dart';
 import 'package:intl/intl.dart';
 
 class WeatherForecastPage extends StatefulWidget {
@@ -83,6 +83,8 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
     );
   }
 
+  /// Code referred from pub.dev
+  /// See <https://pub.dev/packages/fl_chart> for source.
   LineChartData mainData(List<WeatherModel> weatherData) {
     double min = double.parse(weatherData[0].temp);
     double max = double.parse(weatherData[0].temp);
@@ -155,7 +157,9 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
     Color _cardColor = Colors.black.withAlpha(20);
     final rotateAnimation = Tween(begin: 0.0, end: pi).animate(
       CurvedAnimation(
-          parent: this._animationController, curve: Curves.easeInOut),
+        parent: this._animationController,
+        curve: Curves.easeInOut,
+      ),
     );
 
     return Column(
@@ -220,11 +224,14 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
                                       ),
                                       SizedBox(height: 8.0),
                                       Text(
-                                        DateFormat.jm().format(getTime(
-                                          weatherForecast.weatherList[index].dt,
-                                          weatherForecast
-                                              .weatherList[index].timeZone,
-                                        )).toString(),
+                                        DateFormat.jm()
+                                            .format(getTime(
+                                              weatherForecast
+                                                  .weatherList[index].dt,
+                                              weatherForecast
+                                                  .weatherList[index].timeZone,
+                                            ))
+                                            .toString(),
                                         style: SmallTextStyle.apply(
                                           fontSizeFactor: 0.9,
                                         ),
@@ -358,6 +365,8 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
 
   @override
   Widget build(BuildContext context) {
+    /// Code referred from flutter.dev
+    /// See <https://api.flutter.dev/flutter/widgets/StreamBuilder-class.html> for source.
     return StreamBuilder(
         stream: weatherForecastBloc.weatherForecast,
         builder: (context, AsyncSnapshot<WeatherForecastModel> snapshot) {
@@ -373,7 +382,7 @@ class WeatherForecastPageState extends State<WeatherForecastPage>
             Fluttertoast.showToast(msg: snapshot.error);
             return Center(child: Text(snapshot.error));
           } else {
-            return ForecastLoading();
+            return WeatherForecastLoading();
           }
         });
   }

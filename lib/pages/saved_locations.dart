@@ -26,6 +26,8 @@ class _SavedLocationsPageState extends State<SavedLocationsPage> {
     _getUserSavedLocations();
   }
 
+  /// Code referred from Firebase Auth.
+  /// See <https://pub.dev/packages/firebase_auth> for source.
   void _getUserId() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     setState(() {

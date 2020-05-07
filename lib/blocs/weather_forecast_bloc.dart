@@ -3,6 +3,8 @@ import 'package:forecast/models/weather_forecast_model.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:forecast/resources/repository.dart';
 
+/// Code for BLoC Pattern referred from a Medium post.
+/// See <https://medium.com/flutterpub/architecting-your-flutter-project-bd04e144a8f1> for source.
 class WeatherForecastBloc {
   final _repository = Repository();
   PublishSubject<WeatherForecastModel> _weatherForecastFetcher =

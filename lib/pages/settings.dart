@@ -11,7 +11,6 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   String unitDropdownValue;
-  bool isOut = false;
 
   @override
   void initState() {

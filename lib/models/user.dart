@@ -1,3 +1,5 @@
+/// User Model Class
+
 class User {
   String _id;
   String _firstName;
@@ -16,9 +18,13 @@ class User {
   }
 
   String get id => _id;
+
   String get firstName => _firstName;
+
   String get lastName => _lastName;
+
   String get email => _email;
+
   String get imageUrl => _imageUrl;
 
   Map<String, dynamic> toMap() {

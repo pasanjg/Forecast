@@ -24,8 +24,6 @@ class WeatherForecastModel {
   String get error => _error;
 
   WeatherForecastModel.fromJSON(Map<String, dynamic> parsedJSON) {
-    print("WEATHER_FORECAST_MODEL");
-
     _cod = parsedJSON['cod'].toString();
     _cnt = parsedJSON['cnt'];
     _timeZone = parsedJSON['city']['timezone'];

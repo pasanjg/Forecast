@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:simple_animations/simple_animations.dart';
 
+/// Code referred from GitHub.
+/// See <https://github.com/afgprogrammer/Flutter-Splash-Screen-Animation/blob/master/lib/Animations/FadeAnimation.dart> for source.
 class FadeAnimation extends StatelessWidget {
   final Key key;
   final double delay;

@@ -25,9 +25,11 @@ String getTemperatureAPIUnit(String units) {
   return value;
 }
 
+/// Code referred from flutter.dev
+/// See <https://api.flutter.dev/flutter/dart-core/DateTime/add.html> for source.
 DateTime getTime(int seconds, int timeZone) {
   DateTime dateTime =
-  DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toUtc();
+      DateTime.fromMillisecondsSinceEpoch(seconds * 1000).toUtc();
 
   if (timeZone >= 0) {
     dateTime = dateTime.add(
@@ -49,6 +51,8 @@ DateTime getTime(int seconds, int timeZone) {
   return dateTime;
 }
 
+/// Code referred from pub.dev
+/// See <https://pub.dev/packages/fluttertoast> for source.
 void showFlutterToast(String message, {bool isLong = false}) {
   Fluttertoast.cancel();
   Fluttertoast.showToast(

@@ -85,18 +85,12 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
       userLocation = await _getLocation();
 
       if (userLocation != null) {
-        print("PLACEMARK ");
-        print(await _getLocationAddress(userLocation));
         var address = await _getLocationAddress(userLocation);
-
-        print(address[0].toJson());
-        print("LOCALITY: " + (address[0].locality != "").toString());
 
         if (address != null && address[0].locality != "") {
           setState(() {
             this.cityName =
                 "${address[0].locality},${address[0].isoCountryCode}";
-            print("CITY: " + this.cityName);
             openWeatherMapAPI = OpenWeatherMapAPI(
               cityName: this.cityName,
               units: units,
@@ -112,7 +106,6 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
               units: units,
             );
           });
-          print("GEOLOCATION");
         }
         currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
       } else {
@@ -121,13 +114,11 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     } else {
       setState(() {
         this.cityName = widget.cityName;
-        print(this.cityName);
       });
       openWeatherMapAPI = OpenWeatherMapAPI(
         cityName: this.cityName,
         units: units,
       );
-      print("SEARCH");
       currentWeatherBloc.fetchCurrentWeather(openWeatherMapAPI.requestURL);
     }
     _checkSavedLocations();
@@ -139,6 +130,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     showFlutterToast("You're up-to-date");
   }
 
+  /// Code referred from Stackoverflow.
+  /// See <https://stackoverflow.com/questions/49648022/check-whether-there-is-an-internet-connection-available-on-flutter-app> for source.
   void checkInternet() async {
     try {
       final result = await InternetAddress.lookup('example.com');
@@ -156,6 +149,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     }
   }
 
+  /// Code referred from pub.dev
+  /// See <https://pub.dev/packages/geolocator> for source.
   Future<Position> _getLocation() async {
     var currentLocation;
 
@@ -170,6 +165,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     return currentLocation;
   }
 
+  /// Code referred from pub.dev
+  /// See <https://pub.dev/packages/geolocator> for source.
   Future<List<Placemark>> _getLocationAddress(Position userLocation) async {
     var latitude = userLocation.latitude;
     var longitude = userLocation.longitude;
@@ -190,6 +187,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     return null;
   }
 
+  /// Code referred from flutter.dev
+  /// See <https://api.flutter.dev/flutter/dart-core/DateTime/add.html> for source.
   String _getTodayDate(int timeZone) {
     DateTime today = DateTime.now();
 
@@ -217,22 +216,22 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     return DateFormat.yMMMMEEEEd().format(locationDate);
   }
 
+  /// Code referred from Firebase Auth.
+  /// See <https://pub.dev/packages/firebase_auth> for source.
   Future<void> _getUserId() async {
     final FirebaseUser user = await FirebaseAuth.instance.currentUser();
     setState(() {
-      print("FB USER: " +
-          user.toString() +
-          "STATUS: " +
-          (user != null).toString());
       if (user != null) {
         userId = user.uid;
       }
     });
   }
 
+  /// Code referred from Stackoverflow.
+  /// See <https://stackoverflow.com/questions/50471309/how-to-listen-for-document-changes-in-cloud-firestore-using-flutter> for source.
   Future<void> _checkSavedLocations() async {
     await _getUserId();
-    print("USERID SAVED: " + userId.toString());
+
     if (userId != null) {
       Firestore.instance
           .collection(usersCollection)
@@ -244,24 +243,19 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
           setState(() {
             savedLocations = documentData[userSavedLocations];
             if (savedLocations != null && savedLocations.isNotEmpty) {
-              print("USERID SAVED: " + userId.toString());
-              print("CHECK: " + this.cityName.toString());
               isSaved = savedLocations.contains(this.cityName);
             } else {
               isSaved = false;
             }
-            print(savedLocations);
           });
         }
       });
     }
   }
 
+  /// Code referred from Stackoverflow.
+  /// See <https://stackoverflow.com/questions/52150545/how-to-add-or-remove-item-to-the-the-existing-array-in-firestore/53149420#53149420> for source.
   void _handleSave(bool isSaved, String cityName) async {
-    print(savedLocations);
-    print(this.cityName);
-    print("USERID: " + this.userId.toString());
-
     if (userId == null) {
       showFlutterToast("You need to be logged in");
       return;
@@ -293,6 +287,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
     }
   }
 
+  /// Code referred from a Medium post.
+  /// See <https://medium.com/flutter-community/dynamic-theming-with-flutter-78681285d85f> for source.
   void _onAfterBuild(BuildContext context) {
     setState(() {
       if (this.locationDate != null)
@@ -301,7 +297,7 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
             this.locationDate,
             sunRise: this._sunRise,
             sunSet: this._sunSet,
-            timeZone: this.timeZone
+            timeZone: this.timeZone,
           ),
         );
     });
@@ -310,6 +306,8 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
   Widget _buildCurrentWeatherData(WeatherModel currentWeather) {
     Color _cardColor = Colors.black.withAlpha(20);
 
+    /// Code referred from Stackoverflow.
+    /// See <https://stackoverflow.com/questions/50899640/how-to-remove-listview-highlight-color-in-flutter> for source.
     return NotificationListener<OverscrollIndicatorNotification>(
       onNotification: (scroll) {
         scroll.disallowGlow();
@@ -721,53 +719,58 @@ class _CurrentWeatherDetailsPageState extends State<CurrentWeatherDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    /// Code referred from Stackoverflow.
+    /// See <https://stackoverflow.com/questions/51216448/is-there-any-callback-to-tell-me-when-build-function-is-done-in-flutter> for source.
     WidgetsBinding.instance.addPostFrameCallback((_) => _onAfterBuild(context));
+
+    /// Code referred from flutter.dev
+    /// See <https://api.flutter.dev/flutter/widgets/StreamBuilder-class.html> for source.
     return StreamBuilder(
-        stream: currentWeatherBloc.currentWeather,
-        builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
-          if (snapshot.hasData) {
-            if (snapshot.data.cod == "200") {
-              this.country = snapshot.data.country;
-              if (this.cityName == null) {
-                this.cityName =
-                    snapshot.data.name + "," + snapshot.data.country;
-              }
-              this.timeZone = snapshot.data.timeZone;
-              this._sunRise = snapshot.data.sunRise;
-              this._sunSet = snapshot.data.sunSet;
-              return RefreshIndicator(
-                backgroundColor: Colors.white,
-                onRefresh: _pullRefresh,
-                child: GestureDetector(
-                  onDoubleTap: () {
-                    String details = this.cityName;
-                    _handleSave(isSaved, details);
-                  },
-                  child: _buildCurrentWeatherData(snapshot.data),
-                ),
-              );
-            } else {
-              return Center(
-                child: SomethingWentWrong(
-                  message: snapshot.data.error.toUpperCase(),
-                ),
-              );
+      stream: currentWeatherBloc.currentWeather,
+      builder: (context, AsyncSnapshot<WeatherModel> snapshot) {
+        if (snapshot.hasData) {
+          if (snapshot.data.cod == "200") {
+            this.country = snapshot.data.country;
+            if (this.cityName == null) {
+              this.cityName = snapshot.data.name + "," + snapshot.data.country;
             }
-          } else if (snapshot.hasError || hasError) {
-            return Center(
-              child: SomethingWentWrong(),
+            this.timeZone = snapshot.data.timeZone;
+            this._sunRise = snapshot.data.sunRise;
+            this._sunSet = snapshot.data.sunSet;
+            return RefreshIndicator(
+              backgroundColor: Colors.white,
+              onRefresh: _pullRefresh,
+              child: GestureDetector(
+                onDoubleTap: () {
+                  String details = this.cityName;
+                  _handleSave(isSaved, details);
+                },
+                child: _buildCurrentWeatherData(snapshot.data),
+              ),
             );
           } else {
-            if (hasInternet) {
-              return Center(
-                child: CircularProgressIndicator(
-                  backgroundColor: Colors.white,
-                ),
-              );
-            } else {
-              return NoInternet();
-            }
+            return Center(
+              child: SomethingWentWrong(
+                message: snapshot.data.error.toUpperCase(),
+              ),
+            );
           }
-        });
+        } else if (snapshot.hasError || hasError) {
+          return Center(
+            child: SomethingWentWrong(),
+          );
+        } else {
+          if (hasInternet) {
+            return Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.white,
+              ),
+            );
+          } else {
+            return NoInternet();
+          }
+        }
+      },
+    );
   }
 }

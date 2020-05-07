@@ -3,6 +3,8 @@ import 'package:forecast/models/weather_model.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+/// Code for BLoC Pattern referred from a Medium post.
+/// See <https://medium.com/flutterpub/architecting-your-flutter-project-bd04e144a8f1> for source.
 class OpenWeatherMapAPIProvider {
   var client = http.Client();
 
@@ -15,12 +17,11 @@ class OpenWeatherMapAPIProvider {
       if (response.statusCode == 200) {
         return WeatherModel.fromJSON(jsonResponse);
       } else {
-        print(jsonResponse['message']);
         return WeatherModel.fromError(
             response.statusCode.toString(), jsonResponse['message']);
       }
     } catch (e) {
-      throw Exception("Failed to current weather load data :(");
+      throw Exception("Failed to load current weather data :(");
     }
   }
 
