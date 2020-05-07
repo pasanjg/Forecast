@@ -12,14 +12,20 @@ class UserService {
 
   UserService.internal();
 
-/// Referenced from https://pub.dev/packages/cloud_firestore 
-/// User create function
+  /// Referenced from https://pub.dev/packages/cloud_firestore
+  /// User create function
   Future<User> createUser(
       String firstName, String lastName, String email, String imageUrl) async {
     final TransactionHandler createTransaction = (Transaction tx) async {
       final DocumentSnapshot ds = await tx.get(userCollection.document());
 
-      final User user = User(ds.documentID, firstName, lastName, email, imageUrl);
+      final User user = User(
+        ds.documentID,
+        firstName,
+        lastName,
+        email,
+        imageUrl,
+      );
       final Map<String, dynamic> data = user.toMap();
 
       await tx.set(ds.reference, data);
@@ -35,8 +41,8 @@ class UserService {
     });
   }
 
-/// Referenced from https://pub.dev/packages/cloud_firestore 
-/// User update function
+  /// Referenced from https://pub.dev/packages/cloud_firestore
+  /// User update function
   Future<dynamic> updateUser(User user) async {
     final TransactionHandler updateTransaction = (Transaction tx) async {
       final DocumentSnapshot ds =
@@ -55,15 +61,15 @@ class UserService {
     });
   }
 
-/// Referenced from https://pub.dev/packages/cloud_firestore 
-/// Get user by id function
+  /// Referenced from https://pub.dev/packages/cloud_firestore
+  /// Get user by id function
   Future<dynamic> getUserById(String id) async {
     DocumentSnapshot snapshot = await userCollection.document(id).get();
     return snapshot;
   }
- 
-/// Referenced from https://pub.dev/packages/cloud_firestore 
-///Delete user function
+
+  /// Referenced from https://pub.dev/packages/cloud_firestore
+  ///Delete user function
   Future<dynamic> deleteUser(String id) async {
     final TransactionHandler deleteTransaction = (Transaction tx) async {
       final DocumentSnapshot ds = await tx.get(userCollection.document(id));
