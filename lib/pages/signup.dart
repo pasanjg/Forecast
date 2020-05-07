@@ -39,7 +39,7 @@ class _FlareAnimationsPageState extends State<SignupPage> {
         setState(() {
           _success = true;
           _userEmail = user.email;
-          print("User Email $_userEmail");
+
           if (_success) {
             showFlutterToast("You can login now");
             Navigator.pop(context);

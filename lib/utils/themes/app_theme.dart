@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:forecast/utils/themes/themes.dart';
 
+/// Code referred from a Medium post.
+/// See <https://medium.com/flutter-community/dynamic-theming-with-flutter-78681285d85f> for source.
+
 class _AppTheme extends InheritedWidget {
   final AppThemeState data;
 

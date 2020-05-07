@@ -40,8 +40,6 @@ class _LoginPageState extends State<LoginPage> {
           _success = true;
           _userEmail = user.email;
           var _uid = user.uid;
-          print("User Email $_userEmail");
-          print("User UID $_uid");
 
           if (_success) {
             setState(() {
@@ -58,7 +56,6 @@ class _LoginPageState extends State<LoginPage> {
         });
       }
     } catch (e) {
-      print(e);
       _success = false;
       isLoading = false;
       _showError(e.code.toString());
@@ -91,8 +88,6 @@ class _LoginPageState extends State<LoginPage> {
         showFlutterToast("Something went wrong");
     }
   }
-
-
 
 //Password validator
   bool _passwordValidate(String value) {
@@ -236,8 +231,6 @@ class _LoginPageState extends State<LoginPage> {
                       child: FlatButton(
                         padding: const EdgeInsets.all(0.0),
                         onPressed: () {
-                          print(email.text.toString().trim());
-                          print(password.text.toString().trim());
                           try {
                             _validate();
                           } catch (e) {

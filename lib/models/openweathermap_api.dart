@@ -13,15 +13,11 @@ class OpenWeatherMapAPI {
 
   String get requestURL => _requestURL;
 
-  // cityName = https://api.openweathermap.org/data/2.5/weather?q=Malabe&appid=0966efbf0506aeb829958876034e452e&units=metric
-  // coordinates = http://api.openweathermap.org/data/2.5/weather?lat=6.9&lon=79.95&appid=0966efbf0506aeb829958876034e452e&units=metric
+  /// Sample API call.
+  /// cityName = https://api.openweathermap.org/data/2.5/weather?q=Malabe,LK&appid=0966efbf0506aeb5829958876034e452e&units=metric
+  /// coordinates = http://api.openweathermap.org/data/2.5/weather?lat=6.9&lon=79.95&appid=0966efbf0506aeb8299558876034e452e&units=metric
 
-  /// Temperature is available in Fahrenheit, Celsius and Kelvin units.
-
-  /// For temperature in Fahrenheit use units=imperial
-  /// For temperature in Celsius use units=metric
-  /// Temperature in Kelvin is used by default, no need to use units parameter in API call
-  /// List of all API parameters with units openweathermap.org/weather-data
+  /// List of all API parameters with units <openweathermap.org/weather-data>
 
   OpenWeatherMapAPI(
       {this.cityName,

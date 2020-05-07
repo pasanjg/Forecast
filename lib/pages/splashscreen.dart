@@ -6,6 +6,9 @@ import 'package:flare_flutter/flare_actor.dart';
 
 import 'package:forecast/pages/home.dart';
 
+
+/// Code referred from a Medium post.
+/// See <https://medium.com/@vignesh_prakash/flutter-splash-screen-84fb0307ac55> for source.
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();

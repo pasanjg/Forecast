@@ -66,6 +66,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  /// Code referred from flutter.dev
+  /// See <https://flutter.dev/docs/development/data-and-backend/json> for source.
   void _getCities() async {
     final response = await DefaultAssetBundle.of(context)
         .loadString("assets/json/city_list_min.json");
@@ -80,6 +82,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  /// Code referred from a Medium post.
+  /// See <https://medium.com/flutterpub/a-simple-search-bar-in-flutter-f99aed68f523> for source.
   Widget _appBarTitle() {
     return isSearching
         ? TextField(
@@ -96,6 +100,8 @@ class _HomePageState extends State<HomePage> {
         : SizedBox();
   }
 
+  /// Code referred from a Medium post.
+  /// See <https://medium.com/flutterpub/a-simple-search-bar-in-flutter-f99aed68f523> for source.
   void _onSearchPressed() {
     setState(() {
       this.savedLocation = null;
@@ -114,6 +120,8 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  /// Code referred from a Medium post.
+  /// See <https://medium.com/flutterpub/a-simple-search-bar-in-flutter-f99aed68f523> for source.
   Widget _searchList() {
     if (_searchText.isNotEmpty) {
       List tempList = List();
@@ -157,9 +165,6 @@ class _HomePageState extends State<HomePage> {
                   setState(() {
                     this.cityName =
                         "${filteredCities[index]['name']},${filteredCities[index]['country']}";
-                    print(filteredCities[index]['name'] +
-                        "," +
-                        filteredCities[index]['country']);
                     this.savedLocation = null;
                   });
                   _searchTextField.text = "";
@@ -200,7 +205,6 @@ class _HomePageState extends State<HomePage> {
         Map<String, dynamic> documentData = documentSnapshot.data;
 
         setState(() {
-          print(documentData);
           _user = User(
               documentData['id'],
               documentData['firstName'],
@@ -208,11 +212,7 @@ class _HomePageState extends State<HomePage> {
               documentData['email'],
               documentData['imageUrl']);
         });
-
-        print(_user.email);
       });
-    } else {
-      print("Unsuccess!");
     }
   }
 
@@ -223,6 +223,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    /// Code referred from Stackoverflow.
+    /// See <https://stackoverflow.com/questions/49418332/flutter-how-to-prevent-device-orientation-changes-and-force-portrait> for source.
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
 
     if (savedLocation != null) {

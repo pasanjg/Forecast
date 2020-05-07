@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class ForecastLoading extends StatelessWidget {
+class WeatherForecastLoading extends StatelessWidget {
 
   Widget _loadingElement(){
     return Container(

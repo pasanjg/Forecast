@@ -144,7 +144,6 @@ class ProfilePageState extends State<ProfilePage>
       });
 
       DocumentSnapshot snapshot = await userService.getUserById(_uid);
-      print(snapshot.data);
       setState(() {
         this._user = User(
             snapshot.data['id'],
@@ -187,7 +186,6 @@ class ProfilePageState extends State<ProfilePage>
         setState(() {
           fileName = _uid;
         });
-        print(fileName);
         _uploadFile(file, fileName);
       }
     } catch (e) {
@@ -224,7 +222,6 @@ class ProfilePageState extends State<ProfilePage>
     final StorageUploadTask uploadTask = storageReference.putFile(file);
     final StorageTaskSnapshot downloadUrl = (await uploadTask.onComplete);
     final String newUrl = (await downloadUrl.ref.getDownloadURL());
-    print("URL is $newUrl");
     await userService.updateUser(
       _user = User(
         _uid,
@@ -237,8 +234,6 @@ class ProfilePageState extends State<ProfilePage>
 
     setState(() {
       this.url = newUrl;
-      print("NEW URL: " + newUrl);
-
       isLoading = false;
     });
   }

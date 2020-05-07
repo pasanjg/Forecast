@@ -41,7 +41,6 @@ class _ForecastState extends State<Forecast> {
       theme: AppTheme.of(context) == null
           ? AppThemes.setCurrentDynamicTheme()
           : AppTheme.of(context),
-//    theme: AppThemes.getThemeFromKey(AppThemeKeys.EVENING),
       debugShowCheckedModeBanner: false,
       home: SplashScreen(),
     );
