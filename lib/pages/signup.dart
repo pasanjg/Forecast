@@ -23,7 +23,9 @@ class _FlareAnimationsPageState extends State<SignupPage> {
   String _userEmail;
   bool isLoading = false;
 
-// Signup function using firebase authentication
+
+/// Referenced from https://pub.dev/packages/firebase_auth
+/// Signup function using firebase authentication
   void _signup(String email, String password) async {
     setState(() {
       isLoading = true;
@@ -56,6 +58,7 @@ class _FlareAnimationsPageState extends State<SignupPage> {
     }
   }
 
+/// Error message display function
   void _showError(String errorCode) {
     switch (errorCode) {
       case 'ERROR_INVALID_EMAIL':
@@ -83,22 +86,22 @@ class _FlareAnimationsPageState extends State<SignupPage> {
     }
   }
 
-//Password validator
-  bool _passwordValidate(String value) {
-    String pattern = r'^[a-zA-Z0-9]{8,}$';
-    RegExp regExp = RegExp(pattern);
-    return regExp.hasMatch(value);
+/// Password validator
+  bool _passwordValidate(String val) {
+    String patternPassword = r'^[a-zA-Z0-9]{8,}$';
+    RegExp regExp = RegExp(patternPassword);
+    return regExp.hasMatch(val);
   }
 
-//Email validator
-  bool _emailValidate(String value) {
-    String pattern =
+/// Email validator
+  bool _emailValidate(String val) {
+    String patternEmail =
         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
-    RegExp regExp = RegExp(pattern);
-    return regExp.hasMatch(value);
+    RegExp regExp = RegExp(patternEmail);
+    return regExp.hasMatch(val);
   }
 
-//Validate user inputs
+/// Validate user inputs
   void _validate() {
     _success = false;
     bool pw = true;

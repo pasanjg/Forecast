@@ -1,3 +1,5 @@
+/// User Model Class
+
 class User {
   String _id;
   String _firstName;

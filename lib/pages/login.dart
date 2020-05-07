@@ -26,7 +26,8 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   FirebaseUser firebaseUser;
 
-// Login function using firebase authentication
+  /// Referenced from https://pub.dev/packages/firebase_auth
+  /// Login function using firebase authentication
   void _login(String email, String password) async {
     try {
       final FirebaseUser user = (await _auth.signInWithEmailAndPassword(
@@ -62,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  /// Error message display function
   void _showError(String errorCode) {
     switch (errorCode) {
       case 'ERROR_INVALID_EMAIL':
@@ -89,22 +91,22 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-//Password validator
-  bool _passwordValidate(String value) {
-    String pattern = r'^[a-zA-Z0-9]{8,}$';
-    RegExp regExp = new RegExp(pattern);
-    return regExp.hasMatch(value);
+  /// Password validator
+  bool _passwordValidate(String val) {
+    String patternPassword = r'^[a-zA-Z0-9]{8,}$';
+    RegExp regExp = new RegExp(patternPassword);
+    return regExp.hasMatch(val);
   }
 
-//Email validator
-  bool _emailValidate(String value) {
-    String pattern =
+  /// Email validator
+  bool _emailValidate(String val) {
+    String patternEmail =
         r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+";
-    RegExp regExp = new RegExp(pattern);
-    return regExp.hasMatch(value);
+    RegExp regExp = new RegExp(patternEmail);
+    return regExp.hasMatch(val);
   }
 
-//Validate user inputs
+  /// Validate user inputs
   void _validate() async {
     bool pw = true;
     bool em = true;
