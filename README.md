@@ -12,7 +12,7 @@
     <img src="https://img.shields.io/github/license/pasanjg/Forecast?style=for-the-badge"/>
 </p>
 
-
+![CI](https://github.com/pasanjg/Forecast/workflows/CI/badge.svg)
 
 ## Getting Started
 
