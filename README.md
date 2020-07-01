@@ -14,19 +14,7 @@
 
 ![CI](https://github.com/pasanjg/Forecast/workflows/CI/badge.svg)
 
-## Getting Started
-
-Create  a `.env` file in the root of your project with the example content given in `.env.sample`
-
-> APP_NAME=Forecast
->
-> OPENWEATHERMAP_API_KEY=YOUR_API_KEY_HERE
->
-> OPENWEATHERMAP_API_BASE_URL=https://api.openweathermap.org/data/2.5
-
-
-
-## Preview 
+## Preview
 
 <p align="center">
     <img width="300" src="./assets/readme/preview.gif"/>
