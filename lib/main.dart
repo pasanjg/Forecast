@@ -1,15 +1,11 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:forecast/utils/themes/app_theme.dart';
 import 'package:forecast/utils/themes/themes.dart';
 
 import 'package:forecast/pages/splashscreen.dart';
 
-Future main() async {
-  await DotEnv().load('.env');
+void main() {
   runApp(
     AppTheme(
       child: Forecast(),
