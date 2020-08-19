@@ -1,8 +1,16 @@
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:math';
+
+/// OpenWeatherMapAPI Model Class
 
 class OpenWeatherMapAPI {
-  final String apiKey = DotEnv().env['OPENWEATHERMAP_API_KEY'];
-  final String apiBaseURL = DotEnv().env['OPENWEATHERMAP_API_BASE_URL'];
+  final List<String> apiKeysList = [
+    "0966efbf0506aeb829958876034e452e",
+    "08fab3f85391d043dfd9f170cfc6786c",
+    "1353fafb98e1fb4f06bca43498c59ba2",
+    "883791bb395ad3f944ff6ddce0fba094",
+    "93774eede4efd4cb3232ca75f082917e",
+  ];
+  final String apiBaseURL = "https://api.openweathermap.org/data/2.5";
   final String cityName;
   final String cityId;
   final Map coordinates;
@@ -12,6 +20,12 @@ class OpenWeatherMapAPI {
   String _requestURL;
 
   String get requestURL => _requestURL;
+
+  String get apiKey {
+    var random = new Random();
+    print(random.nextInt(apiKeysList.length));
+    return apiKeysList[random.nextInt(apiKeysList.length)];
+  }
 
   /// Sample API call.
   /// cityName = https://api.openweathermap.org/data/2.5/weather?q=Malabe,LK&appid=0966efbf0506aeb5829958876034e452e&units=metric

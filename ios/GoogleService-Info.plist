@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>846809665977-ho5u5cmhcopkbcc0s05mu3p3ocd49860.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.846809665977-ho5u5cmhcopkbcc0s05mu3p3ocd49860</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>846809665977-870lqgi78edpn0td1bf6lc8j2eonso6o.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCPi-U_9oIVPl6OInU6y5GYmven6xPxY64</string>
+	<key>GCM_SENDER_ID</key>
+	<string>846809665977</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>lk.sliit.forecast</string>
+	<key>PROJECT_ID</key>
+	<string>forecast-60bff</string>
+	<key>STORAGE_BUCKET</key>
+	<string>forecast-60bff.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false/>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false/>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true/>
+	<key>IS_GCM_ENABLED</key>
+	<true/>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true/>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:846809665977:ios:b835d57e0636ef297ee668</string>
+	<key>DATABASE_URL</key>
+	<string>https://forecast-60bff.firebaseio.com</string>
+</dict>
+</plist>

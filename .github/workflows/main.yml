@@ -8,9 +8,6 @@ on:
       - v[0-9]+.[0-9]+.[0-9]+
       - v[0-9]+.[0-9]+.[0-9]+-alpha*
       - v[0-9]+.[0-9]+.[0-9]+-beta*
-  pull_request:
-    branches:
-      - develop
 
 jobs:
   build:
@@ -35,16 +32,7 @@ jobs:
 
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: "1.17.3"
-
-      - name: Make .env file
-        run: |
-          echo "OPENWEATHERMAP_API_KEY=${OPENWEATHERMAP_API_KEY}" >> .env
-          echo "OPENWEATHERMAP_API_BASE_URL=${OPENWEATHERMAP_API_BASE_URL}" >> .env
-        working-directory: ${{ github.workspace }}
-        env:
-          OPENWEATHERMAP_API_KEY: ${{ secrets.OPENWEATHERMAP_API_KEY }}
-          OPENWEATHERMAP_API_BASE_URL: ${{ secrets.OPENWEATHERMAP_API_BASE_URL }}
+          flutter-version: "1.20.2"
 
       - run: flutter pub get
 
